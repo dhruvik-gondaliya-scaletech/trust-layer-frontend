@@ -1,0 +1,519 @@
+import React, { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { Shield, Check, X, Star, ChevronLeft, ShieldCheck, Trophy, Lock, MessageCircle, FileText, Image as ImageIcon, Video, CheckCircle2, ChevronRight, PlayCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
+
+export default function BuyerDealPage() {
+  const navigate = useNavigate()
+  
+  // Animation state for WOW moment
+  const [displayScore, setDisplayScore] = useState(0)
+  const [isMaxed, setIsMaxed] = useState(false)
+  const [showBurst, setShowBurst] = useState(false)
+
+  // Carousel State
+  const [activeSlide, setActiveSlide] = useState(0)
+  const slides = [
+    { type: 'image', url: '/pokemon-main.jpg' }, // Main
+    { type: 'image', url: '/pokemon-front.jpg' }, // Front
+    { type: 'image', url: '/pokemon-back.jpg' }, // Back
+    { type: 'image', url: '/pokemon-side.jpg' }, // Side
+    { type: 'image', url: '/pokemon-detail.jpg' }, // Detail
+    { type: 'video', url: '/pokemon-main.jpg' }, // Video thumbnail
+    { type: 'certification', url: '/pokemon-cert.jpg' }
+  ]
+
+  // Decline Modal State
+  const [showDeclineModal, setShowDeclineModal] = useState(false)
+  const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false)
+  const [declineReason, setDeclineReason] = useState("")
+  const [declineMessage, setDeclineMessage] = useState("")
+
+  const handleDeclineSubmit = () => {
+    setShowDeclineModal(false)
+    setShowFeedbackSuccess(true)
+  }
+
+  const itemPrice = 8450
+  const shippingCost = 35
+  const trustLayerFee = 245
+  const totalDue = itemPrice + shippingCost + trustLayerFee
+
+  useEffect(() => {
+    // Animate score 0 -> 100 over 1.5 seconds
+    const duration = 1500
+    const endScore = 100
+    const incrementTime = 30
+    const steps = duration / incrementTime
+    const increment = endScore / steps
+    
+    let current = 0
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= endScore) {
+        setDisplayScore(endScore)
+        setIsMaxed(true)
+        setShowBurst(true)
+        clearInterval(timer)
+        setTimeout(() => setShowBurst(false), 2000) // Hide burst text after 2 seconds
+      } else {
+        setDisplayScore(Math.floor(current))
+      }
+    }, incrementTime)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#F8FAFC] pb-[220px] font-sans">
+      {/* Top Bar */}
+      <div className="flex items-center justify-between p-4 bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1 -ml-1 rounded-full text-foreground hover:bg-gray-100 transition-colors"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            <span className="font-bold text-[15px]">TrustLayer</span>
+          </div>
+        </div>
+        <div className="text-[12px] font-semibold text-primary bg-blue-50 px-2 py-1 rounded-full flex items-center gap-1">
+          <Lock className="w-3.5 h-3.5" /> Secure Escrow
+        </div>
+      </div>
+
+      <div className="p-4 space-y-5">
+        
+        {/* SECTION 1: VERIFIED PRODUCT GALLERY (HERO) */}
+        <div>
+          <div className="relative w-full aspect-square bg-gradient-to-br from-orange-400 to-red-600 rounded-3xl overflow-hidden shadow-md flex items-center justify-center mb-3">
+            {/* Carousel Images - Normally we'd map and translate based on activeSlide */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSlide}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                {slides[activeSlide].type === 'image' && (
+                  <img src={slides[activeSlide].url} alt="Product view" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                {slides[activeSlide].type === 'video' && (
+                  <>
+                    <img src={slides[activeSlide].url} alt="Video thumbnail" className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+                    <div className="text-center text-white relative z-0 flex flex-col items-center">
+                      <PlayCircle className="w-16 h-16 mb-2 opacity-90 drop-shadow-lg" strokeWidth={1.5} />
+                      <h2 className="text-xl font-bold tracking-tight drop-shadow-md">Verification Video</h2>
+                    </div>
+                  </>
+                )}
+                {slides[activeSlide].type === 'certification' && (
+                  <img src={slides[activeSlide].url} alt="PSA Certification" className="absolute inset-0 w-full h-full object-contain bg-black/90 p-4" />
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Top overlays */}
+            <div className="absolute top-4 left-4 right-4 flex justify-end items-start z-10 pointer-events-none">
+              <div className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl bg-gray-900/90 backdrop-blur-md shadow-lg border border-[#F5C542]/30 transition-all duration-1000 ${isMaxed ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+                 <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider mb-[-2px]">PSA 10</span>
+                 <div className="bg-[#F5C542] text-gray-900 text-[10px] font-bold px-1.5 rounded-sm mt-1">TRUST {displayScore}</div>
+              </div>
+            </div>
+            
+            <AnimatePresence>
+              {showBurst && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1 }}
+                  className="absolute inset-0 bg-white/95 backdrop-blur-sm z-30 flex flex-col items-center justify-center rounded-3xl"
+                >
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3 shadow-[0_0_30px_rgba(34,197,94,0.3)]">
+                     <ShieldCheck className="w-8 h-8 text-green-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-green-700">Verified Listing</h3>
+                  <p className="text-sm font-bold text-amber-500 mt-1">Maximum Buyer Confidence</p>
+                  {/* Sparkle effects */}
+                  <div className="absolute top-10 left-10 text-2xl animate-ping">✨</div>
+                  <div className="absolute bottom-20 right-10 text-xl animate-pulse">✨</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {/* Carousel Controls */}
+            <button 
+              onClick={() => setActiveSlide(s => s === 0 ? slides.length - 1 : s - 1)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white z-20 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setActiveSlide(s => s === slides.length - 1 ? 0 : s + 1)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white z-20 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Pagination indicators */}
+            <div className="absolute bottom-4 left-0 w-full flex justify-center gap-1.5 z-10">
+              {slides.map((_, idx) => (
+                <div 
+                  key={idx} 
+                  className={`h-1.5 rounded-full shadow-sm transition-all duration-300 ${idx === activeSlide ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex justify-center gap-4 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
+            <span className="flex items-center gap-1.5"><ImageIcon className="w-3.5 h-3.5" /> 5 Photos</span>
+            <span className="text-gray-300">|</span>
+            <span className="flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> 1 Video</span>
+            <span className="text-gray-300">|</span>
+            <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> 1 Cert</span>
+          </div>
+        </div>
+
+        {/* SECTION 2: PRODUCT DETAILS */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <p className="text-[12px] font-bold text-primary mb-1 uppercase tracking-wider">
+            Trading Cards • Mint (PSA 10)
+          </p>
+          <h1 className="text-[22px] font-extrabold leading-tight mb-2 text-foreground">
+            Charizard Holo 1999 — PSA 10 Gem Mint
+          </h1>
+          <div className="text-[28px] font-black text-foreground mb-4">
+            ${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}
+          </div>
+          
+          <div className="space-y-4">
+            <p className="text-[13px] text-muted-foreground leading-relaxed">
+              Pristine condition Charizard Holo from the 1999 Base Set. Graded PSA 10 Gem Mint. 
+              Slab is completely free of scratches or chips. Will be shipped securely in a waterproof Pelican case.
+            </p>
+            
+            <div className="pt-2 flex flex-col gap-2">
+               <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                 <div className="text-[12px] text-muted-foreground font-medium">Condition</div>
+                 <div className="text-[13px] font-bold text-foreground">Mint (PSA 10)</div>
+               </div>
+               <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                 <div className="text-[12px] text-muted-foreground font-medium">Certification Authority</div>
+                 <div className="text-[13px] font-bold text-foreground">PSA</div>
+               </div>
+               <div className="flex justify-between items-center py-2">
+                 <div className="text-[12px] text-muted-foreground font-medium">Certification Number</div>
+                 <div className="text-[13px] font-bold text-primary">#48920199</div>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 3: TRUST SNAPSHOT */}
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 shadow-xl relative overflow-hidden">
+          {/* subtle pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent bg-[length:20px_20px]" />
+          
+          <div className="flex justify-between items-start mb-5 relative z-10">
+            <div>
+              <h3 className="font-bold text-[18px] text-white flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-green-400" />
+                Buyer Protection
+              </h3>
+              <p className="text-[12px] text-gray-400 mt-1">Maximum Buyer Confidence</p>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">Trust Score</span>
+              <span className="text-[28px] font-black text-[#F5C542] leading-none">{isMaxed ? '100' : '0'}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-3 relative z-10">
+            {[
+              "Seller Verified",
+              "Verification Photos Complete",
+              "Verification Video Included",
+              "Certification Verified",
+              "Escrow Protected"
+            ].map((req, idx) => (
+               <div key={idx} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                     <Check className="w-3 h-3 text-green-400 stroke-[3]" />
+                  </div>
+                  <span className="text-[13px] font-semibold text-gray-200">{req}</span>
+               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 4: SELLER TRUST PROFILE */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 relative overflow-hidden">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-[18px] shadow-sm relative">
+              VI
+              <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
+                 <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-[16px] text-foreground flex items-center gap-2">
+                @vintage_vault
+                <span className="bg-green-50 text-green-700 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
+                  <Star className="w-2.5 h-2.5 fill-green-600 text-green-600" /> TRUSTED SELLER
+                </span>
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                <span className="text-[12px] font-semibold text-blue-600">Identity Verified</span>
+              </div>
+            </div>
+            <div className="text-right flex flex-col items-end">
+              <div className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase mb-1">Trust</div>
+              <div className="text-[20px] font-black text-foreground leading-none">
+                 96
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
+              <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Completed Deals</div>
+              <div className="text-[14px] font-bold text-foreground">184</div>
+            </div>
+            <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
+              <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Member Since</div>
+              <div className="text-[14px] font-bold text-foreground">2022</div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 5: ESCROW PROTECTION TIMELINE */}
+        <div className="bg-blue-50/50 rounded-3xl p-5 shadow-sm border border-blue-100">
+          <div className="flex items-center gap-2 mb-2">
+             <Shield className="w-5 h-5 text-blue-600" />
+             <h3 className="font-bold text-[15px] text-blue-950">How You're Protected</h3>
+          </div>
+          <p className="text-[12px] text-blue-800/70 mb-5 font-medium leading-relaxed">Funds are only released after you inspect and approve the item.</p>
+          
+          <div className="relative mt-2">
+            {/* Horizontal Timeline Line */}
+            <div className="absolute top-4 left-[10%] right-[10%] h-0.5 bg-blue-200 -translate-y-1/2" />
+            
+            <div className="flex justify-between relative z-10">
+              {[
+                { title: "Fund", active: true, step: 1 },
+                { title: "Ship", step: 2 },
+                { title: "Review", step: 3 },
+                { title: "Approve", step: 4 },
+                { title: "Paid", step: 5 },
+              ].map((step, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-2 w-1/5">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 bg-white transition-all ${step.active ? 'border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)] scale-110' : 'border-blue-200 text-blue-300'}`}>
+                    {step.active ? <Check className="w-4 h-4 stroke-[3]" /> : <span className="text-[11px] font-bold">{step.step}</span>}
+                  </div>
+                  <div className={`text-[10px] font-bold text-center ${step.active ? 'text-blue-950' : 'text-blue-900/50'}`}>
+                    {step.title}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 6: PAYMENT SUMMARY */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <h3 className="font-bold text-[15px] text-foreground mb-4">
+             Payment Summary
+          </h3>
+          <div className="space-y-3 text-[13px]">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Item Price</span>
+              <span className="font-medium text-foreground">${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Shipping Cost</span>
+              <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>TrustLayer Fee</span>
+              <span className="font-medium text-foreground">${trustLayerFee.toFixed(2)}</span>
+            </div>
+            
+            <div className="my-4 border-t border-dashed border-gray-200" />
+            
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-foreground text-[14px]">Total Due</span>
+              <span className="text-[24px] font-black text-primary tracking-tight">
+                ${totalDue.toLocaleString('en-US', {maximumFractionDigits: 0})}
+              </span>
+            </div>
+
+            <div className="mt-2 p-3.5 bg-blue-50/60 rounded-xl border border-blue-100 flex flex-col gap-2">
+               <div className="flex items-center gap-2">
+                 <div className="bg-blue-100 p-0.5 rounded-full">
+                    <Check className="w-3 h-3 text-blue-600 stroke-[3]" />
+                 </div>
+                 <span className="text-[12px] font-bold text-blue-900">Buyer Pays Platform Fee</span>
+               </div>
+               <div className="text-[11.5px] text-blue-800/80 leading-relaxed ml-6">
+                 The TrustLayer fee covers:
+                 <ul className="list-disc pl-4 mt-1 space-y-0.5">
+                   <li>Secure escrow protection</li>
+                   <li>Transaction processing</li>
+                   <li>Dispute resolution support</li>
+                 </ul>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM CTA (Sticky Footer) */}
+      <div className="fixed bottom-0 left-0 right-0 mx-auto w-full max-w-[430px] p-4 pb-6 bg-white/95 backdrop-blur-xl border-t border-gray-200 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="flex flex-col gap-3">
+          <Button
+            className="w-full h-[56px] text-[16px] font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white"
+            onClick={() => navigate("/fund-escrow/TRUST-1024")}
+          >
+            <Check className="w-5 h-5" /> Approve Deal • ${totalDue.toLocaleString('en-US', {maximumFractionDigits: 0})}
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full h-[48px] text-[14px] font-bold rounded-2xl flex items-center justify-center border-red-100 text-red-600 bg-white hover:bg-red-50 hover:text-red-700"
+            onClick={() => setShowDeclineModal(true)}
+          >
+            Decline Deal
+          </Button>
+        </div>
+      </div>
+
+      {/* DECLINE MODAL */}
+      <AnimatePresence>
+        {showDeclineModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-foreground mb-2">Why are you declining?</h2>
+                <p className="text-[13px] text-muted-foreground mb-5 leading-relaxed">
+                  Tell the seller what needs to be improved.
+                </p>
+
+                <div className="space-y-2 mb-5">
+                  {[
+                    "Need additional photos",
+                    "Need clearer video",
+                    "Certification concern",
+                    "Price concern",
+                    "Other"
+                  ].map((reason) => (
+                    <label key={reason} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${declineReason === reason ? 'border-primary bg-blue-50/50' : 'border-gray-100 bg-gray-50/50 hover:bg-gray-100'}`}>
+                      <input 
+                        type="radio" 
+                        name="declineReason" 
+                        value={reason}
+                        checked={declineReason === reason}
+                        onChange={(e) => setDeclineReason(e.target.value)}
+                        className="w-4 h-4 text-primary border-gray-300 focus:ring-primary"
+                      />
+                      <span className="text-[14px] font-medium text-foreground">{reason}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <div className="mb-6">
+                  <textarea 
+                    className="w-full border border-gray-200 rounded-xl p-3 text-[14px] resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-white"
+                    placeholder="Provide feedback to seller"
+                    value={declineMessage}
+                    onChange={(e) => setDeclineMessage(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Button 
+                    className="w-full h-[52px] text-[15px] font-bold rounded-xl bg-primary text-white"
+                    onClick={handleDeclineSubmit}
+                    disabled={!declineReason}
+                  >
+                    Send Feedback
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full h-[52px] text-[15px] font-bold rounded-xl text-muted-foreground hover:bg-gray-100"
+                    onClick={() => setShowDeclineModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FEEDBACK SUCCESS MODAL */}
+      <AnimatePresence>
+        {showFeedbackSuccess && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
+            >
+              <div className="p-8 flex flex-col items-center text-center">
+                {/* Animated checkmark */}
+                <motion.div 
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
+                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)] relative"
+                >
+                  <div className="absolute inset-0 rounded-full border-4 border-green-500 opacity-20 animate-pulse" />
+                  <Check className="w-10 h-10 text-green-600 stroke-[3]" />
+                </motion.div>
+                
+                <h2 className="text-xl font-bold text-foreground mb-3">Listing Improvement Requested</h2>
+                <p className="text-[14px] text-muted-foreground mb-8 leading-relaxed px-2">
+                  Your feedback has been sent to the seller. The seller can review your comments and update the listing before republishing it for future buyers.
+                </p>
+
+                <div className="w-full">
+                  <Button 
+                    variant="ghost"
+                    className="w-full h-[52px] text-[15px] font-bold rounded-xl text-muted-foreground hover:bg-gray-100"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
