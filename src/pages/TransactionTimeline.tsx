@@ -1,20 +1,20 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
-import { Shield, MapPin, Package, CheckCircle2, CircleDashed, ChevronLeft } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Shield, MapPin, Package, CheckCircle2, CircleDashed, ChevronLeft, ExternalLink, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
 
 export default function TransactionTimeline() {
   const navigate = useNavigate()
+  const [showConfirmModal, setShowConfirmModal] = React.useState(false)
+  
   const steps = [
     { label: "Deal Created", status: "completed", date: "Oct 12, 10:00 AM" },
     { label: "Buyer Funded", status: "completed", date: "Oct 12, 11:30 AM" },
-    { label: "Tracking Uploaded", status: "completed", date: "Oct 13, 09:15 AM" },
-    { label: "In Transit", status: "current", date: "Oct 14, Est. Delivery: Oct 16" },
-    { label: "Delivered", status: "upcoming" },
-    { label: "Buyer Confirmation", status: "upcoming" },
-    { label: "Review", status: "upcoming" },
+    { label: "Tracking Added", status: "current", date: "Oct 13, 09:15 AM" },
+    { label: "Buyer Confirmed Delivery", status: "upcoming" },
     { label: "Funds Released", status: "upcoming" }
   ]
 
@@ -45,22 +45,41 @@ export default function TransactionTimeline() {
           <div className="h-16 w-16 mx-auto bg-primary/10 flex items-center justify-center rounded-full">
             <Package className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">In Transit</h1>
-          <p className="text-muted-foreground text-sm">Funds secured in TrustLayer Escrow</p>
+          <h1 className="text-2xl font-bold">Tracking Added</h1>
+          <p className="text-muted-foreground text-[14px] px-2 leading-relaxed">
+            Tracking information has been provided by the seller. Track shipment progress directly with the carrier.
+          </p>
         </div>
 
-        {/* Action Needed Card */}
-        <Card className="border-warning bg-warning/5">
-          <CardContent className="p-4 flex items-start gap-3">
-            <MapPin className="h-5 w-5 text-warning mt-0.5" />
-            <div>
-              <h3 className="font-semibold">Next Action: Await Delivery</h3>
-              <p className="text-[14px] text-muted-foreground mt-1">
-                The package is currently in transit. The buyer has 3 days to verify the item upon delivery.
-              </p>
+        {/* Tracking Information Card */}
+        <Card>
+          <CardContent className="p-5 space-y-4">
+            <h2 className="font-semibold text-[18px]">Tracking Information</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                <span className="text-muted-foreground text-[14px]">Carrier</span>
+                <span className="font-bold text-[14px]">USPS</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                <span className="text-muted-foreground text-[14px]">Tracking Number</span>
+                <span className="font-bold text-[14px]">940010920556801844</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground text-[14px]">Date Added</span>
+                <span className="font-bold text-[14px]">Oct 13, 2026</span>
+              </div>
             </div>
+            
+            <div className="bg-blue-50 text-blue-800 p-3.5 rounded-xl text-[13px] font-medium leading-relaxed">
+              Shipment updates are provided by the carrier. Track your package directly using the carrier link below.
+            </div>
+
+            <Button className="w-full font-bold h-12" variant="outline" onClick={() => window.open('https://usps.com', '_blank')}>
+              Track Package <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
           </CardContent>
         </Card>
+
 
         {/* Timeline */}
         <Card>
@@ -71,10 +90,10 @@ export default function TransactionTimeline() {
               {steps.map((step, idx) => (
                 <div key={idx} className="flex gap-4 relative">
                   {idx !== steps.length - 1 && (
-                    <div className={`absolute left-[11px] top-6 bottom-[-24px] w-0.5 ${step.status === 'completed' ? 'bg-success' : 'bg-muted'}`} />
+                    <div className={`absolute left-[11px] top-[28px] bottom-[-28px] w-0.5 ${step.status === 'completed' ? 'bg-success' : 'bg-muted'}`} />
                   )}
 
-                  <div className="relative z-10 flex-shrink-0 bg-background pt-1">
+                  <div className="relative z-10 flex-shrink-0 pt-1">
                     {step.status === 'completed' && <CheckCircle2 className="h-6 w-6 text-success bg-background rounded-full" />}
                     {step.status === 'current' && (
                       <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -95,23 +114,78 @@ export default function TransactionTimeline() {
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardContent className="p-4 flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Shield className="h-4 w-4" />
-              <span>Funds Status</span>
+        {/* Review Period Active Card */}
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-600" />
+              <h2 className="font-semibold text-[18px] text-blue-900">Review Period Active</h2>
             </div>
-            <span className="font-semibold text-success">Secured in Escrow</span>
+            <p className="text-[14px] text-blue-800 leading-relaxed font-medium">
+              You have 14 days to inspect your item and report any issues.
+            </p>
+            <p className="text-[13px] text-blue-700 leading-relaxed">
+              If no action is taken within 14 days, TrustLayer will automatically confirm delivery and release funds to the seller.
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <BottomActionBar>
-        <Button className="w-full h-14 text-[16px]">
-          Upload New Tracking
-        </Button>
+        <div className="flex gap-3 w-full">
+          <Button variant="outline" className="flex-1 h-14 text-[14px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700" onClick={() => navigate("/dispute-flow/TRUST-1024")}>
+            Report & Issue
+          </Button>
+          <Button className="flex-1 h-14 text-[14px] font-bold bg-success hover:bg-success/90" onClick={() => setShowConfirmModal(true)}>
+            Confirm Delivery
+          </Button>
+        </div>
       </BottomActionBar>
+
+      {/* Confirm Delivery Modal */}
+      <AnimatePresence>
+        {showConfirmModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-5 pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setShowConfirmModal(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-[340px] rounded-3xl p-6 relative z-10 shadow-2xl"
+            >
+              <h3 className="text-[20px] font-extrabold text-center text-gray-900 mb-2">Confirm Delivery</h3>
+              <p className="text-[14px] text-gray-500 text-center font-medium mb-6">
+                By confirming delivery, funds will be released to the seller and the transaction will be completed.
+              </p>
+              
+              <div className="flex flex-col gap-2.5">
+                <Button 
+                  className="w-full bg-success hover:bg-success/90 text-white font-bold h-12 rounded-xl text-[15px] shadow-sm"
+                  onClick={() => {
+                    setShowConfirmModal(false)
+                    navigate("/review-seller/TRUST-1024")
+                  }}
+                >
+                  Confirm Delivery
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-gray-600 font-bold h-12 rounded-xl text-[15px] hover:bg-gray-100"
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

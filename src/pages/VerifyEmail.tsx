@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, ChevronLeft, Mail, Check } from "lucide-react";
+import { Shield, ChevronLeft, Mail, Check, ShieldCheck, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BottomActionBar } from "@/components/ui/bottom-action-bar";
@@ -48,74 +48,114 @@ export default function VerifyEmail() {
 
   if (animationStep === "complete") {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col min-h-screen items-center justify-center relative py-12 px-5 pb-[140px]"
-        style={{ background: "radial-gradient(circle at top, #EEF4FF 0%, #FFFFFF 45%)" }}
-      >
-        <div className="w-full max-w-sm flex flex-col items-center justify-center">
-          {/* Hero Animation */}
-          <div className="relative w-28 h-28 mb-8 flex items-center justify-center shrink-0">
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
-              <circle cx="56" cy="56" r="52" fill="transparent" stroke="#10B981" strokeWidth="4" />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-               <Mail className="w-10 h-10 text-[#10B981]" strokeWidth={2} />
-            </div>
-            
+      <div className="flex flex-col min-h-screen bg-background pb-[140px]">
+        {/* Header */}
+        <div className="flex items-center justify-center p-4 relative bg-background border-b border-gray-100">
+          <h1 className="text-[16px] font-semibold text-foreground">Secure Account Setup</h1>
+        </div>
+
+        <div className="flex-1 px-5 pt-10 max-w-sm mx-auto w-full flex flex-col items-center">
+          
+          {/* Success Icon */}
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="relative flex items-center justify-center mb-6 w-24 h-24"
+          >
+            {/* Pulse effect */}
             <motion.div 
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 }}
-              className="absolute bottom-0 right-0 bg-[#10B981] rounded-full p-1.5 border-4 border-white shadow-sm"
-            >
-              <Check className="w-5 h-5 text-white" strokeWidth={3} />
-            </motion.div>
-          </div>
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className="absolute inset-0 bg-green-200 rounded-full"
+            />
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center relative z-10 border-4 border-white shadow-sm">
+              <ShieldCheck className="w-10 h-10 text-green-600" />
+            </div>
+          </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
             className="text-center w-full"
           >
             <h1 className="text-[28px] font-extrabold text-foreground tracking-tight mb-2">
               Email Verified
             </h1>
-            <a href={`mailto:${userEmail}`} className="text-[16px] text-[#2563EB] font-bold block mb-4 hover:underline">
+            <a href={`mailto:${userEmail}`} className="text-[16px] text-primary font-bold block mb-4 hover:underline">
               {userEmail}
             </a>
-            <p className="text-[15px] text-muted-foreground leading-relaxed px-2 mb-8">
-              Your email has been successfully verified and can now be used for account security and transaction notifications.
+            <p className="text-[15px] text-muted-foreground leading-relaxed px-2 mb-6">
+              Your email has been successfully verified and secured for TrustLayer transactions.
             </p>
 
-            <div className="bg-white border border-gray-100 rounded-2xl p-5 text-left w-full mb-8 shadow-sm">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-8 flex items-start gap-3 text-left">
+              <Lock className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+              <p className="text-[13px] text-blue-900 font-medium leading-relaxed">
+                Your account is now protected and ready for secure transactions.
+              </p>
+            </div>
+
+            {/* Progress Card */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 text-left w-full mb-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+              <h3 className="text-[12px] font-bold text-muted-foreground mb-5 uppercase tracking-wider">Account Setup Progress</h3>
+              <div className="flex flex-col gap-4 relative">
+                <div className="absolute left-3 top-3 bottom-6 w-px bg-gray-200 z-0" />
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 border-2 border-white">
                     <Check className="w-3.5 h-3.5 text-green-600" strokeWidth={3} />
                   </div>
                   <span className="text-[15px] font-bold text-foreground">Email Verified</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-200 shrink-0" />
-                  <span className="text-[15px] font-medium text-gray-500">Phone Verification</span>
+                
+                {/* Highlighted next step */}
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center shrink-0 bg-white">
+                    <div className="w-2 h-2 bg-primary rounded-full" />
+                  </div>
+                  <span className="text-[15px] font-bold text-primary">Phone Verification</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-200 shrink-0" />
-                  <span className="text-[15px] font-medium text-gray-500">Profile Setup</span>
+                
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="w-6 h-6 rounded-full border-2 border-gray-200 bg-white shrink-0" />
+                  <span className="text-[15px] font-medium text-gray-400">Profile Setup</span>
                 </div>
               </div>
             </div>
 
-            <Button onClick={() => navigate("/verify-phone")} className="w-full h-14 text-[16px] font-bold">
-              Continue to Phone Verification
-            </Button>
+            {/* Information Card */}
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-left w-full mb-8">
+              <h3 className="text-[14px] font-bold text-foreground mb-3">Why verify your email?</h3>
+              <ul className="space-y-2.5">
+                <li className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 shrink-0" />
+                  <span className="leading-snug">Receive transaction updates</span>
+                </li>
+                <li className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 shrink-0" />
+                  <span className="leading-snug">Get shipping notifications</span>
+                </li>
+                <li className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 shrink-0" />
+                  <span className="leading-snug">Protect your account from unauthorized access</span>
+                </li>
+              </ul>
+            </div>
           </motion.div>
         </div>
-      </motion.div>
+
+        <BottomActionBar>
+          <div className="space-y-3 w-full">
+            <Button onClick={() => navigate("/verify-phone")} className="w-full h-14 text-[16px] font-bold shadow-lg shadow-primary/20">
+              Continue to Phone Verification
+            </Button>
+            <Button onClick={() => navigate("/login")} variant="ghost" className="w-full h-14 text-[15px] font-medium text-muted-foreground hover:bg-gray-100">
+              Back to Sign In
+            </Button>
+          </div>
+        </BottomActionBar>
+      </div>
     );
   }
 
@@ -192,7 +232,7 @@ export default function VerifyEmail() {
               <div className="space-y-1">
                 <p className="text-[13px] font-bold text-blue-900">Why verify your email?</p>
                 <p className="text-[12px] text-blue-800/70 leading-relaxed font-medium">
-                  We need to confirm your email so we can send important escrow and shipping updates securely.
+                  We need to confirm your email so we can send important transaction and shipping updates securely.
                 </p>
               </div>
             </div>

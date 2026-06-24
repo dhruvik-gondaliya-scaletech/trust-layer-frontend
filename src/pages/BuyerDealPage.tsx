@@ -35,10 +35,17 @@ export default function BuyerDealPage() {
     setShowFeedbackSuccess(true)
   }
 
+  const feeOption = Number(localStorage.getItem('feeOption')) || 1
   const itemPrice = 8450
   const shippingCost = 35
-  const trustLayerFee = 245
-  const totalDue = itemPrice + shippingCost + trustLayerFee
+  const totalPlatformFee = 245
+  
+  let buyerFeeShare = 0
+  if (feeOption === 1) buyerFeeShare = totalPlatformFee
+  else if (feeOption === 0) buyerFeeShare = totalPlatformFee / 2
+  else buyerFeeShare = 0
+
+  const totalDue = itemPrice + shippingCost + buyerFeeShare
 
   useEffect(() => {
     // Animate score 0 -> 100 over 1.5 seconds
@@ -82,7 +89,7 @@ export default function BuyerDealPage() {
           </div>
         </div>
         <div className="text-[12px] font-semibold text-primary bg-blue-50 px-2 py-1 rounded-full flex items-center gap-1">
-          <Lock className="w-3.5 h-3.5" /> Secure Escrow
+          <Lock className="w-3.5 h-3.5" /> Secure Payment
         </div>
       </div>
 
@@ -183,22 +190,20 @@ export default function BuyerDealPage() {
 
         {/* SECTION 2: PRODUCT DETAILS */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-          <p className="text-[12px] font-bold text-primary mb-1 uppercase tracking-wider">
-            Trading Cards • Mint (PSA 10)
-          </p>
-          <h1 className="text-[22px] font-extrabold leading-tight mb-2 text-foreground">
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-[12px] font-bold text-primary uppercase tracking-wider">
+              Trading Cards • Mint (PSA 10)
+            </p>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">TRUST-1024</span>
+          </div>
+          <h1 className="text-[18px] font-extrabold leading-tight mb-2 text-foreground">
             Charizard Holo 1999 — PSA 10 Gem Mint
           </h1>
           <div className="text-[28px] font-black text-foreground mb-4">
-            ${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}
+            ${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 0})}
           </div>
           
           <div className="space-y-4">
-            <p className="text-[13px] text-muted-foreground leading-relaxed">
-              Pristine condition Charizard Holo from the 1999 Base Set. Graded PSA 10 Gem Mint. 
-              Slab is completely free of scratches or chips. Will be shipped securely in a waterproof Pelican case.
-            </p>
-            
             <div className="pt-2 flex flex-col gap-2">
                <div className="flex justify-between items-center py-2 border-b border-gray-50">
                  <div className="text-[12px] text-muted-foreground font-medium">Condition</div>
@@ -217,65 +222,64 @@ export default function BuyerDealPage() {
         </div>
 
         {/* SECTION 3: TRUST SNAPSHOT */}
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 shadow-xl relative overflow-hidden">
-          {/* subtle pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent bg-[length:20px_20px]" />
-          
-          <div className="flex justify-between items-start mb-5 relative z-10">
+        <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div>
-              <h3 className="font-bold text-[18px] text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-green-400" />
-                Buyer Protection
+              <h3 className="font-bold text-[15px] text-blue-950 flex items-center gap-1.5">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                Protected by TrustLayer
               </h3>
-              <p className="text-[12px] text-gray-400 mt-1">Maximum Buyer Confidence</p>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">Trust Score</span>
-              <span className="text-[28px] font-black text-[#F5C542] leading-none">{isMaxed ? '100' : '0'}</span>
+              <span className="text-[9px] text-blue-900/60 uppercase font-bold tracking-widest mb-0.5">Trust Score</span>
+              <span className="text-[22px] font-black text-blue-600 leading-none">{isMaxed ? '100 / 100' : '0 / 100'}</span>
             </div>
           </div>
           
-          <div className="space-y-3 relative z-10">
+          <div className="space-y-2 relative z-10">
             {[
               "Seller Verified",
-              "Verification Photos Complete",
-              "Verification Video Included",
+              "Product Verified",
+              "Video Verified",
               "Certification Verified",
-              "Escrow Protected"
+              "TrustLayer Protected"
             ].map((req, idx) => (
-               <div key={idx} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-                     <Check className="w-3 h-3 text-green-400 stroke-[3]" />
-                  </div>
-                  <span className="text-[13px] font-semibold text-gray-200">{req}</span>
+               <div key={idx} className="flex items-center gap-2.5">
+                  <Check className="w-3.5 h-3.5 text-blue-600 stroke-[3]" />
+                  <span className="text-[13px] font-medium text-blue-900">{req}</span>
                </div>
             ))}
+          </div>
+          <div className="mt-4 pt-3 border-t border-blue-200/50 flex justify-between items-center">
+            <span className="text-[12px] font-bold text-blue-900">Maximum Buyer Confidence</span>
           </div>
         </div>
 
         {/* SECTION 4: SELLER TRUST PROFILE */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 relative overflow-hidden">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-[18px] shadow-sm relative">
-              VI
-              <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
-                 <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-[16px] shadow-sm relative shrink-0">
+                VI
+                <div className="absolute -bottom-1 -right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center">
+                   <Check className="w-2 h-2 text-white stroke-[3]" />
+                </div>
               </div>
-            </div>
-            <div className="flex-1">
-              <p className="font-bold text-[16px] text-foreground flex items-center gap-2">
-                @vintage_vault
-                <span className="bg-green-50 text-green-700 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
-                  <Star className="w-2.5 h-2.5 fill-green-600 text-green-600" /> TRUSTED SELLER
-                </span>
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                <span className="text-[12px] font-semibold text-blue-600">Identity Verified</span>
+              <div>
+                <p className="font-bold text-[15px] text-foreground flex items-center gap-1.5">
+                  @vintage_vault
+                  <span className="bg-green-50 text-green-700 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 fill-green-600 text-green-600" /> TRUSTED SELLER
+                  </span>
+                </p>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-[12px] font-semibold text-blue-600">Identity Verified</span>
+                </div>
               </div>
             </div>
             <div className="text-right flex flex-col items-end">
-              <div className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase mb-1">Trust</div>
+              <div className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase mb-1">Trust Score</div>
               <div className="text-[20px] font-black text-foreground leading-none">
                  96
               </div>
@@ -284,41 +288,35 @@ export default function BuyerDealPage() {
           
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
-              <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Completed Deals</div>
-              <div className="text-[14px] font-bold text-foreground">184</div>
+              <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Successful Deals</div>
+              <div className="text-[13px] font-bold text-foreground">184</div>
             </div>
             <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
-              <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Member Since</div>
-              <div className="text-[14px] font-bold text-foreground">2022</div>
+              <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Member Since</div>
+              <div className="text-[13px] font-bold text-foreground">2022</div>
             </div>
           </div>
         </div>
 
-        {/* SECTION 5: ESCROW PROTECTION TIMELINE */}
+        {/* SECTION 5: TRUSTLAYER PROTECTION TIMELINE */}
         <div className="bg-blue-50/50 rounded-3xl p-5 shadow-sm border border-blue-100">
-          <div className="flex items-center gap-2 mb-2">
-             <Shield className="w-5 h-5 text-blue-600" />
-             <h3 className="font-bold text-[15px] text-blue-950">How You're Protected</h3>
-          </div>
-          <p className="text-[12px] text-blue-800/70 mb-5 font-medium leading-relaxed">Funds are only released after you inspect and approve the item.</p>
-          
-          <div className="relative mt-2">
+          <div className="relative">
             {/* Horizontal Timeline Line */}
-            <div className="absolute top-4 left-[10%] right-[10%] h-0.5 bg-blue-200 -translate-y-1/2" />
+            <div className="absolute top-3 left-[10%] right-[10%] h-[1.5px] bg-blue-200" />
             
             <div className="flex justify-between relative z-10">
               {[
-                { title: "Fund", active: true, step: 1 },
-                { title: "Ship", step: 2 },
-                { title: "Review", step: 3 },
-                { title: "Approve", step: 4 },
-                { title: "Paid", step: 5 },
+                { title: "Funds Protected" },
+                { title: "Seller Ships" },
+                { title: "Buyer Inspects" },
+                { title: "Buyer Approves" },
+                { title: "Funds Released" },
               ].map((step, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-2 w-1/5">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 bg-white transition-all ${step.active ? 'border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)] scale-110' : 'border-blue-200 text-blue-300'}`}>
-                    {step.active ? <Check className="w-4 h-4 stroke-[3]" /> : <span className="text-[11px] font-bold">{step.step}</span>}
+                <div key={idx} className="flex flex-col items-center gap-2 w-[20%]">
+                  <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 bg-white transition-all ${idx === 0 ? 'border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' : 'border-blue-200'}`}>
+                    {idx === 0 ? <div className="w-1.5 h-1.5 bg-primary rounded-full" /> : null}
                   </div>
-                  <div className={`text-[10px] font-bold text-center ${step.active ? 'text-blue-950' : 'text-blue-900/50'}`}>
+                  <div className={`text-[9px] font-bold text-center leading-tight ${idx === 0 ? 'text-blue-950' : 'text-blue-900/50'}`}>
                     {step.title}
                   </div>
                 </div>
@@ -327,50 +325,63 @@ export default function BuyerDealPage() {
           </div>
         </div>
 
-        {/* SECTION 6: PAYMENT SUMMARY */}
+        {/* SECTION 6: FEE RESPONSIBILITY & PAYMENT SUMMARY */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-bold text-[15px] text-foreground mb-4">
-             Payment Summary
-          </h3>
-          <div className="space-y-3 text-[13px]">
+          <div className="mb-4">
+            <div className="flex justify-between items-start mb-1">
+              <h3 className="text-[16px] font-bold text-foreground">Fee Responsibility</h3>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded">Selected by Seller</span>
+            </div>
+            <p className="text-[14px] font-semibold text-foreground mt-2">
+              {feeOption === 0 ? "Platform Fee Shared 50/50" : feeOption === 1 ? "Buyer Pays 100% of Platform Fee" : "Seller Pays 100% of Platform Fee"}
+            </p>
+            <p className="text-[13px] text-muted-foreground mt-1 leading-relaxed">
+              {feeOption === 0 ? "The seller has chosen to split the TrustLayer platform fee equally." : feeOption === 1 ? "The seller has chosen for the buyer to pay the full TrustLayer platform fee." : "The seller has chosen to cover the full TrustLayer platform fee."}
+            </p>
+          </div>
+
+          <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 space-y-3 text-[13px]">
             <div className="flex justify-between text-muted-foreground">
               <span>Item Price</span>
-              <span className="font-medium text-foreground">${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+              <span className="font-medium text-foreground">${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <span>Shipping Cost</span>
-              <span className="font-medium text-foreground">${shippingCost.toFixed(2)}</span>
+              <span className="font-medium text-foreground">${shippingCost.toFixed(0)}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
-              <span>TrustLayer Fee</span>
-              <span className="font-medium text-foreground">${trustLayerFee.toFixed(2)}</span>
+              <span>
+                {feeOption === 0 ? "Your Fee Share (non-refundable)" : feeOption === 1 ? "Platform Fee (non-refundable)" : "Platform Fee Included By Seller (non-refundable)"}
+              </span>
+              <span className="font-medium text-foreground">
+                {feeOption === 2 ? "$0" : `$${buyerFeeShare.toFixed(0)}`}
+              </span>
             </div>
             
-            <div className="my-4 border-t border-dashed border-gray-200" />
+            <div className="my-3 border-t border-dashed border-gray-200" />
             
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-1">
               <span className="font-bold text-foreground text-[14px]">Total Due</span>
               <span className="text-[24px] font-black text-primary tracking-tight">
                 ${totalDue.toLocaleString('en-US', {maximumFractionDigits: 0})}
               </span>
             </div>
+          </div>
 
-            <div className="mt-2 p-3.5 bg-blue-50/60 rounded-xl border border-blue-100 flex flex-col gap-2">
-               <div className="flex items-center gap-2">
-                 <div className="bg-blue-100 p-0.5 rounded-full">
-                    <Check className="w-3 h-3 text-blue-600 stroke-[3]" />
-                 </div>
-                 <span className="text-[12px] font-bold text-blue-900">Buyer Pays Platform Fee</span>
-               </div>
-               <div className="text-[11.5px] text-blue-800/80 leading-relaxed ml-6">
-                 The TrustLayer fee covers:
-                 <ul className="list-disc pl-4 mt-1 space-y-0.5">
-                   <li>Secure escrow protection</li>
-                   <li>Transaction processing</li>
-                   <li>Dispute resolution support</li>
-                 </ul>
-               </div>
-            </div>
+          <div className="mt-4 p-4 bg-blue-50/60 rounded-2xl border border-blue-100 flex flex-col gap-2">
+             <div className="flex items-center gap-2">
+               <ShieldCheck className="w-4 h-4 text-blue-600" />
+               <span className="text-[13px] font-bold text-blue-900">The Platform Fee covers:</span>
+             </div>
+             <div className="text-[12px] text-blue-800/80 leading-relaxed mt-1">
+               <ul className="list-disc pl-4 space-y-1">
+                 <li>TrustLayer Protection</li>
+                 <li>Fraud Prevention</li>
+                 <li>Secure Payment Processing</li>
+                 <li>Dispute Resolution Support</li>
+               </ul>
+               <p className="mt-2.5 text-[11px] font-semibold opacity-80">Platform fees are non-refundable once the transaction is funded.</p>
+             </div>
           </div>
         </div>
       </div>

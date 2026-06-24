@@ -14,7 +14,8 @@ export default function Wallet() {
   const transactions = [
     { id: 1, type: "deposit", amount: 8500, date: "Oct 16, 2023", desc: "Funds Released: Rolex Submariner" },
     { id: 2, type: "withdrawal", amount: -4200, date: "Oct 10, 2023", desc: "Withdrawal to Chase ***1234" },
-    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Funds Released: Omega Speedmaster" },
+    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Recent Deposit: Stripe" },
+    { id: 4, type: "withdrawal", amount: -150, date: "Oct 01, 2023", desc: "Payment: Platform Fee" },
   ]
 
   return (
@@ -36,8 +37,12 @@ export default function Wallet() {
       <div className="flex-1 px-5 pt-4 animate-in fade-in duration-500 space-y-6">
 
         {/* Main Balance Card */}
-        <Card className="bg-primary text-primary-foreground border-none relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 right-0 p-6 opacity-10">
+        <Card className="rounded-[20px] bg-gradient-to-br from-[#2563EB] to-[#1e3a8a] text-white shadow-xl shadow-[#2563EB]/20 border-none relative overflow-hidden">
+          {/* Decorative background elements for premium feel */}
+          <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-24 h-24 rounded-full bg-white/10 blur-2xl"></div>
+          
+          <div className="absolute top-0 right-0 p-6 opacity-10 z-0">
             <WalletIcon className="h-24 w-24" />
           </div>
           <CardContent className="p-6 relative z-10 space-y-6">
@@ -48,7 +53,7 @@ export default function Wallet() {
             
             <div className="grid grid-cols-2 gap-4 border-t border-primary-foreground/20 pt-4">
               <div>
-                <p className="text-primary-foreground/80 text-xs">Pending Escrow</p>
+                <p className="text-primary-foreground/80 text-xs">Funds On Hold</p>
                 <p className="font-semibold mt-0.5">$8,500.00</p>
               </div>
               <div>
@@ -86,6 +91,39 @@ export default function Wallet() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Payment Methods */}
+        <div className="space-y-4">
+          <h2 className="text-[18px] font-bold text-foreground">Payment Methods</h2>
+          <Card>
+            <CardContent className="p-0 divide-y">
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
+                    <Building2 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[15px]">Chase Checking</p>
+                    <p className="text-[13px] text-muted-foreground">****1234</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-primary font-semibold">Manage</Button>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
+                    <WalletIcon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[15px]">Visa Credit Card</p>
+                    <p className="text-[13px] text-muted-foreground">****5678</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-primary font-semibold">Manage</Button>
+              </div>
             </CardContent>
           </Card>
         </div>
