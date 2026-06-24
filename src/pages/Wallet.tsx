@@ -14,7 +14,8 @@ export default function Wallet() {
   const transactions = [
     { id: 1, type: "deposit", amount: 8500, date: "Oct 16, 2023", desc: "Funds Released: Rolex Submariner" },
     { id: 2, type: "withdrawal", amount: -4200, date: "Oct 10, 2023", desc: "Withdrawal to Chase ***1234" },
-    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Funds Released: Omega Speedmaster" },
+    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Recent Deposit: Stripe" },
+    { id: 4, type: "withdrawal", amount: -150, date: "Oct 01, 2023", desc: "Payment: Platform Fee" },
   ]
 
   return (
@@ -48,7 +49,7 @@ export default function Wallet() {
             
             <div className="grid grid-cols-2 gap-4 border-t border-primary-foreground/20 pt-4">
               <div>
-                <p className="text-primary-foreground/80 text-xs">Pending Escrow</p>
+                <p className="text-primary-foreground/80 text-xs">Funds On Hold</p>
                 <p className="font-semibold mt-0.5">$8,500.00</p>
               </div>
               <div>
@@ -86,6 +87,39 @@ export default function Wallet() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Payment Methods */}
+        <div className="space-y-4">
+          <h2 className="text-[18px] font-bold text-foreground">Payment Methods</h2>
+          <Card>
+            <CardContent className="p-0 divide-y">
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
+                    <Building2 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[15px]">Chase Checking</p>
+                    <p className="text-[13px] text-muted-foreground">****1234</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-primary font-semibold">Manage</Button>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
+                    <WalletIcon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[15px]">Visa Credit Card</p>
+                    <p className="text-[13px] text-muted-foreground">****5678</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-primary font-semibold">Manage</Button>
+              </div>
             </CardContent>
           </Card>
         </div>

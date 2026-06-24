@@ -20,7 +20,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background pb-[140px]">
+    <div className="flex flex-col min-h-screen bg-background pb-[240px]">
       {/* Top Header */}
       <div className="flex items-center justify-center p-6 bg-background">
         <div className="flex items-center gap-2 text-primary font-bold text-lg">
@@ -87,7 +87,7 @@ export default function Register() {
               className="mt-0.5 flex-shrink-0 w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary"
             />
             <label htmlFor="consent" className="text-[13px] leading-tight text-slate-500">
-              I agree to the <Link to="#" className="text-primary hover:underline">Terms</Link>, <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>, and <Link to="#" className="text-primary hover:underline">Escrow Terms</Link>.
+              I agree to the <Link to="#" className="text-primary hover:underline">Terms</Link>, <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>, and <Link to="#" className="text-primary hover:underline">Platform Terms</Link>.
             </label>
           </div>
           {showError && (

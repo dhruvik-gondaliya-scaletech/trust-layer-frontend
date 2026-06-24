@@ -128,7 +128,7 @@ export default function VerifyPhone() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background pb-[140px]">
+    <div className="flex flex-col min-h-screen bg-background pb-[180px]">
       {/* Top Header */}
       <div className="flex items-center justify-center p-4 relative bg-background">
         <button 

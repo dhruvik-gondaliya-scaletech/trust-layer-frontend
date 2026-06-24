@@ -11,6 +11,10 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['astrology-regulatory-craft-attempted.trycloudflare.com'],
+    allowedHosts: [
+      'astrology-regulatory-craft-attempted.trycloudflare.com',
+      'nails-welding-participate-crm.trycloudflare.com',
+      '.trycloudflare.com'
+    ],
   },
 })

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
-import { ChevronLeft, Upload, CheckCircle2, Info, Camera, Plus, Video, FileBadge, Trash2, Edit2, ChevronDown, Check, ChevronUp, Zap, Image as ImageIcon, Rocket, Trophy, ShieldCheck } from "lucide-react"
+import { ChevronLeft, Upload, CheckCircle2, Info, Camera, Plus, Video, FileBadge, Trash2, Edit2, ChevronDown, Check, ChevronUp, Zap, Image as ImageIcon, Rocket, Trophy, ShieldCheck, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -13,7 +13,7 @@ import { motion, animate, AnimatePresence } from "framer-motion"
 const PremiumParticles = () => {
   return (
     <div className="fixed inset-0 pointer-events-none z-[100] flex items-center justify-center overflow-hidden">
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -28,24 +28,24 @@ const PremiumParticles = () => {
         const colors = ['bg-amber-400', 'bg-blue-500', 'bg-emerald-400', 'bg-amber-300', 'bg-white'];
         const color = colors[i % colors.length];
         const isSquare = i % 3 === 0;
-
+        
         return (
           <motion.div
             key={i}
             initial={{ opacity: 1, x: 0, y: -50, scale: 0, rotate: 0 }}
-            animate={{
-              opacity: [1, 1, 0],
-              x: x,
-              y: y + Math.random() * 200,
+            animate={{ 
+              opacity: [1, 1, 0], 
+              x: x, 
+              y: y + Math.random() * 200, 
               scale: Math.random() * 1.5 + 0.5,
-              rotate: Math.random() * 360
+              rotate: Math.random() * 360 
             }}
             transition={{ duration: 2.5 + Math.random() * 1.5, ease: "easeOut" }}
             className={`absolute w-3 h-3 ${isSquare ? 'rounded-sm' : 'rounded-full'} ${color} shadow-sm z-10`}
           />
         )
       })}
-
+      
       <motion.div
         initial={{ scale: 0, opacity: 0, y: 50 }}
         animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 1, 0], y: [-50, -150, -150, -200] }}
@@ -94,7 +94,7 @@ export default function CreateDeal() {
   const [cameraState, setCameraState] = React.useState<"guiding" | "recording" | "preview">("guiding")
   const [recordingTime, setRecordingTime] = React.useState(0)
   const [guidanceMessage, setGuidanceMessage] = React.useState("")
-
+  
   const [expandedSection, setExpandedSection] = React.useState<string | null>("main")
   const [instructionModal, setInstructionModal] = React.useState<string | null>(null)
   const [showScoreBreakdown, setShowScoreBreakdown] = React.useState(false)
@@ -122,12 +122,18 @@ export default function CreateDeal() {
   const [handlingTime, setHandlingTime] = React.useState("Ship within 1–2 business days")
   const [carrier, setCarrier] = React.useState("USPS")
   const [customCarrier, setCustomCarrier] = React.useState("")
+  const [customTrackingUrl, setCustomTrackingUrl] = React.useState("")
   const [shippingType, setShippingType] = React.useState("Standard")
   const [isInsured, setIsInsured] = React.useState(false)
   const [shippingCost, setShippingCost] = React.useState("0")
 
   // Step 4 State
-  const [feeOption, setFeeOption] = React.useState(1)
+  const [feeOption, setFeeOption] = React.useState(() => {
+    return Number(localStorage.getItem('feeOption')) || 1
+  })
+  React.useEffect(() => {
+    localStorage.setItem('feeOption', feeOption.toString())
+  }, [feeOption])
   const [showFeeBreakdown, setShowFeeBreakdown] = React.useState(false)
 
   // Toast state
@@ -146,7 +152,7 @@ export default function CreateDeal() {
       setScorePulsing(true)
       setTimeout(() => setScorePulsing(false), 1000)
     }
-
+    
     const isMax = currentScore === 100
 
     const controls = animate(displayScore, currentScore, {
@@ -159,7 +165,7 @@ export default function CreateDeal() {
           hasTriggeredMax.current = true
           setCelebrationPhase('bursting')
           setTimeout(() => setCelebrationPhase('finished'), 4000)
-
+          
           const msgs = [
             "🔥 Amazing!",
             "🚀 Listing Fully Verified",
@@ -183,13 +189,13 @@ export default function CreateDeal() {
   React.useEffect(() => {
     let timeout1: ReturnType<typeof setTimeout>
     let timeout2: ReturnType<typeof setTimeout>
-
+    
     if (activeCamera && activeCamera !== "video" && cameraState === "guiding") {
       setGuidanceMessage("📷 Position item inside frame")
       timeout1 = setTimeout(() => setGuidanceMessage("📷 Get a bit closer"), 2500)
       timeout2 = setTimeout(() => setGuidanceMessage("📷 Perfect. Ready to capture."), 5000)
     }
-
+    
     return () => {
       clearTimeout(timeout1)
       clearTimeout(timeout2)
@@ -197,7 +203,7 @@ export default function CreateDeal() {
   }, [activeCamera, cameraState])
 
   React.useEffect(() => {
-    let interval: ReturnType<typeof setTimeout>
+    let interval: ReturnType<typeof setInterval>
     if (activeCamera === "video" && cameraState === "recording") {
       interval = setInterval(() => {
         setRecordingTime((prev) => {
@@ -239,7 +245,7 @@ export default function CreateDeal() {
     setActiveCamera(type)
     setCameraState("guiding")
     setRecordingTime(0)
-
+    
     if (type === "video") {
       setGuidanceMessage("Center the item to begin")
     }
@@ -254,9 +260,9 @@ export default function CreateDeal() {
       detail: "/pokemon-detail.jpg",
     }
     const dummyImage = images[type] || "/pokemon-main.jpg"
-
+    
     let newMain = mainPhoto, newFront = frontPhoto, newBack = backPhoto, newSide = sidePhoto, newDetail = detailPhoto, newVideo = hasVideo, newCert = hasCert
-
+    
     const randomMsgs = [
       "🎉 Nice start! +20 Trust Points",
       "🚀 Great job! Buyers trust detailed listings",
@@ -266,7 +272,7 @@ export default function CreateDeal() {
       "🛡 Trust level increased"
     ]
     const getRandomMsg = () => randomMsgs[Math.floor(Math.random() * randomMsgs.length)]
-
+    
     if (type === "main") { setMainPhoto(dummyImage); newMain = dummyImage; addToast(getRandomMsg()); setExpandedSection("product"); }
     if (type === "front") { setFrontPhoto(dummyImage); newFront = dummyImage; addToast(getRandomMsg()); }
     if (type === "back") { setBackPhoto(dummyImage); newBack = dummyImage; addToast(getRandomMsg()); }
@@ -274,13 +280,13 @@ export default function CreateDeal() {
     if (type === "detail") { setDetailPhoto(dummyImage); newDetail = dummyImage; addToast(getRandomMsg()); }
     if (type === "video") { setHasVideo(true); newVideo = true; addToast("🎥 Excellent! Video verification added"); setExpandedSection("cert"); }
     if (type === "cert") { setHasCert(true); newCert = true; addToast("🏆 Verification boosted!"); setExpandedSection(null); }
-
+    
     const newScore = Math.min(100, verifiedProfileScore + itemDetailsScore + (newMain ? 20 : 0) + (newFront ? 5 : 0) + (newBack ? 5 : 0) + (newSide ? 5 : 0) + (newDetail ? 5 : 0) + (newVideo ? 20 : 0) + ((newCert && isGraded) ? 20 : 0))
-
+    
     if (currentScore < 80 && newScore >= 80) {
       setTimeout(() => addToast(`⭐ Almost there! Just a few more steps`, `Trust Score: ${newScore}/100`), 1500)
     }
-
+    
     setActiveCamera(null)
   }
 
@@ -294,7 +300,7 @@ export default function CreateDeal() {
   const sellerEarnings = itemPriceNum + shipCostNum - sellerFee
 
   return (
-    <div className="flex flex-col min-h-screen bg-background pb-[140px]">
+    <div className="flex flex-col min-h-screen bg-background pb-[180px]">
       <div className="flex items-center justify-center p-4 relative bg-background">
         <button
           onClick={prevStep}
@@ -321,7 +327,7 @@ export default function CreateDeal() {
               </div>
             </div>
             <div className="h-4 w-full bg-blue-900/40 rounded-full overflow-hidden relative z-10 shadow-inner">
-              <div className="h-full bg-white w-[5%]" />
+               <div className="h-full bg-white w-[5%]" />
             </div>
             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-400/20 rounded-full blur-xl" />
@@ -376,7 +382,7 @@ export default function CreateDeal() {
                   transition={{ duration: 1, ease: "easeOut" }}
                 />
               </div>
-
+              
               <div className="flex items-center justify-between relative z-10">
                 <div className="text-[13px] font-medium text-blue-100">
                   Next: {!mainPhoto ? "Take Main Photo" : (!frontPhoto || !backPhoto || !sidePhoto || !detailPhoto) ? "Add Product Photos" : !hasVideo ? "Add Video Verification" : "Complete Verification"}
@@ -396,7 +402,7 @@ export default function CreateDeal() {
                     )}
                     <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '20/20 Complete' : '0/20'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore + bScore + sScore + dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore + bScore + sScore + dScore}/20 {fScore + bScore + sScore + dScore === 20 ? 'Complete' : ''}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore+bScore+sScore+dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/20 {fScore+bScore+sScore+dScore === 20 ? 'Complete' : ''}</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Video Verification</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '20/20 Complete' : '0/20'}</span></div>
                   </motion.div>
                 )}
@@ -521,8 +527,8 @@ export default function CreateDeal() {
                     <div className="p-4">
                       {!mainPhoto ? (
                         <div className="space-y-3">
-                          <p className="text-[13px] text-muted-foreground">The primary photo buyers see in search results. Make it count.</p>
-                          <Button className="w-full font-bold" onClick={() => setInstructionModal("main")}>Take Main Photo</Button>
+                           <p className="text-[13px] text-muted-foreground">The primary photo buyers see in search results. Make it count.</p>
+                           <Button className="w-full font-bold" onClick={() => setInstructionModal("main")}>Take Main Photo</Button>
                         </div>
                       ) : (
                         <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-border shadow-sm group">
@@ -559,7 +565,7 @@ export default function CreateDeal() {
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-gray-50/50 border-t border-border">
                     <div className="p-4 space-y-4">
                       <p className="text-[13px] text-muted-foreground">Capture multiple angles to build maximum buyer confidence.</p>
-
+                      
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { id: "front", label: "Front View", state: frontPhoto, setState: setFrontPhoto },
@@ -616,8 +622,8 @@ export default function CreateDeal() {
                     <div className="p-4">
                       {!hasVideo ? (
                         <div className="space-y-3">
-                          <p className="text-[13px] text-muted-foreground">A 360-degree video proves authenticity and physical possession.</p>
-                          <Button className="w-full font-bold" onClick={() => setInstructionModal("video")}>Record Video</Button>
+                           <p className="text-[13px] text-muted-foreground">A 360-degree video proves authenticity and physical possession.</p>
+                           <Button className="w-full font-bold" onClick={() => setInstructionModal("video")}>Record Video</Button>
                         </div>
                       ) : (
                         <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
@@ -658,8 +664,8 @@ export default function CreateDeal() {
                       <div className="p-4">
                         {!hasCert ? (
                           <div className="space-y-3">
-                            <p className="text-[13px] text-muted-foreground">Upload PSA, receipts, or authenticity documents.</p>
-                            <Button className="w-full font-bold" onClick={() => startCamera("cert")}>Upload Certificate</Button>
+                             <p className="text-[13px] text-muted-foreground">Upload PSA, receipts, or authenticity documents.</p>
+                             <Button className="w-full font-bold" onClick={() => startCamera("cert")}>Upload Certificate</Button>
                           </div>
                         ) : (
                           <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
@@ -681,7 +687,7 @@ export default function CreateDeal() {
             )}
 
             {isScoreMaxed && (
-              <motion.div
+              <motion.div 
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -689,7 +695,7 @@ export default function CreateDeal() {
               >
                 <div className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-300 rounded-2xl p-8 shadow-xl overflow-hidden relative">
                   <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-green-400/20 rounded-full blur-3xl"></div>
-
+                  
                   <div className="flex flex-col items-center text-center relative z-10 mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg mb-4 border-4 border-white">
                       <Trophy className="w-8 h-8 text-white" />
@@ -697,7 +703,7 @@ export default function CreateDeal() {
                     <h3 className="text-[22px] font-extrabold text-green-900 leading-tight">Maximum Trust Achieved</h3>
                     <p className="text-[15px] text-green-800 mt-1">Your verification package is now complete.</p>
                   </div>
-
+                  
                   <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 mb-6 shadow-inner border border-white/50">
                     <div className="flex justify-between items-center mb-4 border-b border-green-200/50 pb-3">
                       <span className="font-bold text-green-900">Trust Score</span>
@@ -710,7 +716,7 @@ export default function CreateDeal() {
                       {isGraded && <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Certification Verified</li>}
                     </ul>
                   </div>
-
+                  
                   <div className="text-center relative z-10">
                     <p className="text-[12px] font-bold text-green-800/70 uppercase tracking-widest mb-1">Buyer Confidence</p>
                     <p className="text-[20px] font-extrabold text-green-600 tracking-tight flex items-center justify-center gap-2">
@@ -780,11 +786,22 @@ export default function CreateDeal() {
               </div>
 
               {carrier === "Other" && (
-                <div className="space-y-2 animate-in slide-in-from-top-2">
-                  <label className="text-[13px] font-medium text-foreground">Custom Carrier</label>
-                  <Input placeholder="Enter carrier name" value={customCarrier} onChange={e => setCustomCarrier(e.target.value)} />
+                <div className="space-y-4 animate-in slide-in-from-top-2">
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-foreground">Custom Carrier</label>
+                    <Input placeholder="Enter carrier name" value={customCarrier} onChange={e => setCustomCarrier(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-foreground">Carrier Tracking URL</label>
+                    <Input placeholder="Enter tracking URL (e.g. https://...)" value={customTrackingUrl} onChange={e => setCustomTrackingUrl(e.target.value)} />
+                  </div>
                 </div>
               )}
+
+              <div className="space-y-2 mt-4">
+                <label className="text-[13px] font-medium text-foreground">Shipping Cost (USD)</label>
+                <Input type="number" placeholder="0" value={shippingCost} onChange={e => setShippingCost(e.target.value)} />
+              </div>
 
               <div className="flex items-center gap-2 mt-4 p-4 border rounded-2xl cursor-pointer hover:bg-gray-50" onClick={() => setIsInsured(!isInsured)}>
                 <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${isInsured ? 'bg-primary border-primary text-white' : 'border-input'}`}>
@@ -824,6 +841,11 @@ export default function CreateDeal() {
               ))}
             </div>
 
+            <div className="mt-3 text-[13px] text-muted-foreground p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <p>The selected fee structure will be shown to the buyer before payment confirmation.</p>
+            </div>
+
             <div className="mt-8 border rounded-2xl overflow-hidden">
               <div
                 className="bg-gray-50 p-4 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
@@ -855,7 +877,7 @@ export default function CreateDeal() {
                       <span className="font-medium">{shipCostNum === 0 ? "Free" : `$${shipCostNum.toFixed(2)}`}</span>
                     </div>
                     <div className="flex justify-between text-[14px]">
-                      <span className="text-muted-foreground">Platform Fee (3.5% + $0.30)</span>
+                      <span className="text-muted-foreground">Platform Fee (3.5% + $0.30) <span className="opacity-80 text-[11px]">(non-refundable)</span></span>
                       <span className="font-medium">${platformFee.toFixed(2)}</span>
                     </div>
                     <div className="w-full h-px bg-gray-100 my-2" />
@@ -896,14 +918,14 @@ export default function CreateDeal() {
                 </div>
               </div>
               <div className="h-4 w-full bg-blue-900/40 rounded-full overflow-hidden relative z-10 shadow-inner">
-                <div className={`h-full transition-all duration-1000 ${displayScore === 100 ? 'bg-[#F5C542] shadow-[0_0_10px_#F5C542]' : 'bg-white'}`} style={{ width: `${displayScore}%` }} />
+                 <div className={`h-full transition-all duration-1000 ${displayScore === 100 ? 'bg-[#F5C542] shadow-[0_0_10px_#F5C542]' : 'bg-white'}`} style={{ width: `${displayScore}%` }} />
               </div>
               {displayScore === 100 && (
                 <p className="mt-4 text-[13px] text-blue-100 font-medium relative z-10 text-center animate-pulse">
                   This deal is fully verified and optimized for buyer trust!
                 </p>
               )}
-
+              
               <div className="flex items-center justify-center relative z-10 mt-4 border-t border-blue-500/30 pt-3">
                 <button onClick={() => setShowScoreBreakdown(!showScoreBreakdown)} className="text-[12px] font-bold text-white flex items-center gap-1 hover:text-blue-200 transition-colors">
                   {showScoreBreakdown ? 'Hide Breakdown' : 'View Breakdown'} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showScoreBreakdown ? 'rotate-180' : ''}`} />
@@ -920,7 +942,7 @@ export default function CreateDeal() {
                     )}
                     <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '20/20 Complete' : '0/20'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore + bScore + sScore + dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore + bScore + sScore + dScore}/20 {fScore + bScore + sScore + dScore === 20 ? 'Complete' : ''}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore+bScore+sScore+dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/20 {fScore+bScore+sScore+dScore === 20 ? 'Complete' : ''}</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Video Verification</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '20/20 Complete' : '0/20'}</span></div>
                   </motion.div>
                 )}
@@ -1071,17 +1093,17 @@ export default function CreateDeal() {
               <div className="flex-1 relative flex items-center justify-center p-6 overflow-hidden">
                 {/* Simulated live feed or preview image */}
                 {cameraState === "preview" && (
-                  <img
-                    src={activeCamera === 'main' ? '/pokemon-main.jpg' :
-                      activeCamera === 'front' ? '/pokemon-front.jpg' :
-                        activeCamera === 'back' ? '/pokemon-back.jpg' :
-                          activeCamera === 'side' ? '/pokemon-side.jpg' :
-                            activeCamera === 'detail' ? '/pokemon-detail.jpg' : '/pokemon-main.jpg'}
-                    alt="Preview"
-                    className="absolute inset-0 w-full h-full object-cover opacity-90 scale-105"
+                  <img 
+                    src={activeCamera === 'main' ? '/pokemon-main.jpg' : 
+                         activeCamera === 'front' ? '/pokemon-front.jpg' : 
+                         activeCamera === 'back' ? '/pokemon-back.jpg' : 
+                         activeCamera === 'side' ? '/pokemon-side.jpg' : 
+                         activeCamera === 'detail' ? '/pokemon-detail.jpg' : '/pokemon-main.jpg'} 
+                    alt="Preview" 
+                    className="absolute inset-0 w-full h-full object-cover opacity-90 scale-105" 
                   />
                 )}
-
+                
                 {/* Corner Framing Guides */}
                 {cameraState !== "preview" && (
                   <>
@@ -1096,7 +1118,7 @@ export default function CreateDeal() {
                 {/* Guidance Overlay */}
                 {cameraState !== "preview" && (
                   <div className="absolute bottom-16 left-0 right-0 text-center px-8">
-                    <motion.div
+                    <motion.div 
                       key={guidanceMessage}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -1122,14 +1144,14 @@ export default function CreateDeal() {
                 ) : (
                   <div className="flex flex-col items-center">
                     {activeCamera === "video" && cameraState === "recording" ? (
-                      <button
+                      <button 
                         onClick={() => setCameraState("preview")}
                         className="w-20 h-20 rounded-full bg-red-500 border-[6px] border-white flex items-center justify-center hover:scale-105 transition-transform"
                       >
                         <div className="w-6 h-6 bg-white rounded-sm" />
                       </button>
                     ) : activeCamera === "video" && cameraState === "guiding" ? (
-                      <button
+                      <button 
                         onClick={() => {
                           setCameraState("recording")
                           setRecordingTime(0)
@@ -1138,14 +1160,14 @@ export default function CreateDeal() {
                         className="w-20 h-20 rounded-full bg-red-500 border-[6px] border-white flex items-center justify-center hover:scale-105 transition-transform"
                       />
                     ) : (
-                      <button
+                      <button 
                         onClick={() => setCameraState("preview")}
                         className="w-20 h-20 rounded-full bg-white border-[6px] border-gray-300 flex items-center justify-center hover:scale-105 transition-transform"
                       />
                     )}
-
+                    
                     {activeCamera !== "video" && (
-                      <p className="text-white/60 text-[13px] mt-6 text-center font-medium">Position item inside frame<br />Ensure good lighting • Capture the entire product</p>
+                      <p className="text-white/60 text-[13px] mt-6 text-center font-medium">Position item inside frame<br/>Ensure good lighting • Capture the entire product</p>
                     )}
                   </div>
                 )}
@@ -1190,9 +1212,9 @@ export default function CreateDeal() {
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Keep the camera steady</li>
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Ensure details (like corners) are in focus</li>
               </ul>
-              <Button className="w-full h-14 font-bold text-[16px]" onClick={() => {
+              <Button className="w-full h-14 font-bold text-[16px]" onClick={() => { 
                 const camId = instructionModal.split('-')[1];
-                setInstructionModal(null);
+                setInstructionModal(null); 
                 startCamera(camId);
               }}>Close and Take Photo</Button>
             </>
@@ -1212,7 +1234,7 @@ export default function CreateDeal() {
                 <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Ensure good lighting throughout</li>
                 <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Keep the product centered in frame</li>
               </ul>
-
+              
               <div className="flex items-center justify-between px-2">
                 <div>
                   <p className="text-[12px] font-bold text-foreground">Maximum recording length</p>
