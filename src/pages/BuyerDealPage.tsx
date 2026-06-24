@@ -194,7 +194,7 @@ export default function BuyerDealPage() {
             <p className="text-[12px] font-bold text-primary uppercase tracking-wider">
               Trading Cards • Mint (PSA 10)
             </p>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">Deal ID: TRUST-1024</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">TRUST-1024</span>
           </div>
           <h1 className="text-[18px] font-extrabold leading-tight mb-2 text-foreground">
             Charizard Holo 1999 — PSA 10 Gem Mint

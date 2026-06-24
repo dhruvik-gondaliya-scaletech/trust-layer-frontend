@@ -124,7 +124,7 @@ export default function Dashboard() {
 
       {/* Premium Fintech Wallet (Moved to Top) */}
       <div className="space-y-3 cursor-pointer" onClick={() => navigate("/wallet")}>
-        <div className={`rounded-[20px] p-5 bg-gradient-to-br text-white shadow-xl relative overflow-hidden ${userMode === 'buyer' ? 'from-[#10B981] to-[#047857] shadow-[#10B981]/20' : 'from-[#2563EB] to-[#1e3a8a] shadow-[#2563EB]/20'}`}>
+        <div className="rounded-[20px] p-5 bg-gradient-to-br from-[#2563EB] to-[#1e3a8a] text-white shadow-xl shadow-[#2563EB]/20 relative overflow-hidden">
           {/* Decorative background elements for premium feel */}
           <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
           <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-24 h-24 rounded-full bg-white/10 blur-2xl"></div>
@@ -157,9 +157,9 @@ export default function Dashboard() {
                       <AlertCircle className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="font-bold text-[14px] text-foreground leading-tight">Confirm Delivery</p>
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">Deal ID: TRUST-1024</p>
-                      <p className="text-[12px] text-muted-foreground font-medium mt-0.5">Buyer is waiting to inspect the item.</p>
+                      <p className="font-bold text-[14px] text-foreground leading-tight">Charizard Holo 1999</p>
+                      <p className="text-[12px] font-medium text-gray-500 mb-1">TRUST-1024</p>
+                      <p className="text-[12px] text-muted-foreground font-medium">Buyer is waiting to inspect the item.</p>
                     </div>
                   </div>
                   <Button size="sm" className="bg-[#10B981] hover:bg-[#059669] text-white font-bold h-8 px-3" onClick={() => navigate("/timeline/TRUST-1024")}>
@@ -173,9 +173,9 @@ export default function Dashboard() {
                       <Upload className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="font-bold text-[14px] text-foreground leading-tight">Upload Tracking</p>
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">Deal ID: TRUST-1024</p>
-                      <p className="text-[12px] text-muted-foreground font-medium mt-0.5">Buyer has funded the deal.</p>
+                      <p className="font-bold text-[14px] text-foreground leading-tight">Charizard Holo 1999</p>
+                      <p className="text-[12px] font-medium text-gray-500 mb-1">TRUST-1024</p>
+                      <p className="text-[12px] text-muted-foreground font-medium">Buyer has funded the deal.</p>
                     </div>
                   </div>
                   <Button size="sm" className="bg-[#2563EB] hover:bg-blue-700 text-white font-bold h-8 px-3" onClick={() => navigate("/add-tracking/deal-123")}>
@@ -223,62 +223,62 @@ export default function Dashboard() {
       <div className="space-y-2 mt-6">
         <div className="flex items-center justify-between px-1 mb-1">
           <h2 className="text-[18px] font-bold text-foreground">Recent Deals</h2>
-          <Button variant="link" className="px-0 text-[14px] h-auto text-primary font-semibold">View All</Button>
+          <Button variant="link" className={`px-0 text-[14px] h-auto font-semibold ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>View All</Button>
         </div>
 
-        <Card className="border border-border bg-white shadow-sm overflow-hidden">
+        <Card className={`border shadow-sm overflow-hidden ${userMode === 'buyer' ? 'bg-[#F2FCF7] border-[#10B981]' : 'bg-[#F5F9FF] border-[#2563EB]'}`}>
           <div className="flex flex-col divide-y divide-gray-100">
             {/* Item 1 */}
-            <div className="cursor-pointer hover:bg-gray-50 transition-colors p-3.5 flex items-center justify-between group">
+            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-200">
+                <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="/pokemon-main.jpg" alt="Charizard" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col justify-center">
                   <span className="font-bold text-[15px] text-foreground leading-tight mb-0.5">Charizard Holo 1999</span>
-                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Deal ID: TRUST-1024</span>
+                  <span className="text-[12px] font-medium text-gray-500 mb-0.5">TRUST-1024</span>
                   <span className={`text-[12px] font-semibold leading-none ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>Completed</span>
                 </div>
               </div>
               <div className="flex flex-col items-end justify-center">
                 <span className="font-extrabold text-[15px] text-foreground mb-1">$4,300</span>
-                <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                <ChevronRight className={`w-4 h-4 transition-colors ${userMode === 'buyer' ? 'text-[#10B981]/50 group-hover:text-[#10B981]' : 'text-[#2563EB]/50 group-hover:text-[#2563EB]'}`} />
               </div>
             </div>
 
             {/* Item 2 */}
-            <div className="cursor-pointer hover:bg-gray-50 transition-colors p-3.5 flex items-center justify-between group">
+            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-200">
+                <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop" alt="Leica" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col justify-center">
                   <span className="font-bold text-[15px] text-foreground leading-tight mb-0.5">Vintage Leica M6</span>
-                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Deal ID: TRUST-1025</span>
+                  <span className="text-[12px] font-medium text-gray-500 mb-0.5">TRUST-1025</span>
                   <span className={`text-[12px] font-semibold leading-none ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>Completed</span>
                 </div>
               </div>
               <div className="flex flex-col items-end justify-center">
                 <span className="font-extrabold text-[15px] text-foreground mb-1">$2,400</span>
-                <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                <ChevronRight className={`w-4 h-4 transition-colors ${userMode === 'buyer' ? 'text-[#10B981]/50 group-hover:text-[#10B981]' : 'text-[#2563EB]/50 group-hover:text-[#2563EB]'}`} />
               </div>
             </div>
 
             {/* Item 3 */}
-            <div className="cursor-pointer hover:bg-gray-50 transition-colors p-3.5 flex items-center justify-between group">
+            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-200">
+                <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=200&auto=format&fit=crop" alt="MacBook" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col justify-center">
                   <span className="font-bold text-[15px] text-foreground leading-tight mb-0.5">MacBook Pro M3</span>
-                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Deal ID: TRUST-1026</span>
+                  <span className="text-[12px] font-medium text-gray-500 mb-0.5">TRUST-1026</span>
                   <span className={`text-[12px] font-semibold leading-none ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>Completed</span>
                 </div>
               </div>
               <div className="flex flex-col items-end justify-center">
                 <span className="font-extrabold text-[15px] text-foreground mb-1">$1,850</span>
-                <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                <ChevronRight className={`w-4 h-4 transition-colors ${userMode === 'buyer' ? 'text-[#10B981]/50 group-hover:text-[#10B981]' : 'text-[#2563EB]/50 group-hover:text-[#2563EB]'}`} />
               </div>
             </div>
           </div>

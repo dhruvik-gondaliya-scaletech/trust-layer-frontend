@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronLeft, ShieldCheck, Check, CheckCircle2, 
-  CreditCard, Wallet, Lock, Shield, ArrowRight, Smartphone, Mail, X
+  CreditCard, Wallet, Lock, Shield, ArrowRight, Smartphone, Mail, X, AlertCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -753,10 +753,16 @@ export default function FundEscrowFlow() {
                  
                  <motion.h1 
                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                   className="text-[28px] font-extrabold tracking-tight text-foreground mb-2"
+                   className="text-[28px] font-extrabold tracking-tight text-foreground mb-0.5"
                  >
                    Deal Funded
                  </motion.h1>
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+                   className="text-[12px] font-medium text-gray-500 mb-4"
+                 >
+                   TRUST-1024
+                 </motion.div>
                  
                  <motion.div 
                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
@@ -776,10 +782,6 @@ export default function FundEscrowFlow() {
                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-5"
                  >
-                   <div className="flex justify-between items-center mb-3">
-                     <span className="text-[12px] text-muted-foreground font-bold uppercase tracking-wider">Deal ID</span>
-                     <span className="font-bold text-[14px]">TRUST-1024</span>
-                   </div>
                    <div className="flex justify-between items-center mb-3">
                      <span className="text-[12px] text-muted-foreground font-bold uppercase tracking-wider">Seller</span>
                      <span className="font-bold text-[14px]">@vintage_vault</span>

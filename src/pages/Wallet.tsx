@@ -37,8 +37,12 @@ export default function Wallet() {
       <div className="flex-1 px-5 pt-4 animate-in fade-in duration-500 space-y-6">
 
         {/* Main Balance Card */}
-        <Card className="bg-primary text-primary-foreground border-none relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 right-0 p-6 opacity-10">
+        <Card className="rounded-[20px] bg-gradient-to-br from-[#2563EB] to-[#1e3a8a] text-white shadow-xl shadow-[#2563EB]/20 border-none relative overflow-hidden">
+          {/* Decorative background elements for premium feel */}
+          <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-24 h-24 rounded-full bg-white/10 blur-2xl"></div>
+          
+          <div className="absolute top-0 right-0 p-6 opacity-10 z-0">
             <WalletIcon className="h-24 w-24" />
           </div>
           <CardContent className="p-6 relative z-10 space-y-6">

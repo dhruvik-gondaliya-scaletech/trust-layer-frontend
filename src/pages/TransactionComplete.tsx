@@ -41,13 +41,9 @@ export default function TransactionComplete() {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="w-full bg-white border border-gray-200 rounded-2xl p-5 shadow-sm text-left"
         >
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-[12px] text-muted-foreground font-bold uppercase tracking-wider">Deal ID</span>
-            <span className="font-bold text-[14px]">TRUST-1024</span>
-          </div>
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-[12px] text-muted-foreground font-bold uppercase tracking-wider">Item</span>
-            <span className="font-bold text-[14px]">Charizard Holo 1999</span>
+          <div className="mb-4">
+            <div className="font-bold text-[16px] text-foreground mb-0.5">Charizard Holo 1999</div>
+            <div className="text-[12px] font-medium text-gray-500">TRUST-1024</div>
           </div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-[12px] text-muted-foreground font-bold uppercase tracking-wider">Amount</span>

@@ -155,7 +155,7 @@ export default function BuyerDashboard() {
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span className="text-[10px] font-bold text-[#10B981] uppercase tracking-wider">Buying</span>
                     <span className="text-gray-300">•</span>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Deal ID: TRUST-1024</span>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">TRUST-1024</span>
                     <span className="text-gray-300">•</span>
                     <span className="text-[10px] font-bold text-gray-500 flex items-center gap-0.5"><ShieldCheck className="w-3 h-3"/> 96</span>
                   </div>
@@ -179,7 +179,7 @@ export default function BuyerDashboard() {
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span className="text-[10px] font-bold text-[#10B981] uppercase tracking-wider">Buying</span>
                     <span className="text-gray-300">•</span>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Deal ID: TRUST-1024</span>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">TRUST-1024</span>
                     <span className="text-gray-300">•</span>
                     <span className="text-[10px] font-bold text-gray-500 flex items-center gap-0.5"><ShieldCheck className="w-3 h-3"/> 84</span>
                   </div>
