@@ -12,10 +12,11 @@ export default function Wallet() {
   const [isWithdrawOpen, setIsWithdrawOpen] = React.useState(false)
 
   const transactions = [
-    { id: 1, type: "deposit", amount: 8500, date: "Oct 16, 2023", desc: "Funds Released: Rolex Submariner" },
-    { id: 2, type: "withdrawal", amount: -4200, date: "Oct 10, 2023", desc: "Withdrawal to Chase ***1234" },
-    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Recent Deposit: Stripe" },
-    { id: 4, type: "withdrawal", amount: -150, date: "Oct 01, 2023", desc: "Payment: Platform Fee" },
+    { id: 1, type: "deposit", amount: 8500, date: "Oct 16, 2023", desc: "Funds Released", status: "Completed" },
+    { id: 2, type: "withdrawal", amount: -4200, date: "Oct 10, 2023", desc: "Withdrawal", status: "Processing" },
+    { id: 3, type: "deposit", amount: 1250, date: "Oct 05, 2023", desc: "Deposit", status: "Completed" },
+    { id: 4, type: "withdrawal", amount: -150, date: "Oct 01, 2023", desc: "Platform Fee", status: "Completed" },
+    { id: 5, type: "deposit", amount: 450, date: "Sep 28, 2023", desc: "Refund", status: "Completed" },
   ]
 
   return (
@@ -23,7 +24,7 @@ export default function Wallet() {
       {/* Header */}
       <div className="flex items-center justify-center p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
         <button 
-          onClick={() => navigate(-1)} 
+          onClick={() => navigate('/dashboard')} 
           className="absolute left-4 p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -53,12 +54,13 @@ export default function Wallet() {
             
             <div className="grid grid-cols-2 gap-4 border-t border-primary-foreground/20 pt-4">
               <div>
-                <p className="text-primary-foreground/80 text-xs">Funds On Hold</p>
-                <p className="font-semibold mt-0.5">$8,500.00</p>
+                <p className="text-primary-foreground/80 text-xs font-medium">Funds On Hold</p>
+                <p className="font-bold mt-1 text-[18px]">$8,500.00</p>
+                <p className="text-[10px] text-primary-foreground/60 mt-1 leading-tight">Funds currently reserved for active transactions.</p>
               </div>
               <div>
-                <p className="text-primary-foreground/80 text-xs">Withdrawable</p>
-                <p className="font-semibold mt-0.5">$1,250.00</p>
+                <p className="text-primary-foreground/80 text-xs font-medium">Ready to Withdraw</p>
+                <p className="font-bold mt-1 text-[18px]">$1,250.00</p>
               </div>
             </div>
           </CardContent>
@@ -74,19 +76,27 @@ export default function Wallet() {
           <Card>
             <CardContent className="p-0 divide-y">
               {transactions.map((tx) => (
-                <div key={tx.id} className="p-4 flex items-center justify-between">
+                <div 
+                  key={tx.id} 
+                  onClick={() => navigate('/transactions')}
+                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                      tx.type === 'deposit' ? 'bg-success/10 text-success' : 'bg-gray-100 text-primary'
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center shrink-0 ${
+                      tx.type === 'deposit' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {tx.type === 'deposit' ? <ArrowDownRight className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
                     </div>
                     <div>
-                      <p className="font-medium text-[15px]">{tx.desc}</p>
-                      <p className="text-[13px] text-muted-foreground">{tx.date}</p>
+                      <p className="font-semibold text-[15px]">{tx.desc}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[12px] text-muted-foreground">{tx.date}</span>
+                        <span className="text-[10px] text-muted-foreground">•</span>
+                        <span className={`text-[12px] font-medium ${tx.status === 'Completed' ? 'text-green-600' : 'text-orange-500'}`}>{tx.status}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className={`font-semibold text-[15px] ${tx.type === 'deposit' ? 'text-success' : ''}`}>
+                  <div className={`font-bold text-[16px] ${tx.type === 'deposit' ? 'text-green-600' : 'text-foreground'}`}>
                     {tx.type === 'deposit' ? '+' : ''}{tx.amount < 0 ? `-$${Math.abs(tx.amount).toLocaleString()}` : `$${tx.amount.toLocaleString()}`}
                   </div>
                 </div>
@@ -130,9 +140,14 @@ export default function Wallet() {
       </div>
 
       <BottomActionBar>
-        <Button onClick={() => setIsWithdrawOpen(true)} className="w-full h-14 text-[16px]">
-          Withdraw Funds
-        </Button>
+        <div className="flex items-center gap-3 w-full">
+          <Button variant="outline" onClick={() => navigate('/payment-methods')} className="flex-1 h-14 text-[15px] font-bold">
+            Manage Bank Account
+          </Button>
+          <Button onClick={() => setIsWithdrawOpen(true)} className="flex-1 h-14 text-[15px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30">
+            Withdraw Funds
+          </Button>
+        </div>
       </BottomActionBar>
 
       <BottomSheet

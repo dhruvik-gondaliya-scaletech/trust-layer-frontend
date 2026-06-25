@@ -14,6 +14,9 @@ export default function VerifyPhone() {
   const userPhone = "+1 (555) 123-4567";
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [error, setError] = useState("");
+
   useEffect(() => {
     if (resendCountdown > 0) {
       const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
@@ -41,6 +44,12 @@ export default function VerifyPhone() {
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
+    const digits = phoneNumber.replace(/\D/g, "");
+    if (digits.length < 10) {
+      setError("Please enter a valid 10-digit phone number.");
+      return;
+    }
+    setError("");
     setStep("otp");
   };
 
@@ -183,11 +192,31 @@ export default function VerifyPhone() {
               <div className="space-y-3">
                 <label className="text-[13px] font-bold text-foreground ml-1">Phone Number</label>
                 <div className="flex gap-2">
-                  <div className="flex items-center justify-center w-16 h-14 rounded-xl border border-gray-200 bg-gray-50/50 text-[16px] font-bold text-foreground">
+                  <div className={`flex items-center justify-center w-16 h-14 rounded-xl border ${error ? 'border-red-500 bg-red-50/50 text-red-600' : 'border-gray-200 bg-gray-50/50 text-foreground'} text-[16px] font-bold`}>
                     +1
                   </div>
-                  <Input required type="tel" className="h-14 flex-1 text-[16px] font-bold bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20" placeholder="(555) 000-0000" />
+                  <Input 
+                    required 
+                    type="tel" 
+                    inputMode="numeric"
+                    maxLength={14}
+                    value={phoneNumber}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "");
+                      let formatted = digits;
+                      if (digits.length > 3 && digits.length <= 6) {
+                        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                      } else if (digits.length > 6) {
+                        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+                      }
+                      setPhoneNumber(formatted);
+                      setError("");
+                    }}
+                    className={`h-14 flex-1 text-[16px] font-bold bg-gray-50/50 ${error ? 'border-red-500 focus-visible:ring-red-200 text-red-600' : 'border-gray-200 focus-visible:ring-primary/20'}`} 
+                    placeholder="(555) 000-0000" 
+                  />
                 </div>
+                {error && <p className="text-red-500 text-[12px] font-medium ml-1 mt-1">{error}</p>}
               </div>
             </form>
           ) : (
@@ -195,7 +224,6 @@ export default function VerifyPhone() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-[13px] font-bold text-foreground ml-1">6-Digit Code</label>
-                  <span className="text-[12px] font-semibold text-primary cursor-pointer">Resend Code</span>
                 </div>
                 <div className="flex gap-2">
                   {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -203,10 +231,17 @@ export default function VerifyPhone() {
                       key={i}
                       ref={(el) => { inputRefs.current[i] = el; }}
                       required 
-                      maxLength={1} 
+                      maxLength={1}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       className="h-14 text-center text-lg font-bold p-0 bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20" 
                       placeholder="0"
-                      onChange={(e) => handleInput(i, e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "");
+                        e.target.value = val;
+                        handleInput(i, val);
+                      }}
                       onKeyDown={(e) => handleKeyDown(i, e)}
                     />
                   ))}

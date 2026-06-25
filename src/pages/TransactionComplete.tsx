@@ -68,7 +68,7 @@ export default function TransactionComplete() {
         </p>
         <Button 
           className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white"
-          onClick={() => navigate(`/dashboard/${role}`)}
+          onClick={() => navigate(`/dashboard?mode=${role}`)}
         >
           Back To Dashboard
         </Button>

@@ -9,8 +9,6 @@ import Login from "@/pages/Login"
 import ForgotPassword from "@/pages/ForgotPassword"
 import ResetPassword from "@/pages/ResetPassword"
 import Dashboard from "@/pages/Dashboard"
-import SellerDashboard from "@/pages/SellerDashboard"
-import BuyerDashboard from "@/pages/BuyerDashboard"
 import CreateDeal from "@/pages/CreateDeal"
 import DealPublished from "@/pages/DealPublished"
 import BuyerDealPage from "@/pages/BuyerDealPage"
@@ -23,8 +21,24 @@ import TrackingSuccess from "@/pages/TrackingSuccess"
 import DisputeFlow from "@/pages/DisputeFlow"
 import ReviewSeller from "@/pages/ReviewSeller"
 import TransactionComplete from "@/pages/TransactionComplete"
-
-
+import AllTransactions from "@/pages/AllTransactions"
+import DealDetails from "@/pages/DealDetails"
+import AccountCenter from "@/pages/account/AccountCenter"
+import MyProfile from "@/pages/account/MyProfile"
+import VerificationCenter from "@/pages/account/VerificationCenter"
+import PaymentMethods from "@/pages/account/PaymentMethods"
+import ShippingAddresses from "@/pages/account/ShippingAddresses"
+import Reviews from "@/pages/account/Reviews"
+import HelpCenter from "@/pages/account/HelpCenter"
+import ContactSupport from "@/pages/account/ContactSupport"
+import ReportIssue from "@/pages/account/ReportIssue"
+import TransactionProtection from "@/pages/account/TransactionProtection"
+import TermsConditions from "@/pages/account/TermsConditions"
+import PrivacyPolicy from "@/pages/account/PrivacyPolicy"
+import PublicProfilePreview from "@/pages/account/profile/PublicProfilePreview"
+import NotificationPreferences from "@/pages/account/NotificationPreferences"
+import { PageSkeleton } from "@/components/ui/page-skeleton"
+import React, { useState, useEffect } from "react"
 // Simplified MobileLayout - it just ensures the child fills the space, 
 // because the true mobile-constraint is now applied globally to the App container.
 function MobileLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +56,18 @@ function PlaceholderPage({ title }: { title: string }) {
       <p className="text-muted-foreground">This screen is under construction.</p>
     </div>
   )
+}
+
+function WithSkeleton({ children, title }: { children: React.ReactNode, title: string }) {
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    // Artificial delay to show off the skeleton loader
+    const timer = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
+  
+  if (loading) return <PageSkeleton title={title} />
+  return <>{children}</>
 }
 
 function App() {
@@ -67,8 +93,8 @@ function App() {
 
           {/* Seller Routes */}
           <Route path="/dashboard" element={<MobileLayout><Dashboard /></MobileLayout>} />
-          <Route path="/dashboard/seller" element={<MobileLayout><SellerDashboard /></MobileLayout>} />
-          <Route path="/dashboard/buyer" element={<MobileLayout><BuyerDashboard /></MobileLayout>} />
+          <Route path="/dashboard/seller" element={<Navigate to="/dashboard?mode=seller" replace />} />
+          <Route path="/dashboard/buyer" element={<Navigate to="/dashboard?mode=buyer" replace />} />
           <Route path="/create-deal" element={<MobileLayout><CreateDeal /></MobileLayout>} />
           <Route path="/deal-published" element={<MobileLayout><DealPublished /></MobileLayout>} />
           <Route path="/notifications" element={<MobileLayout><Notifications /></MobileLayout>} />
@@ -85,6 +111,24 @@ function App() {
 
           {/* Shared Routes */}
           <Route path="/wallet" element={<MobileLayout><Wallet /></MobileLayout>} />
+          <Route path="/transactions" element={<MobileLayout><AllTransactions /></MobileLayout>} />
+          <Route path="/deal-details/:id" element={<MobileLayout><DealDetails /></MobileLayout>} />
+
+          {/* Account Center Routes */}
+          <Route path="/account" element={<MobileLayout><AccountCenter /></MobileLayout>} />
+          <Route path="/profile" element={<MobileLayout><WithSkeleton title="My Profile"><MyProfile /></WithSkeleton></MobileLayout>} />
+          <Route path="/profile/preview" element={<MobileLayout><PublicProfilePreview /></MobileLayout>} />
+          <Route path="/verification-center" element={<MobileLayout><WithSkeleton title="Verification Center"><VerificationCenter /></WithSkeleton></MobileLayout>} />
+          <Route path="/payment-methods" element={<MobileLayout><WithSkeleton title="Payment Methods"><PaymentMethods /></WithSkeleton></MobileLayout>} />
+          <Route path="/shipping-addresses" element={<MobileLayout><WithSkeleton title="Shipping Addresses"><ShippingAddresses /></WithSkeleton></MobileLayout>} />
+          <Route path="/reviews" element={<MobileLayout><WithSkeleton title="Reviews"><Reviews /></WithSkeleton></MobileLayout>} />
+          <Route path="/notification-preferences" element={<MobileLayout><WithSkeleton title="Notification Preferences"><NotificationPreferences /></WithSkeleton></MobileLayout>} />
+          <Route path="/help-center" element={<MobileLayout><WithSkeleton title="Help Center"><HelpCenter /></WithSkeleton></MobileLayout>} />
+          <Route path="/contact-support" element={<MobileLayout><WithSkeleton title="Contact Support"><ContactSupport /></WithSkeleton></MobileLayout>} />
+          <Route path="/report-issue" element={<MobileLayout><WithSkeleton title="Report Issue"><ReportIssue /></WithSkeleton></MobileLayout>} />
+          <Route path="/transaction-protection" element={<MobileLayout><WithSkeleton title="Transaction Protection"><TransactionProtection /></WithSkeleton></MobileLayout>} />
+          <Route path="/terms" element={<MobileLayout><WithSkeleton title="Terms & Conditions"><TermsConditions /></WithSkeleton></MobileLayout>} />
+          <Route path="/privacy-policy" element={<MobileLayout><WithSkeleton title="Privacy Policy"><PrivacyPolicy /></WithSkeleton></MobileLayout>} />
 
           <Route path="*" element={<MobileLayout><PlaceholderPage title="404 Not Found" /></MobileLayout>} />
         </Routes>

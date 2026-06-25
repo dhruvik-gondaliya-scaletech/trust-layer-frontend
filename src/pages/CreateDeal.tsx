@@ -103,12 +103,12 @@ export default function CreateDeal() {
   // Trust Score Logic
   const verifiedProfileScore = isGraded ? 0 : 20
   const itemDetailsScore = 20
-  const mainPhotoScore = mainPhoto ? 20 : 0
-  const fScore = frontPhoto ? 5 : 0
-  const bScore = backPhoto ? 5 : 0
-  const sScore = sidePhoto ? 5 : 0
-  const dScore = detailPhoto ? 5 : 0
-  const videoScore = hasVideo ? 20 : 0
+  const mainPhotoScore = mainPhoto ? 15 : 0
+  const fScore = frontPhoto ? 3.75 : 0
+  const bScore = backPhoto ? 3.75 : 0
+  const sScore = sidePhoto ? 3.75 : 0
+  const dScore = detailPhoto ? 3.75 : 0
+  const videoScore = hasVideo ? 30 : 0
   const certScore = hasCert && isGraded ? 20 : 0
   const currentScore = Math.min(100, verifiedProfileScore + itemDetailsScore + mainPhotoScore + fScore + bScore + sScore + dScore + videoScore + certScore)
 
@@ -241,13 +241,20 @@ export default function CreateDeal() {
     }
   }
 
-  const startCamera = (type: string) => {
-    setActiveCamera(type)
-    setCameraState("guiding")
-    setRecordingTime(0)
-    
-    if (type === "video") {
-      setGuidanceMessage("Center the item to begin")
+  const startCamera = async (type: string) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+      stream.getTracks().forEach(track => track.stop())
+      setActiveCamera(type)
+      setCameraState("guiding")
+      setRecordingTime(0)
+      
+      if (type === "video") {
+        setGuidanceMessage("Center the item to begin")
+      }
+    } catch (err) {
+      console.error("Camera access denied", err)
+      addToast("Camera Permission Required", "Please allow camera access in your browser to continue.", 4000)
     }
   }
 
@@ -348,7 +355,7 @@ export default function CreateDeal() {
                     {scorePulsing && !isScoreMaxed && <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />}
                   </h2>
                   <div className="flex items-center gap-2 mt-1 relative">
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded border flex items-center gap-1 transition-colors duration-500 overflow-hidden ${displayScore < 40 ? 'bg-red-500/20 text-red-100 border-red-500/30' : displayScore < 100 ? 'bg-yellow-500/20 text-yellow-100 border-yellow-500/30' : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 border-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.5)]'}`}>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded border flex items-center gap-1 transition-colors duration-500 overflow-hidden ${displayScore < 60 ? 'bg-red-500/20 text-red-100 border-red-500/30' : displayScore < 80 ? 'bg-yellow-500/20 text-yellow-100 border-yellow-500/30' : displayScore < 100 ? 'bg-green-500/20 text-green-100 border-green-500/30' : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 border-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.5)]'}`}>
                       {displayScore === 100 && (
                         <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring" }}>
                           <ShieldCheck className="w-3 h-3 text-amber-950" />
@@ -356,13 +363,13 @@ export default function CreateDeal() {
                       )}
                       <AnimatePresence mode="wait">
                         <motion.span
-                          key={displayScore < 40 ? 'LOW' : displayScore < 80 ? 'MEDIUM' : displayScore < 100 ? 'HIGH' : 'MAXIMUM TRUST'}
+                          key={displayScore < 60 ? 'LOW' : displayScore < 80 ? 'MEDIUM' : displayScore < 100 ? 'HIGH' : 'MAXIMUM TRUST'}
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -5 }}
                           transition={{ duration: 0.2 }}
                         >
-                          {displayScore < 40 ? 'LOW' : displayScore < 80 ? 'MEDIUM' : displayScore < 100 ? 'HIGH' : 'MAXIMUM TRUST'}
+                          {displayScore < 60 ? 'LOW' : displayScore < 80 ? 'MEDIUM' : displayScore < 100 ? 'HIGH' : 'MAXIMUM TRUST'}
                         </motion.span>
                       </AnimatePresence>
                     </span>
@@ -385,7 +392,7 @@ export default function CreateDeal() {
               
               <div className="flex items-center justify-between relative z-10">
                 <div className="text-[13px] font-medium text-blue-100">
-                  Next: {!mainPhoto ? "Take Main Photo" : (!frontPhoto || !backPhoto || !sidePhoto || !detailPhoto) ? "Add Product Photos" : !hasVideo ? "Add Video Verification" : "Complete Verification"}
+                  Next: {!mainPhoto ? "Take Main Photo" : (!frontPhoto || !backPhoto || !sidePhoto || !detailPhoto) ? "Add Additional Photos" : !hasVideo ? "Add Product Video" : "Complete Verification"}
                 </div>
                 <button onClick={() => setShowScoreBreakdown(!showScoreBreakdown)} className="text-[12px] font-bold text-white flex items-center gap-1 hover:text-blue-200 transition-colors">
                   {showScoreBreakdown ? 'Hide Breakdown' : 'View Breakdown'} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showScoreBreakdown ? 'rotate-180' : ''}`} />
@@ -395,15 +402,15 @@ export default function CreateDeal() {
               <AnimatePresence>
                 {showScoreBreakdown && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-4 pt-4 border-t border-blue-500/30 text-[13px] space-y-2 relative z-10 overflow-hidden">
+                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '15/15 Complete' : '0/15'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={(fScore+bScore+sScore+dScore) === 15 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/15 {fScore+bScore+sScore+dScore === 15 ? 'Complete' : ''}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Product Video</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '30/30 Complete' : '0/30'}</span></div>
                     {!isGraded ? (
-                      <div className="flex justify-between"><span className="text-blue-200">Verified Seller Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
+                      <div className="flex justify-between"><span className="text-blue-200">TrustLayer Verified Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
                     ) : (
                       <div className="flex justify-between"><span className="text-blue-200">Certification Verification</span><span className={hasCert ? 'text-white font-bold' : 'text-blue-300'}>{hasCert ? '20/20 Complete' : '0/20'}</span></div>
                     )}
-                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '20/20 Complete' : '0/20'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore+bScore+sScore+dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/20 {fScore+bScore+sScore+dScore === 20 ? 'Complete' : ''}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Video Verification</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '20/20 Complete' : '0/20'}</span></div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -516,7 +523,7 @@ export default function CreateDeal() {
                   </div>
                   <div>
                     <h4 className="font-bold text-[15px]">1. Main Photo</h4>
-                    <p className="text-[12px] text-muted-foreground">{mainPhoto ? 'Completed (+20)' : 'Required'}</p>
+                    <p className="text-[12px] text-muted-foreground">{mainPhoto ? 'Completed (+15)' : '+15 Trust Score'}</p>
                   </div>
                 </div>
                 <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${expandedSection === 'main' ? 'rotate-180' : ''}`} />
@@ -546,7 +553,7 @@ export default function CreateDeal() {
               </AnimatePresence>
             </Card>
 
-            {/* Product Photos Accordion */}
+            {/* Additional Photos Accordion */}
             <Card className="overflow-hidden border-border shadow-sm">
               <div className="p-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50" onClick={() => setExpandedSection(expandedSection === 'product' ? null : 'product')}>
                 <div className="flex items-center gap-3">
@@ -554,8 +561,8 @@ export default function CreateDeal() {
                     {(frontPhoto && backPhoto && sidePhoto && detailPhoto) ? <CheckCircle2 className="w-5 h-5" /> : <ImageIcon className="w-4 h-4" />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-[15px]">2. Product Photos</h4>
-                    <p className="text-[12px] text-muted-foreground">{[frontPhoto, backPhoto, sidePhoto, detailPhoto].filter(Boolean).length}/4 Completed</p>
+                    <h4 className="font-bold text-[15px]">2. Additional Photos</h4>
+                    <p className="text-[12px] text-muted-foreground">{(frontPhoto && backPhoto && sidePhoto && detailPhoto) ? 'Completed (+15)' : `+15 Trust Score • ${[frontPhoto, backPhoto, sidePhoto, detailPhoto].filter(Boolean).length}/4 Completed`}</p>
                   </div>
                 </div>
                 <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${expandedSection === 'product' ? 'rotate-180' : ''}`} />
@@ -568,15 +575,14 @@ export default function CreateDeal() {
                       
                       <div className="grid grid-cols-2 gap-3">
                         {[
-                          { id: "front", label: "Front View", state: frontPhoto, setState: setFrontPhoto },
-                          { id: "back", label: "Back View", state: backPhoto, setState: setBackPhoto },
-                          { id: "side", label: "Side View", state: sidePhoto, setState: setSidePhoto },
-                          { id: "detail", label: "Detail View", state: detailPhoto, setState: setDetailPhoto }
+                          { id: "front", state: frontPhoto, setState: setFrontPhoto },
+                          { id: "back", state: backPhoto, setState: setBackPhoto },
+                          { id: "side", state: sidePhoto, setState: setSidePhoto },
+                          { id: "detail", state: detailPhoto, setState: setDetailPhoto }
                         ].map((cam) => (
                           cam.state ? (
                             <div key={cam.id} className="relative aspect-square rounded-xl overflow-hidden border border-border group shadow-sm">
-                              <img src={cam.state} alt={cam.label} className="w-full h-full object-cover" />
-                              <div className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm font-semibold">{cam.label}</div>
+                              <img src={cam.state} alt="Photo" className="w-full h-full object-cover" />
                               <button
                                 onClick={() => cam.setState(null)}
                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity w-full h-full"
@@ -590,8 +596,7 @@ export default function CreateDeal() {
                               onClick={() => setInstructionModal(`product-${cam.id}`)}
                               className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-muted-foreground hover:bg-gray-100 transition-colors bg-white shadow-sm"
                             >
-                              <Camera className="h-6 w-6 mb-2 text-primary/60" />
-                              <span className="text-xs font-semibold">{cam.label}</span>
+                              <Camera className="h-6 w-6 text-primary/60" />
                             </button>
                           )
                         ))}
@@ -602,7 +607,7 @@ export default function CreateDeal() {
               </AnimatePresence>
             </Card>
 
-            {/* Video Verification Accordion */}
+            {/* Product Video Accordion */}
             <Card className="overflow-hidden border-border shadow-sm">
               <div className="p-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50" onClick={() => setExpandedSection(expandedSection === 'video' ? null : 'video')}>
                 <div className="flex items-center gap-3">
@@ -610,7 +615,7 @@ export default function CreateDeal() {
                     {hasVideo ? <CheckCircle2 className="w-5 h-5" /> : <Video className="w-4 h-4" />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-[15px]">3. Video Verification</h4>
+                    <h4 className="font-bold text-[15px]">3. Product Video</h4>
                     <p className="text-[12px] text-muted-foreground">{hasVideo ? 'Completed (+30)' : '+30 Trust Score'}</p>
                   </div>
                 </div>
@@ -711,8 +716,8 @@ export default function CreateDeal() {
                     </div>
                     <ul className="space-y-3">
                       <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Main Photo Verified</li>
-                      <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Product Photos Verified</li>
-                      <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Video Verification Complete</li>
+                      <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Additional Photos Verified</li>
+                      <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Product Video Complete</li>
                       {isGraded && <li className="flex items-center gap-3 text-[14px] font-bold text-green-900"><CheckCircle2 className="w-5 h-5 text-green-600" /> Certification Verified</li>}
                     </ul>
                   </div>
@@ -935,15 +940,15 @@ export default function CreateDeal() {
               <AnimatePresence>
                 {showScoreBreakdown && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 text-[13px] space-y-2 relative z-10 overflow-hidden">
+                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '15/15 Complete' : '0/15'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={(fScore+bScore+sScore+dScore) === 15 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/15 {fScore+bScore+sScore+dScore === 15 ? 'Complete' : ''}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Product Video</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '30/30 Complete' : '0/30'}</span></div>
                     {!isGraded ? (
-                      <div className="flex justify-between"><span className="text-blue-200">Verified Seller Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
+                      <div className="flex justify-between"><span className="text-blue-200">TrustLayer Verified Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
                     ) : (
                       <div className="flex justify-between"><span className="text-blue-200">Certification Verification</span><span className={hasCert ? 'text-white font-bold' : 'text-blue-300'}>{hasCert ? '20/20 Complete' : '0/20'}</span></div>
                     )}
-                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '20/20 Complete' : '0/20'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Product Photos</span><span className={(fScore+bScore+sScore+dScore) === 20 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/20 {fScore+bScore+sScore+dScore === 20 ? 'Complete' : ''}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Video Verification</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '20/20 Complete' : '0/20'}</span></div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1179,7 +1184,7 @@ export default function CreateDeal() {
       </AnimatePresence>
 
       {/* Instruction Modals */}
-      <BottomSheet isOpen={instructionModal !== null} onClose={() => setInstructionModal(null)} title={instructionModal === 'video' ? 'Video Verification Instructions' : 'Instruction Guidelines'}>
+      <BottomSheet isOpen={instructionModal !== null} onClose={() => setInstructionModal(null)} title={instructionModal === 'video' ? 'Product Video Instructions' : 'Instruction Guidelines'}>
         <div className="p-5 pb-8 space-y-6">
           {instructionModal === 'main' && (
             <>
@@ -1195,6 +1200,7 @@ export default function CreateDeal() {
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Avoid shadows on the item</li>
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Place on a clean, solid background</li>
               </ul>
+              <p className="text-[12px] text-muted-foreground text-center mt-4">TrustLayer requires access to your camera.</p>
               <Button className="w-full h-14 font-bold text-[16px]" onClick={() => { setInstructionModal(null); startCamera("main"); }}>Continue to Camera</Button>
             </>
           )}
@@ -1204,7 +1210,7 @@ export default function CreateDeal() {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <ImageIcon className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-[18px] font-bold">Product Photo Guidelines</h3>
+                <h3 className="text-[18px] font-bold">Additional Photo Guidelines</h3>
                 <p className="text-[14px] text-muted-foreground mt-2">Buyers want to see all angles. Be honest about condition to build trust.</p>
               </div>
               <ul className="space-y-3 bg-gray-50 p-4 rounded-xl text-[14px]">
@@ -1212,6 +1218,7 @@ export default function CreateDeal() {
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Keep the camera steady</li>
                 <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-600" /> Ensure details (like corners) are in focus</li>
               </ul>
+              <p className="text-[12px] text-muted-foreground text-center mt-4">TrustLayer requires access to your camera.</p>
               <Button className="w-full h-14 font-bold text-[16px]" onClick={() => { 
                 const camId = instructionModal.split('-')[1];
                 setInstructionModal(null); 
@@ -1246,6 +1253,7 @@ export default function CreateDeal() {
                 </div>
               </div>
 
+              <p className="text-[12px] text-muted-foreground text-center pt-2">TrustLayer requires access to your camera.</p>
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => setInstructionModal(null)}>Cancel</Button>
                 <Button className="flex-1 h-14 font-bold text-[16px]" onClick={() => { setInstructionModal(null); startCamera("video"); }}>Start Recording</Button>

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import type { Variants } from "framer-motion"
 import { 
@@ -18,6 +19,7 @@ interface AccountHubProps {
 
 export function AccountHub({ isOpen, onClose }: AccountHubProps) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const navigate = useNavigate()
 
   // Drawer variants
   const drawerVariants: Variants = {
@@ -42,7 +44,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 pointer-events-none overflow-hidden">
+        <div className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[100] pointer-events-none overflow-hidden">
           {/* Glassmorphism Backdrop */}
           <motion.div 
             initial="closed"
@@ -95,49 +97,6 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   </motion.div>
                   
                   <h2 className="text-[22px] font-extrabold text-gray-900 tracking-tight leading-none mb-1">Alex Johnson</h2>
-                  <div className="flex items-center gap-1.5 mb-5">
-                    <span className="text-[12px] font-bold text-emerald-600 uppercase tracking-wider">Verified Collector</span>
-                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                    <span className="text-[12px] font-semibold text-gray-500">Member Since 2026</span>
-                  </div>
-
-                  {/* Trust Score Visualizer */}
-                  <div className="flex items-center justify-center gap-5 w-full bg-gray-50/80 rounded-2xl p-4 border border-gray-100">
-                    <div className="relative w-[64px] h-[64px]">
-                      <svg viewBox="0 0 36 36" className="w-full h-full drop-shadow-sm">
-                        <path
-                          className="text-gray-200"
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                        />
-                        <motion.path
-                          className="text-emerald-500"
-                          strokeLinecap="round"
-                          strokeDasharray="0, 100"
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3.5"
-                          variants={ringVariants}
-                          initial="hidden"
-                          animate="visible"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-[18px] font-extrabold text-gray-900">92</span>
-                      </div>
-                    </div>
-                    
-                    <div className="text-left flex-1">
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Trust Score</p>
-                      <h3 className="text-[16px] font-bold text-emerald-600 leading-tight">Exceptional</h3>
-                      <p className="text-[12px] text-gray-500 font-medium mt-1 flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" /> Top 5% Trusted
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -153,21 +112,26 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Account</h3>
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {[
-                      { icon: <User />, label: "My Profile" },
-                      { icon: <Award />, label: "Trust Score Breakdown" },
-                      { icon: <ShieldCheck />, label: "Verification Center" },
-                      { icon: <Wallet />, label: "Payment Methods" },
-                      { icon: <MapPin />, label: "Shipping Addresses" },
-                      { icon: <Bell />, label: "Notification Preferences" },
-                      { icon: <Key />, label: "Privacy & Security" },
-                      { icon: <Globe />, label: "Language & Region" },
+                      { icon: <User />, label: "My Profile", route: "/profile" },
+                      { icon: <Wallet />, label: "Payment Methods", route: "/payment-methods" },
+                      { icon: <MapPin />, label: "Shipping Addresses", route: "/shipping-addresses" },
+                      { icon: <Bell />, label: "Notification Preferences", route: "/notification-preferences" },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group">
+                      <div 
+                        key={i} 
+                        onClick={() => {
+                          if (item.route) {
+                            navigate(item.route);
+                            onClose();
+                          }
+                        }}
+                        className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
+                      >
                         <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                           {React.cloneElement(item.icon as any, { className: "w-4 h-4" })}
                         </div>
                         <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500" />
+                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 group-active:translate-x-1 transition-transform" />
                       </div>
                     ))}
                   </div>
@@ -182,42 +146,37 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Support</h3>
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {[
-                      { icon: <HelpCircle />, label: "Help Center" },
-                      { icon: <MessageCircle />, label: "Contact Support" },
-                      { icon: <AlertTriangle />, label: "Report Issue" },
-                      { icon: <Shield />, label: "Transaction Protection" },
+                      { icon: <HelpCircle />, label: "Help Center", route: "/help-center" },
+                      { icon: <MessageCircle />, label: "Contact Support", route: "/contact-support" },
+                      { icon: <AlertTriangle />, label: "Report Issue", route: "/report-issue" },
+                      { icon: <Shield />, label: "Transaction Protection", route: "/transaction-protection" },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group">
+                      <div 
+                        key={i} 
+                        onClick={() => {
+                          if (item.route) {
+                            navigate(item.route);
+                            onClose();
+                          }
+                        }}
+                        className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
+                      >
                         <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
                           {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
                         </div>
                         <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-300" />
+                        <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
                       </div>
                     ))}
                   </div>
-                </motion.div>
-
-                {/* BOTTOM PREMIUM AREA */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="flex flex-col items-center justify-center py-4"
-                >
-                  <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2 border border-emerald-100">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-[13px] font-extrabold text-gray-700 uppercase tracking-widest mb-1">TrustLayer Protection</h4>
-                  <p className="text-[12px] font-bold text-gray-400">Active Since Jan 2026</p>
                 </motion.div>
 
                 {/* LOGOUT */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="pt-2 pb-10"
+                  transition={{ delay: 0.8 }}
+                  className="py-4"
                 >
                   <div 
                     onClick={() => setShowLogoutConfirm(true)}
@@ -226,6 +185,20 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                     <LogOut className="w-5 h-5" />
                     <span className="text-[15px] font-extrabold">Sign Out</span>
                   </div>
+                </motion.div>
+
+                {/* BOTTOM PREMIUM AREA */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="flex flex-col items-center justify-center pt-2 pb-10"
+                >
+                  <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2 border border-emerald-100">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-[13px] font-extrabold text-gray-700 uppercase tracking-widest mb-1">TrustLayer Protection</h4>
+                  <p className="text-[12px] font-bold text-gray-400">Active Since Jan 2026</p>
                 </motion.div>
 
               </div>
@@ -252,25 +225,28 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   <div className="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mx-auto mb-4 border border-rose-100">
                     <LogOut className="w-6 h-6" />
                   </div>
-                  <h3 className="text-[20px] font-extrabold text-center text-gray-900 mb-2">Leaving TrustLayer?</h3>
-                  <p className="text-[14px] text-gray-500 text-center font-medium mb-6">You can sign back in anytime to access your trusted account.</p>
+                  <h2 className="text-[20px] font-extrabold text-gray-900 mb-2">Sign Out?</h2>
+                  <p className="text-[14px] text-gray-500 leading-relaxed mb-6">
+                    Are you sure you want to sign out of your TrustLayer account?
+                  </p>
                   
-                  <div className="flex flex-col gap-2.5">
+                  <div className="flex gap-3 w-full">
                     <Button 
-                      className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold h-12 rounded-xl text-[15px] shadow-sm"
-                      onClick={() => {
-                        setShowLogoutConfirm(false);
-                        onClose();
-                      }}
-                    >
-                      Sign Out
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-gray-600 font-bold h-12 rounded-xl text-[15px] hover:bg-gray-100"
+                      variant="outline" 
+                      className="flex-1 h-12 text-[15px] font-bold rounded-xl"
                       onClick={() => setShowLogoutConfirm(false)}
                     >
                       Cancel
+                    </Button>
+                    <Button 
+                      className="flex-1 h-12 text-[15px] font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white"
+                      onClick={() => {
+                        setShowLogoutConfirm(false);
+                        onClose();
+                        navigate('/login');
+                      }}
+                    >
+                      Sign Out
                     </Button>
                   </div>
                 </motion.div>

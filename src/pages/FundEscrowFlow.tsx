@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronLeft, ShieldCheck, Check, CheckCircle2, 
-  CreditCard, Wallet, Lock, Shield, ArrowRight, Smartphone, Mail, X, AlertCircle
+  CreditCard, Wallet, Lock, Shield, ArrowRight, Smartphone, Mail, X, AlertCircle, Home, Building2, Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,12 +33,60 @@ export default function FundEscrowFlow() {
   const [isPhoneVerified, setIsPhoneVerified] = React.useState(false)
   const [isVerifyingPhone, setIsVerifyingPhone] = React.useState(false)
   
-  // Step 3: Address
-  const [street, setStreet] = React.useState("")
-  const [apt, setApt] = React.useState("")
-  const [city, setCity] = React.useState("")
-  const [state, setState] = React.useState("")
-  const [zip, setZip] = React.useState("")
+  // Step 3: Address Selection
+  type Address = {
+    id: string;
+    type: string;
+    name: string;
+    street: string;
+    apt?: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    phone: string;
+    isDefault?: boolean;
+  }
+
+  const [addresses, setAddresses] = React.useState<Address[]>([
+    {
+      id: "1",
+      type: "Home",
+      name: "Alex Johnson",
+      street: "123 Main Street",
+      city: "Austin",
+      state: "TX",
+      zip: "78701",
+      country: "United States",
+      phone: "+1 (555) 123-4567",
+      isDefault: true
+    },
+    {
+      id: "2",
+      type: "Office",
+      name: "Alex Johnson",
+      street: "500 Congress Ave",
+      city: "Austin",
+      state: "TX",
+      zip: "78704",
+      country: "United States",
+      phone: "+1 (555) 987-6543"
+    }
+  ])
+  const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(null)
+  const [isAddingAddress, setIsAddingAddress] = React.useState(false)
+  const [newAddress, setNewAddress] = React.useState<Partial<Address>>({
+    name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567"
+  })
+
+  const selectedAddress = addresses.find(a => a.id === selectedAddressId)
+
+  React.useEffect(() => {
+    if (step === 3) {
+      if (addresses.length === 0) setIsAddingAddress(true)
+      else if (addresses.length === 1 && !selectedAddressId) setSelectedAddressId(addresses[0].id)
+    }
+  }, [step, addresses.length])
 
   // Step 4: Terms
   const [termsChecked, setTermsChecked] = React.useState({
@@ -74,6 +122,7 @@ export default function FundEscrowFlow() {
   
   // Handlers
   const nextStep = () => setStep(s => {
+    if (s === 1 && isLoginView) return 3
     if (s === 2) return 2.5
     if (s === 2.5) return 3
     return s + 1
@@ -81,10 +130,21 @@ export default function FundEscrowFlow() {
   const prevStep = () => {
     if (step === 1) navigate("/buyer-view/TRUST-1024")
     else setStep(s => {
+      if (s === 3 && isLoginView) return 1
       if (s === 3) return 2.5
       if (s === 2.5) return 2
       return s - 1
     })
+  }
+
+  const handleSaveAddress = (e: React.FormEvent) => {
+    e.preventDefault()
+    const id = Date.now().toString()
+    const addr = { ...newAddress, id, type: newAddress.type || "Other" } as Address
+    setAddresses(prev => [...prev, addr])
+    setSelectedAddressId(id)
+    setIsAddingAddress(false)
+    setNewAddress({ name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567" })
   }
 
   const handleOtpChange = (index: number, value: string) => {
@@ -392,7 +452,25 @@ export default function FundEscrowFlow() {
                             <div className="flex items-center justify-center w-16 h-14 rounded-xl border border-gray-200 bg-gray-50/50 text-[16px] font-bold text-foreground">
                               +1
                             </div>
-                            <Input required type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className="h-14 flex-1 text-[16px] font-bold bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20" placeholder="(555) 000-0000" />
+                            <Input 
+                              required 
+                              type="tel" 
+                              inputMode="numeric"
+                              maxLength={14}
+                              value={phoneNumber} 
+                              onChange={(e) => {
+                                const digits = e.target.value.replace(/\D/g, "");
+                                let formatted = digits;
+                                if (digits.length > 3 && digits.length <= 6) {
+                                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                                } else if (digits.length > 6) {
+                                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+                                }
+                                setPhoneNumber(formatted);
+                              }} 
+                              className="h-14 flex-1 text-[16px] font-bold bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20" 
+                              placeholder="(555) 000-0000" 
+                            />
                           </div>
                         </div>
                       </form>
@@ -489,37 +567,116 @@ export default function FundEscrowFlow() {
           {/* STEP 3: SHIPPING ADDRESS */}
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 pt-2">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight mb-2">Where should we ship?</h1>
-                <p className="text-[14px] text-muted-foreground">
-                  Only the seller and shipping carrier can view this address.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium">Street Address</label>
-                  <Input value={street} onChange={e => setStreet(e.target.value)} placeholder="123 Main St" className="h-12 bg-gray-50/50" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium">Address Line 2 (Apt, Suite, etc.)</label>
-                  <Input value={apt} onChange={e => setApt(e.target.value)} placeholder="Apt 4B" className="h-12 bg-gray-50/50" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium">City</label>
-                  <Input value={city} onChange={e => setCity(e.target.value)} placeholder="New York" className="h-12 bg-gray-50/50" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[13px] font-medium">State</label>
-                    <Input value={state} onChange={e => setState(e.target.value)} placeholder="NY" className="h-12 bg-gray-50/50" />
+              {!isAddingAddress && addresses.length > 0 ? (
+                <>
+                  <div>
+                    <h1 className="text-2xl font-bold tracking-tight mb-2">Select Shipping Address</h1>
+                    <p className="text-[14px] text-muted-foreground">
+                      Choose where you would like this item delivered.
+                    </p>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[13px] font-medium">ZIP Code</label>
-                    <Input value={zip} onChange={e => setZip(e.target.value)} placeholder="10001" className="h-12 bg-gray-50/50" />
+                  <div className="space-y-4">
+                    {addresses.map(addr => (
+                      <Card 
+                        key={addr.id}
+                        onClick={() => setSelectedAddressId(addr.id)}
+                        className={`p-5 cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAddressId === addr.id ? 'border-primary bg-blue-50/50' : 'border-gray-100 hover:border-gray-200'}`}
+                      >
+                        <div className="flex gap-4">
+                          <div className={`mt-1 w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${selectedAddressId === addr.id ? 'bg-primary border-primary' : 'border-gray-300'}`}>
+                            {selectedAddressId === addr.id && <Check className="w-3.5 h-3.5 text-white" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                {addr.type === "Home" ? <Home className="w-4 h-4 text-muted-foreground" /> : <Building2 className="w-4 h-4 text-muted-foreground" />}
+                                <span className="font-bold text-[15px]">{addr.type}</span>
+                              </div>
+                              {addr.isDefault && (
+                                <span className="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">DEFAULT ADDRESS</span>
+                              )}
+                            </div>
+                            <p className="text-[14px] font-semibold mb-1">{addr.name}</p>
+                            <p className="text-[13px] text-muted-foreground leading-relaxed">
+                              {addr.street} {addr.apt && `, ${addr.apt}`} <br/>
+                              {addr.city}, {addr.state} {addr.zip}<br/>
+                              {addr.country}
+                            </p>
+                            <p className="text-[13px] text-muted-foreground mt-2">{addr.phone}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                    <Button variant="outline" className="w-full h-[56px] rounded-2xl border-2 border-dashed border-gray-200 text-gray-500 font-bold hover:bg-gray-50 hover:text-gray-900" onClick={() => setIsAddingAddress(true)}>
+                      <Plus className="w-5 h-5 mr-2" /> Add New Address
+                    </Button>
                   </div>
-                </div>
-              </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                     <div>
+                       <h1 className="text-2xl font-bold tracking-tight mb-2">Add Shipping Address</h1>
+                       <p className="text-[14px] text-muted-foreground">
+                         Where should the seller send your item?
+                       </p>
+                     </div>
+                     {addresses.length > 0 && (
+                       <Button variant="ghost" size="icon" onClick={() => setIsAddingAddress(false)}>
+                         <X className="w-5 h-5" />
+                       </Button>
+                     )}
+                  </div>
+                  <form id="address-form" onSubmit={handleSaveAddress} className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Location Name (e.g., Home, Office)</label>
+                      <Input required value={newAddress.type || ""} onChange={e => setNewAddress({...newAddress, type: e.target.value})} placeholder="Home" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Full Name</label>
+                      <Input required value={newAddress.name || ""} onChange={e => setNewAddress({...newAddress, name: e.target.value})} placeholder="Alex Johnson" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Street Address</label>
+                      <Input required value={newAddress.street || ""} onChange={e => setNewAddress({...newAddress, street: e.target.value})} placeholder="123 Main St" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Apartment / Suite (Optional)</label>
+                      <Input value={newAddress.apt || ""} onChange={e => setNewAddress({...newAddress, apt: e.target.value})} placeholder="Apt 4B" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">City</label>
+                      <Input required value={newAddress.city || ""} onChange={e => setNewAddress({...newAddress, city: e.target.value})} placeholder="Austin" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[13px] font-medium">State / Province</label>
+                        <Input required value={newAddress.state || ""} onChange={e => setNewAddress({...newAddress, state: e.target.value})} placeholder="TX" className="h-12 bg-gray-50/50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[13px] font-medium">ZIP Code</label>
+                        <Input required value={newAddress.zip || ""} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} placeholder="78701" className="h-12 bg-gray-50/50" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Country</label>
+                      <Input required value={newAddress.country || ""} onChange={e => setNewAddress({...newAddress, country: e.target.value})} placeholder="United States" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[13px] font-medium">Phone Number</label>
+                      <Input required type="tel" value={newAddress.phone || ""} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} placeholder="+1 (555) 123-4567" className="h-12 bg-gray-50/50" />
+                    </div>
+                    <div className="pt-2 pb-6">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${newAddress.isDefault ? 'bg-primary border-primary' : 'border-gray-300'}`} onClick={() => setNewAddress({...newAddress, isDefault: !newAddress.isDefault})}>
+                           {newAddress.isDefault && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                        <span className="text-[14px] font-medium text-gray-700">Set as Default Address</span>
+                      </label>
+                    </div>
+                  </form>
+                </>
+              )}
             </motion.div>
           )}
 
@@ -534,6 +691,29 @@ export default function FundEscrowFlow() {
               </div>
 
               <div className="space-y-3">
+                {/* Shipping Address Summary */}
+                {selectedAddress && (
+                  <Card className="p-4 border border-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold text-[14px] text-gray-500 uppercase tracking-wider">Shipping Address</h3>
+                      <button onClick={() => setStep(3)} className="text-[13px] text-primary font-bold hover:underline">
+                        [ Change ]
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-1 text-[14px]">
+                      <span className="font-bold">{selectedAddress.name}</span>
+                      <span className="text-muted-foreground">
+                        {selectedAddress.street} {selectedAddress.apt && `, ${selectedAddress.apt}`}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zip}
+                      </span>
+                      <span className="text-muted-foreground">{selectedAddress.country}</span>
+                      <span className="text-muted-foreground mt-1">{selectedAddress.phone}</span>
+                    </div>
+                  </Card>
+                )}
+
                 {[
                   { id: 'item', title: 'Item', desc: 'Charizard Holo 1999\nPSA 10 Gem Mint', value: '$8,450' },
                   { id: 'shipping', title: 'Shipping', desc: 'Shipping Cost', value: '$35' },
@@ -568,7 +748,53 @@ export default function FundEscrowFlow() {
                       {termsChecked.fees && <Check className="w-3.5 h-3.5 text-white" />}
                     </div>
                     <div className="flex-1 space-y-4">
-                      <h3 className="font-bold text-[15px]">Fees & Total</h3>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-[15px]">Fees & Total</h3>
+                      </div>
+                      
+                      {/* Platform Fee Arrangement Section */}
+                      <div className="bg-gray-50 border border-gray-100 p-3 rounded-xl space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[13px] font-bold text-foreground">Platform Fee</span>
+                          {feeOption === 1 && (
+                            <span className="bg-green-100 text-green-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                              Buyer Pays 100%
+                            </span>
+                          )}
+                          {feeOption === 2 && (
+                            <span className="bg-blue-100 text-blue-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                              Seller Pays 100%
+                            </span>
+                          )}
+                          {feeOption === 0 && (
+                            <span className="bg-orange-100 text-orange-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                              Split 50 / 50
+                            </span>
+                          )}
+                        </div>
+                        
+                        {feeOption === 0 && (
+                          <div className="flex gap-4 text-[12px] pt-1">
+                            <div className="flex-1 bg-white border border-gray-100 p-2 rounded-lg flex justify-between items-center">
+                              <span className="text-muted-foreground">Your Share</span>
+                              <span className="font-bold text-foreground">${buyerFeeShare.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div className="flex-1 bg-white border border-gray-100 p-2 rounded-lg flex justify-between items-center">
+                              <span className="text-muted-foreground">Seller Share</span>
+                              <span className="font-medium text-foreground">${(platformFee - buyerFeeShare).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <p className="text-[12px] text-muted-foreground leading-relaxed">
+                          {feeOption === 1 && "You are responsible for paying the Platform Fee for this transaction."}
+                          {feeOption === 2 && "The seller is covering the Platform Fee. You only pay the item price and shipping."}
+                          {feeOption === 0 && "The Platform Fee is shared equally between you and the seller."}
+                        </p>
+                      </div>
                       
                       <div className="space-y-2 text-[13px] bg-white border border-gray-100 p-3 rounded-xl">
                         <div className="flex justify-between items-center px-2 pt-2 text-muted-foreground">
@@ -579,10 +805,26 @@ export default function FundEscrowFlow() {
                           <span>Shipping</span>
                           <span className="font-medium text-foreground">${shippingCostNum}</span>
                         </div>
-                        <div className="flex justify-between items-center px-2 text-muted-foreground">
-                          <span>{feeOption === 0 ? "Your Platform Fee Share" : "Platform Fee"}</span>
-                          <span className="font-medium text-foreground">{feeOption === 2 ? "Paid By Seller" : `$${buyerFeeShare.toLocaleString(undefined, {minimumFractionDigits: feeOption === 0 ? 2 : 0})}`}</span>
-                        </div>
+                        
+                        {feeOption === 1 && (
+                          <div className="flex justify-between items-center px-2 text-muted-foreground">
+                            <span>Platform Fee</span>
+                            <span className="font-medium text-foreground">${platformFee.toLocaleString()}</span>
+                          </div>
+                        )}
+                        {feeOption === 0 && (
+                          <div className="flex justify-between items-center px-2 text-muted-foreground">
+                            <span>Platform Fee (Your Share)</span>
+                            <span className="font-medium text-foreground">${buyerFeeShare.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                          </div>
+                        )}
+                        {feeOption === 2 && (
+                          <div className="flex justify-between items-center px-2 text-muted-foreground">
+                            <span>Platform Fee</span>
+                            <span className="font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider">Included by Seller</span>
+                          </div>
+                        )}
+                        
                         <div className="h-px bg-gray-100 my-2" />
                         <div className="flex justify-between items-center px-2 font-bold text-[15px]">
                           <span>Total You Pay</span>
@@ -590,11 +832,6 @@ export default function FundEscrowFlow() {
                         </div>
                       </div>
 
-                      <p className="text-[12px] text-muted-foreground italic leading-relaxed whitespace-pre-line">
-                        {feeOption === 0 && "The Platform Fee is shared equally between buyer and seller."}
-                        {feeOption === 1 && "You are responsible for the Platform Fee."}
-                        {feeOption === 2 && "The seller is paying the Platform Fee. You only pay for the item and shipping."}
-                      </p>
                     </div>
                   </div>
                 </Card>
@@ -637,6 +874,25 @@ export default function FundEscrowFlow() {
                  <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
                  <p className="text-[13px] font-medium text-blue-900">Payment is released only when you confirm delivery or when the delivery confirmation window expires.</p>
               </div>
+
+              {/* Shipping To Summary */}
+              {selectedAddress && (
+                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex justify-between items-start">
+                  <div>
+                    <h3 className="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-1">Shipping To</h3>
+                    <p className="text-[14px] font-bold text-gray-900">{selectedAddress.name}</p>
+                    <p className="text-[13px] text-gray-600 mt-0.5">
+                      {selectedAddress.street} {selectedAddress.apt && `, ${selectedAddress.apt}`}
+                    </p>
+                    <p className="text-[13px] text-gray-600">
+                      {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zip}
+                    </p>
+                  </div>
+                  <button onClick={() => setStep(3)} className="text-[13px] text-primary font-bold hover:underline">
+                    [ Change ]
+                  </button>
+                </div>
+              )}
 
               <div className="space-y-4 pt-2">
                 <div className="flex bg-gray-100 p-1 rounded-xl">
@@ -802,7 +1058,7 @@ export default function FundEscrowFlow() {
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="w-full mt-8">
                  <Button 
                    className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white shadow-lg flex items-center justify-center gap-2"
-                   onClick={() => navigate("/dashboard/buyer")}
+                   onClick={() => navigate("/dashboard?mode=buyer")}
                  >
                    Go to Dashboard <ArrowRight className="w-5 h-5" />
                  </Button>
@@ -847,9 +1103,19 @@ export default function FundEscrowFlow() {
             )}
 
             {step === 3 && (
-              <Button className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white" onClick={nextStep}>
-                Continue
-              </Button>
+              isAddingAddress ? (
+                <Button form="address-form" type="submit" className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white">
+                  Save Address
+                </Button>
+              ) : (
+                <Button 
+                  className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white disabled:opacity-50" 
+                  disabled={!selectedAddressId}
+                  onClick={nextStep}
+                >
+                  Continue
+                </Button>
+              )
             )}
 
             {step === 4 && (
