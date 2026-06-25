@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
-import { ChevronLeft, Package, Upload, Calendar } from "lucide-react"
+import { ChevronLeft, Package, Upload, Calendar, FileText, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CustomSelect } from "@/components/ui/custom-select"
@@ -14,6 +14,27 @@ export default function AddTracking() {
   const [deliveryDate, setDeliveryDate] = React.useState("")
   const [customCarrier, setCustomCarrier] = React.useState("")
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
+  
+  const [shippingProof, setShippingProof] = React.useState<File | null>(null)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setShippingProof(e.target.files[0])
+    }
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShippingProof(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] pb-[140px]">
@@ -72,7 +93,7 @@ export default function AddTracking() {
 
           <div className="space-y-2">
             <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
-              Estimated Delivery Date <span className="text-gray-400 font-normal">(Optional)</span>
+              Estimated Delivery Date
             </label>
             <CustomDatePicker 
               value={deliveryDate} 
@@ -85,15 +106,49 @@ export default function AddTracking() {
             <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
               Shipping Proof <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm border border-gray-100">
-                <Upload className="w-5 h-5" />
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept=".jpg,.jpeg,.png,.pdf"
+              onChange={handleFileChange}
+            />
+            {!shippingProof ? (
+              <div 
+                onClick={handleUploadClick}
+                className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center gap-2 bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm border border-gray-100">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div className="text-center">
+                  <span className="text-[14px] font-bold text-blue-600">Upload receipt</span>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">JPG, PNG or PDF (Max 5MB)</p>
+                </div>
               </div>
-              <div className="text-center">
-                <span className="text-[14px] font-bold text-blue-600">Upload receipt</span>
-                <p className="text-[12px] text-muted-foreground mt-0.5">JPG, PNG or PDF (Max 5MB)</p>
+            ) : (
+              <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-[14px] font-medium text-foreground truncate">
+                      {shippingProof.name}
+                    </span>
+                    <span className="text-[12px] text-muted-foreground">
+                      {(shippingProof.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleRemoveFile}
+                  className="p-2 shrink-0 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -102,6 +157,7 @@ export default function AddTracking() {
         <Button 
           className="w-full h-14 text-[16px] font-bold shadow-sm"
           onClick={() => navigate("/tracking-success/deal-123")}
+          disabled={!carrier || !trackingNumber || !deliveryDate || (carrier === "Other" && !customCarrier)}
         >
           Submit Tracking Information
         </Button>

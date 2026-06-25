@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import {
   Plus,
   ChevronRight,
@@ -9,7 +9,13 @@ import {
   ShieldCheck,
   Upload,
   AlertCircle,
-  X
+  X,
+  Store,
+  ShoppingCart,
+  CheckCircle2,
+  Info,
+  Clock,
+  AlertTriangle
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
@@ -20,17 +26,54 @@ import { AccountHub } from "@/components/AccountHub"
 export default function Dashboard() {
   const navigate = useNavigate()
   const [isAccountHubOpen, setIsAccountHubOpen] = useState(false)
-  const [userMode, setUserMode] = useState<"seller" | "buyer">("seller")
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
-  const [showModeDropdown, setShowModeDropdown] = useState(false)
+  const location = useLocation()
+  const initialMode = new URLSearchParams(location.search).get('mode') as "seller" | "buyer" || "seller"
+  const [userMode, setUserMode] = useState<"seller" | "buyer">(initialMode)
 
   const currentHour = new Date().getHours()
   const greeting = currentHour < 12 ? "Good Morning" : currentHour < 18 ? "Good Afternoon" : "Good Evening"
 
-  const notifications = [
-    "Buyer funded your deal",
-    "Complete email verification before creating your first deal.",
-    "Item shipped"
+  const actionRequired = [
+    {
+      id: 1,
+      type: 'orange',
+      title: 'Upload Tracking',
+      dealId: 'TRUST-1024',
+      description: 'Buyer funded your deal.',
+      time: 'Just now',
+      cta: 'Add Tracking',
+      Icon: Clock,
+    },
+    {
+      id: 2,
+      type: 'red',
+      title: 'Verify your email',
+      description: 'Required to start transacting.',
+      time: '2 hours ago',
+      cta: 'Verify Now',
+      Icon: AlertCircle,
+    }
+  ]
+
+  const recentUpdates = [
+    {
+      id: 3,
+      type: 'green',
+      title: 'Item delivered',
+      dealId: 'TRUST-0992',
+      description: 'Buyer has received the item.',
+      time: 'Yesterday',
+      Icon: CheckCircle2,
+    },
+    {
+      id: 4,
+      type: 'blue',
+      title: 'Funds released',
+      dealId: 'TRUST-0845',
+      description: 'Payout is on the way to your bank.',
+      time: '2 days ago',
+      Icon: Info,
+    }
   ]
 
   return (
@@ -56,26 +99,31 @@ export default function Dashboard() {
               transition={{ duration: 0.4, delay: 0.1 }}
               className="flex flex-col justify-center"
             >
-              <h1 className="text-[19px] font-extrabold text-foreground tracking-tight leading-none mb-1.5">{greeting}, Alex</h1>
-              <div className="relative">
+              <h1 className="text-[19px] font-extrabold text-foreground tracking-tight leading-none mb-3">{greeting}, Alex</h1>
+              
+              {/* Workspace Toggle */}
+              <div className="flex bg-gray-100 p-1 rounded-xl w-full max-w-[240px] relative">
+                {/* Animated Background */}
+                <motion.div
+                  layoutId="workspace-active-bg"
+                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg ${userMode === 'seller' ? 'bg-[#2563EB] left-1' : 'bg-[#10B981] left-[calc(50%+2px)]'}`}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+                
                 <button
-                  onClick={() => setShowModeDropdown(!showModeDropdown)}
-                  className={`flex items-center gap-1 text-[12px] font-bold px-2 py-0.5 rounded tracking-wider mb-1 ${userMode === 'buyer' ? 'text-[#10B981] bg-[#10B981]/10' : 'text-[#2563EB] bg-[#2563EB]/10'}`}
+                  onClick={() => setUserMode('seller')}
+                  className={`flex-1 py-1.5 text-[12px] font-bold rounded-lg transition-colors relative z-10 flex items-center justify-center gap-1.5 ${userMode === 'seller' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  {userMode === 'buyer' ? 'Buyer Mode' : 'Seller Mode'} <ChevronDown className="w-3 h-3" />
+                  <Store className="w-3.5 h-3.5" /> SELLER
                 </button>
-                <AnimatePresence>
-                  {showModeDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-                      className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg w-32 py-1 z-50"
-                    >
-                      <button className="w-full text-left px-3 py-2 text-[13px] font-medium hover:bg-gray-50 text-foreground" onClick={() => { setUserMode('seller'); setShowModeDropdown(false); }}>Seller Mode</button>
-                      <button className="w-full text-left px-3 py-2 text-[13px] font-medium hover:bg-gray-50 text-foreground" onClick={() => { setUserMode('buyer'); setShowModeDropdown(false); }}>Buyer Mode</button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <button
+                  onClick={() => setUserMode('buyer')}
+                  className={`flex-1 py-1.5 text-[12px] font-bold rounded-lg transition-colors relative z-10 flex items-center justify-center gap-1.5 ${userMode === 'buyer' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  <ShoppingCart className="w-3.5 h-3.5" /> BUYER
+                </button>
               </div>
+
             </motion.div>
           </div>
 
@@ -85,39 +133,15 @@ export default function Dashboard() {
               animate={{ scale: 1 }}
               transition={{ duration: 0.3, delay: 0.2, type: "spring" }}
               className="cursor-pointer"
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              onClick={() => navigate('/notifications')}
             >
               <div className="h-11 w-11 bg-white rounded-full flex items-center justify-center border border-gray-200 shadow-sm text-foreground hover:bg-gray-50 transition-colors">
                 <Bell className="h-5 w-5 text-gray-800" />
-                <div className="absolute -top-1 -right-1 h-4 w-4 bg-pink-500 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white">
-                  3
+                <div className="absolute -top-1 -right-1 h-4 w-4 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white">
+                  {actionRequired.length}
                 </div>
               </div>
             </motion.div>
-
-            <AnimatePresence>
-              {isNotificationsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, transformOrigin: "top right" }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden"
-                >
-                  <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <span className="font-bold text-[14px]">Notifications</span>
-                    <button onClick={() => setIsNotificationsOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {notifications.map((note, i) => (
-                      <div key={i} className="p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3">
-                        <div className="mt-0.5 shrink-0"><AlertCircle className="w-4 h-4 text-primary" /></div>
-                        <p className="text-[13px] text-foreground font-medium leading-snug">{note}</p>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -223,13 +247,13 @@ export default function Dashboard() {
       <div className="space-y-2 mt-6">
         <div className="flex items-center justify-between px-1 mb-1">
           <h2 className="text-[18px] font-bold text-foreground">Recent Deals</h2>
-          <Button variant="link" className={`px-0 text-[14px] h-auto font-semibold ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>View All</Button>
+          <Button onClick={() => navigate("/transactions")} variant="link" className={`px-0 text-[14px] h-auto font-semibold ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>View All</Button>
         </div>
 
         <Card className={`border shadow-sm overflow-hidden ${userMode === 'buyer' ? 'bg-[#F2FCF7] border-[#10B981]' : 'bg-[#F5F9FF] border-[#2563EB]'}`}>
           <div className="flex flex-col divide-y divide-gray-100">
             {/* Item 1 */}
-            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
+            <div onClick={() => navigate("/deal-details/TRUST-1024")} className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="/pokemon-main.jpg" alt="Charizard" className="w-full h-full object-cover" />
@@ -247,7 +271,7 @@ export default function Dashboard() {
             </div>
 
             {/* Item 2 */}
-            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
+            <div onClick={() => navigate("/deal-details/TRUST-1025")} className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop" alt="Leica" className="w-full h-full object-cover" />
@@ -265,7 +289,7 @@ export default function Dashboard() {
             </div>
 
             {/* Item 3 */}
-            <div className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
+            <div onClick={() => navigate("/deal-details/TRUST-1026")} className={`cursor-pointer transition-colors p-3.5 flex items-center justify-between group ${userMode === 'buyer' ? 'hover:bg-[#E6F8EE]' : 'hover:bg-[#EBF3FF]'}`}>
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-200">
                   <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=200&auto=format&fit=crop" alt="MacBook" className="w-full h-full object-cover" />

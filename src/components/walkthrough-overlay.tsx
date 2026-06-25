@@ -230,8 +230,8 @@ export function WalkthroughOverlay({ isOpen, onClose }: WalkthroughOverlayProps)
                   <div className="flex flex-col items-center text-center">
                     <div className="w-full bg-white border border-border rounded-2xl shadow-sm mb-10 p-5 text-left">
                       <div className="flex items-center gap-4 border-b border-gray-100 pb-4 mb-4">
-                        <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-                          <User className="w-6 h-6 text-gray-400" />
+                        <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-gray-200 bg-gray-100">
+                          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop" alt="Alex M." className="w-full h-full object-cover" />
                         </div>
                         <div>
                           <h3 className="font-bold text-[16px]">Alex M.</h3>

@@ -217,10 +217,17 @@ export default function VerifyEmail() {
                     key={i}
                     ref={(el) => { inputRefs.current[i] = el; }}
                     required 
-                    maxLength={1} 
+                    maxLength={1}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="h-14 text-center text-lg font-bold p-0 bg-gray-50/50 border-gray-200 focus-visible:ring-primary/20" 
                     placeholder="0"
-                    onChange={(e) => handleInput(i, e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      e.target.value = val;
+                      handleInput(i, val);
+                    }}
                     onKeyDown={(e) => handleKeyDown(i, e)}
                   />
                 ))}
