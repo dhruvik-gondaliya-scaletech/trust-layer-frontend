@@ -1,86 +1,231 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
 import { 
-  ChevronLeft, 
-  CheckCircle2, 
-  Info,
-  AlertCircle, 
-  Clock
+  ChevronLeft,
+  Check,
+  CheckCircle2
 } from "lucide-react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Notifications() {
   const navigate = useNavigate()
   const [filter, setFilter] = React.useState<'all' | 'selling' | 'buying'>('all')
+  const [toasts, setToasts] = React.useState<{ id: number, message: string }[]>([])
 
-  const actionRequiredData = [
+  const initialData = [
     {
-      id: 1,
+      id: 11,
       role: 'selling',
-      type: 'orange',
-      title: 'Upload Tracking',
+      userName: 'TrustLayer',
+      title: 'Deal created successfully',
+      productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      description: 'Buyer funded your deal.',
+      description: 'Your deal is ready. Share the deal link with the buyer to continue.',
       time: 'Just now',
-      cta: 'Add Tracking',
-      Icon: Clock,
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: false
     },
     {
-      id: 2,
-      role: 'buying',
-      type: 'red',
-      title: 'Item Shipped',
-      dealId: 'TRUST-1050',
-      description: 'Seller has shipped your item.',
-      time: '2 hours ago',
-      cta: 'Track Package',
-      Icon: AlertCircle,
-    }
-  ]
-
-  const recentUpdatesData = [
-    {
-      id: 3,
+      id: 10,
       role: 'selling',
-      type: 'green',
-      title: 'Item delivered',
-      dealId: 'TRUST-0992',
-      description: 'Buyer has received the item.',
+      userName: 'Michael Smith',
+      title: 'Michael Smith completed payment',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      description: 'Michael Smith completed the payment.\n\nFunds are now on hold until the deal is completed.\n\nYou can now prepare the shipment.',
+      time: '15 mins ago',
+      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=150&auto=format&fit=crop',
+      isRead: false
+    },
+    {
+      id: 9,
+      role: 'selling',
+      userName: 'TrustLayer',
+      title: 'Tracking information needed',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      description: 'Please upload your tracking details after shipping the item.',
+      time: '20 mins ago',
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: false
+    },
+    {
+      id: 8,
+      role: 'selling',
+      userName: 'TrustLayer',
+      title: 'Tracking shared with buyer',
+      productName: 'Vintage Leica M6',
+      dealId: 'TRUST-1050',
+      description: 'Your tracking information has been shared with the buyer.',
+      time: '4 hours ago',
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: true
+    },
+    {
+      id: 7,
+      role: 'selling',
+      userName: 'David Wilson',
+      title: 'David Wilson confirmed delivery',
+      productName: 'MacBook Pro M3',
+      dealId: 'TRUST-1068',
+      description: 'The buyer confirmed receiving the item.\n\nFunds will now be released to your wallet.',
       time: 'Yesterday',
-      Icon: CheckCircle2,
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop',
+      isRead: true
+    },
+    {
+      id: 6,
+      role: 'selling',
+      userName: 'TrustLayer',
+      title: 'Funds released',
+      productName: 'MacBook Pro M3',
+      dealId: 'TRUST-1068',
+      description: 'Your payout is now available in your wallet.',
+      time: 'Yesterday',
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: true
+    },
+    {
+      id: 5,
+      role: 'buying',
+      userName: 'Emily Davis',
+      title: 'Emily Davis accepted your deal',
+      productName: 'Pokemon Booster Box',
+      dealId: 'TRUST-1075',
+      description: 'Your deal has been accepted.\n\nComplete payment to continue.',
+      time: 'Yesterday',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop',
+      isRead: true
     },
     {
       id: 4,
       role: 'buying',
-      type: 'blue',
-      title: 'Funds released',
-      dealId: 'TRUST-0845',
-      description: 'Payout is on the way to your bank.',
+      userName: 'TrustLayer',
+      title: 'Payment completed',
+      productName: 'Pokemon Booster Box',
+      dealId: 'TRUST-1075',
+      description: 'Your payment was received successfully.\n\nFunds are now on hold until delivery is confirmed.',
       time: '2 days ago',
-      Icon: Info,
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: true
+    },
+    {
+      id: 3,
+      role: 'buying',
+      userName: 'Alex Johnson',
+      title: 'Alex Johnson shipped your item',
+      productName: 'Vintage Leica M6',
+      dealId: 'TRUST-1050',
+      description: 'Tracking information has been shared.\n\nYour package is on the way.',
+      time: '2 days ago',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop',
+      isRead: true
+    },
+    {
+      id: 2,
+      role: 'buying',
+      userName: 'USPS',
+      title: 'Package delivered',
+      productName: 'Vintage Leica M6',
+      dealId: 'TRUST-1050',
+      description: 'Your package has been marked as delivered.\n\nPlease inspect the item.',
+      time: '3 days ago',
+      avatar: 'https://ui-avatars.com/api/?name=USPS&background=004B87&color=fff',
+      isRead: true
+    },
+    {
+      id: 1,
+      role: 'buying',
+      userName: 'TrustLayer',
+      title: 'Confirm delivery',
+      productName: 'Vintage Leica M6',
+      dealId: 'TRUST-1050',
+      description: 'If everything looks good, confirm delivery to complete the transaction.',
+      time: '3 days ago',
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: true
     }
   ]
 
-  const actionRequired = actionRequiredData.filter(item => filter === 'all' || item.role === filter)
-  const recentUpdates = recentUpdatesData.filter(item => filter === 'all' || item.role === filter)
+  const [notifications, setNotifications] = React.useState(initialData)
 
-  const allCount = actionRequiredData.length + recentUpdatesData.length
-  const sellingCount = [...actionRequiredData, ...recentUpdatesData].filter(i => i.role === 'selling').length
-  const buyingCount = [...actionRequiredData, ...recentUpdatesData].filter(i => i.role === 'buying').length
+  const showToast = (message: string) => {
+    const id = Date.now()
+    setToasts(prev => [...prev, { id, message }])
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, 3000)
+  }
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    showToast("All notifications marked as read")
+  }
+
+  const handleNotificationClick = (notification: typeof initialData[0]) => {
+    // If unread, mark it as read when tapped
+    if (!notification.isRead) {
+      setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true } : n))
+    }
+    
+    // Navigate to Deal Details page
+    navigate(`/deal-details/${notification.dealId}`)
+  }
+
+  // Sort by reverse order based on ID for visual timeline effect
+  const sortedData = [...notifications].sort((a, b) => b.id - a.id)
+  
+  const filteredData = sortedData.filter(item => filter === 'all' || item.role === filter)
+
+  const unreadCount = notifications.filter(i => !i.isRead).length
+  const allCount = notifications.length
+  const sellingCount = notifications.filter(i => i.role === 'selling').length
+  const buyingCount = notifications.filter(i => i.role === 'buying').length
+
+  const getPeriod = (timeStr: string) => {
+    const lower = timeStr.toLowerCase()
+    if (lower.includes('just now') || lower.includes('min') || lower.includes('hour')) return 'Today'
+    if (lower.includes('yesterday')) return 'Yesterday'
+    if (lower.includes('day')) {
+      const match = lower.match(/\d+/)
+      if (match) {
+        const days = parseInt(match[0], 10)
+        if (days <= 7) return 'Last 7 Days'
+      }
+    }
+    return 'Earlier'
+  }
+
+  const periodOrder = ['Today', 'Yesterday', 'Last 7 Days', 'Earlier']
+  
+  const groupedData = filteredData.reduce((acc, item) => {
+    const period = getPeriod(item.time)
+    if (!acc[period]) acc[period] = []
+    acc[period].push(item)
+    return acc
+  }, {} as Record<string, typeof initialData>)
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
       {/* Header */}
       <div className="bg-white sticky top-0 z-20 shadow-sm">
-        <div className="flex items-center justify-center p-4 border-b border-gray-100 relative">
-          <button 
-            onClick={() => navigate('/dashboard')} 
-            className="absolute left-4 p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <span className="font-bold text-[17px]">Activity</span>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 relative min-h-[64px]">
+          <div className="flex-1 flex justify-start">
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <div className="flex-[2] flex justify-center">
+            <span className="font-bold text-[17px]">Notifications</span>
+          </div>
+
+          <div className="flex-1 flex justify-end">
+            {/* Action removed from here */}
+          </div>
         </div>
 
         {/* Filter Segmented Control */}
@@ -116,104 +261,122 @@ export default function Notifications() {
         </div>
       </div>
 
-      <div className="flex-1 px-4 pt-6 pb-[140px] animate-in fade-in duration-300">
-        {actionRequired.length === 0 && recentUpdates.length === 0 ? (
+      <div className="flex-1 px-4 pt-2 pb-[140px] animate-in fade-in duration-300">
+        {filteredData.length === 0 ? (
           <div className="p-8 mt-10 text-center flex flex-col items-center">
             <div className="w-16 h-16 bg-white shadow-sm border border-gray-100 rounded-full flex items-center justify-center mb-4">
               <span className="text-3xl">🎉</span>
             </div>
             <p className="font-extrabold text-[18px] text-gray-900 mb-2">You're all caught up</p>
             <p className="text-[14px] text-gray-500 font-medium leading-relaxed max-w-[250px]">
-              No new updates in this view. We'll notify you when something needs your attention.
+              No new updates in this view. We'll notify you when something happens.
             </p>
           </div>
         ) : (
-          <div className="space-y-8">
-            {actionRequired.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">Action Required</h3>
-                <div className="space-y-3">
-                  {actionRequired.map((item) => (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      key={item.id} 
-                      className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden"
-                    >
-                      <div className={`absolute top-0 left-0 w-1.5 h-full ${item.role === 'selling' ? 'bg-blue-600' : 'bg-green-600'}`}></div>
-                      <div className="pl-2">
-                        {/* Role Badge */}
-                        <div className="flex items-center gap-1.5 mb-3">
-                          <div className={`w-2 h-2 rounded-sm ${item.role === 'selling' ? 'bg-blue-600' : 'bg-green-600'}`}></div>
-                          <span className={`text-[11px] font-extrabold uppercase tracking-wider ${item.role === 'selling' ? 'text-blue-600' : 'text-green-600'}`}>
-                            {item.role}
-                          </span>
-                        </div>
+          <div className="space-y-6 pt-2">
+            {periodOrder.map((period, periodIdx) => {
+              const items = groupedData[period]
+              if (!items || items.length === 0) return null
+              
+              // Only show the "Mark all read" button on the first rendered group header
+              const isFirstGroup = periodOrder.findIndex(p => groupedData[p] && groupedData[p].length > 0) === periodIdx
 
-                        <div className="flex gap-4">
-                          <div className={`mt-0.5 shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                            item.type === 'orange' ? 'bg-orange-50 text-orange-500' :
-                            item.type === 'red' ? 'bg-rose-50 text-rose-500' :
-                            item.type === 'green' ? 'bg-emerald-50 text-emerald-500' :
-                            'bg-blue-50 text-blue-500'
-                          }`}>
-                            <item.Icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start mb-0.5">
-                              <p className="text-[15px] text-gray-900 font-extrabold truncate pr-2">{item.title}</p>
-                              <span className="text-[12px] text-gray-400 font-bold shrink-0">{item.time}</span>
+              return (
+                <div key={period} className="space-y-4">
+                  {/* Group Header */}
+                  <div className="flex items-center justify-between sticky top-[132px] z-10 bg-[#F8FAFC] pt-[28px] pb-[14px] -mx-4 px-4 shadow-[0_10px_10px_-10px_#F8FAFC]">
+                    <h3 className="text-[20px] font-semibold text-gray-900">{period}</h3>
+                    {isFirstGroup && unreadCount > 0 && (
+                      <button 
+                        onClick={handleMarkAllAsRead}
+                        className="text-[14px] font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1.5"
+                      >
+                        <Check className="w-4 h-4" />
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Cards */}
+                  <div className="space-y-4">
+                    {items.map((item) => (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={item.id} 
+                        onClick={() => handleNotificationClick(item)}
+                        className={`p-[18px] rounded-[18px] border relative overflow-hidden flex gap-4 items-start cursor-pointer transition-colors shadow-[0_2px_10px_rgba(15,23,42,0.05)]
+                          ${item.isRead ? 'bg-[#FCFCFD] border-[#EEF2F7]' : 'bg-white border-[#E9EDF5]'}
+                        `}
+                      >
+
+                        {/* Unread indicator dot */}
+                        {!item.isRead && (
+                          <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary" />
+                        )}
+                        
+                        {/* User Avatar */}
+                        <div className="shrink-0 w-12 h-12 rounded-full border border-gray-200 shadow-sm mt-1 overflow-hidden bg-white">
+                          <img src={item.avatar} alt={item.userName} className="w-full h-full object-cover" />
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 pt-0.5">
+                          <div className="flex justify-between items-start mb-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2 h-2 rounded-sm ${item.role === 'selling' ? 'bg-[#2563EB]' : 'bg-[#16A34A]'}`}></div>
+                              <span className={`text-[11px] font-extrabold uppercase tracking-wider ${item.role === 'selling' ? 'text-[#2563EB]' : 'text-[#16A34A]'}`}>
+                                {item.role}
+                              </span>
                             </div>
-                            {item.dealId && <p className="text-[12px] font-bold text-gray-400 mb-1">{item.dealId}</p>}
-                            <p className="text-[14px] text-gray-500 font-medium mb-4">{item.description}</p>
-                            <Button className="w-full h-10 text-[14px] font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-                              {item.cta}
-                            </Button>
+                            <span className={`text-[12px] pr-3 shrink-0 ${!item.isRead ? 'text-primary font-bold' : 'text-gray-400 font-medium'}`}>{item.time}</span>
+                          </div>
+                          
+                          <div className={`mb-2 ${item.isRead ? 'opacity-90' : ''}`}>
+                            <p className={`text-[15px] leading-snug pr-3 ${!item.isRead ? 'text-gray-900 font-bold' : 'text-gray-700 font-semibold'}`}>
+                              {item.title}
+                            </p>
+                          </div>
+                          
+                          <div className={`flex items-center gap-2 mb-2 ${item.isRead ? 'opacity-70' : ''}`}>
+                            <p className="text-[13px] font-bold text-gray-700 truncate max-w-[140px]">{item.productName}</p>
+                            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <p className="text-[12px] font-bold text-gray-400">{item.dealId}</p>
+                          </div>
+                          
+                          <div className={item.isRead ? 'opacity-70' : ''}>
+                            <p className={`text-[14px] leading-relaxed whitespace-pre-line ${!item.isRead ? 'text-gray-700 font-medium' : 'text-gray-500 font-medium'}`}>
+                              {item.description}
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {recentUpdates.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">Recent Updates</h3>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50">
-                  {recentUpdates.map((item) => (
-                    <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors flex gap-4 relative">
-                      <div className={`absolute top-0 left-0 w-1 h-full ${item.role === 'selling' ? 'bg-blue-600' : 'bg-green-600'}`}></div>
-                      <div className={`mt-1 shrink-0 w-10 h-10 rounded-full flex items-center justify-center border border-gray-100 bg-white shadow-sm ${
-                        item.type === 'orange' ? 'text-orange-500' :
-                        item.type === 'red' ? 'text-rose-500' :
-                        item.type === 'green' ? 'text-emerald-500' :
-                        'text-blue-500'
-                      }`}>
-                        <item.Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <div className="flex items-center gap-1.5 mb-1.5">
-                          <span className={`text-[10px] font-extrabold uppercase tracking-wider ${item.role === 'selling' ? 'text-blue-600' : 'text-green-600'}`}>
-                            {item.role}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-start mb-0.5">
-                          <p className="text-[14px] text-gray-900 font-bold truncate pr-2">{item.title}</p>
-                          <span className="text-[12px] text-gray-400 font-bold shrink-0">{item.time}</span>
-                        </div>
-                        {item.dealId && <p className="text-[12px] font-bold text-gray-400 mb-0.5">{item.dealId}</p>}
-                        <p className="text-[13px] text-gray-500 font-medium">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )
+            })}
           </div>
         )}
       </div>
+
+      {/* Toast Overlay */}
+      <div className="fixed bottom-6 left-0 right-0 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 w-max max-w-[380px]"
+            >
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
+              <span className="text-[14px] font-bold">{toast.message}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
     </div>
   )
 }

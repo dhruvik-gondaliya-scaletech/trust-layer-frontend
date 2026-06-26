@@ -1,19 +1,21 @@
 import * as React from "react"
-import { useNavigate } from "react-router-dom"
-import { ChevronLeft, Package, Upload, Calendar, FileText, X } from "lucide-react"
+import { useNavigate, useParams } from "react-router-dom"
+import { ChevronLeft, Package, Upload, FileText, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { CustomSelect } from "@/components/ui/custom-select"
 import { CustomDatePicker } from "@/components/ui/custom-date-picker"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
 
 export default function AddTracking() {
   const navigate = useNavigate()
+  const { id } = useParams()
   const [carrier, setCarrier] = React.useState("")
   const [trackingNumber, setTrackingNumber] = React.useState("")
-  const [deliveryDate, setDeliveryDate] = React.useState("")
+  const [shippingDate, setShippingDate] = React.useState("")
+  const [notes, setNotes] = React.useState("")
   const [customCarrier, setCustomCarrier] = React.useState("")
-  const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
   
   const [shippingProof, setShippingProof] = React.useState<File | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -46,7 +48,7 @@ export default function AddTracking() {
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
-        <h1 className="font-bold text-[17px] ml-2">Add Tracking Details</h1>
+        <h1 className="font-bold text-[17px] ml-2">Upload Tracking Details</h1>
       </div>
 
       <div className="flex-1 px-5 pt-6 animate-in fade-in duration-500 space-y-6">
@@ -54,8 +56,8 @@ export default function AddTracking() {
           <div className="h-16 w-16 mx-auto bg-blue-50 flex items-center justify-center rounded-full border border-blue-100 shadow-sm">
             <Package className="h-8 w-8 text-blue-600" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Shipment Details</h2>
-          <p className="text-muted-foreground text-[14px]">Buyer has funded this transaction. Please provide shipment details.</p>
+          <h2 className="text-2xl font-bold text-foreground">Upload Tracking Details</h2>
+          <p className="text-muted-foreground text-[14px] px-2 leading-relaxed">Provide shipping information so the buyer can track the package.</p>
         </div>
 
         <div className="space-y-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
@@ -85,7 +87,7 @@ export default function AddTracking() {
           <div className="space-y-2">
             <label className="text-[13px] font-medium text-foreground">Tracking Number</label>
             <Input 
-              placeholder="e.g. 1Z999AA10123456784" 
+              placeholder="Enter tracking number" 
               value={trackingNumber} 
               onChange={e => setTrackingNumber(e.target.value)} 
             />
@@ -93,18 +95,18 @@ export default function AddTracking() {
 
           <div className="space-y-2">
             <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
-              Estimated Delivery Date
+              Shipping Date
             </label>
             <CustomDatePicker 
-              value={deliveryDate} 
-              onChange={setDeliveryDate} 
+              value={shippingDate} 
+              onChange={setShippingDate} 
               placeholder="MM/DD/YYYY"
             />
           </div>
 
           <div className="space-y-2 pt-2">
             <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
-              Shipping Proof <span className="text-gray-400 font-normal">(Optional)</span>
+              Drop-off Receipt <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
             <input 
               type="file" 
@@ -122,8 +124,8 @@ export default function AddTracking() {
                   <Upload className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <span className="text-[14px] font-bold text-blue-600">Upload receipt</span>
-                  <p className="text-[12px] text-muted-foreground mt-0.5">JPG, PNG or PDF (Max 5MB)</p>
+                  <span className="text-[14px] font-bold text-blue-600">Upload photo or PDF</span>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">JPG, PNG, PDF</p>
                 </div>
               </div>
             ) : (
@@ -150,16 +152,28 @@ export default function AddTracking() {
               </div>
             )}
           </div>
+
+          <div className="space-y-2 pt-2">
+            <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
+              Notes <span className="text-gray-400 font-normal">(Optional)</span>
+            </label>
+            <Textarea 
+              placeholder="Package dropped off at USPS Main Office."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="resize-none h-24"
+            />
+          </div>
         </div>
       </div>
 
       <BottomActionBar>
         <Button 
           className="w-full h-14 text-[16px] font-bold shadow-sm"
-          onClick={() => navigate("/tracking-success/deal-123")}
-          disabled={!carrier || !trackingNumber || !deliveryDate || (carrier === "Other" && !customCarrier)}
+          onClick={() => navigate(`/tracking-success/${id || 'TRUST-1024'}`)}
+          disabled={!carrier || !trackingNumber || !shippingDate || (carrier === "Other" && !customCarrier)}
         >
-          Submit Tracking Information
+          Upload Tracking
         </Button>
       </BottomActionBar>
     </div>

@@ -15,13 +15,18 @@ import {
   CheckCircle2,
   Info,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  Package,
+  Truck,
+  MapPin
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AccountHub } from "@/components/AccountHub"
+import { QuickActionsCard } from "@/components/dashboard/quick-actions-card"
+import type { DealStatus } from "@/components/dashboard/quick-actions-card"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -29,6 +34,37 @@ export default function Dashboard() {
   const location = useLocation()
   const initialMode = new URLSearchParams(location.search).get('mode') as "seller" | "buyer" || "seller"
   const [userMode, setUserMode] = useState<"seller" | "buyer">(initialMode)
+  const [activeDealStatus, setActiveDealStatus] = useState<DealStatus>('funded')
+
+  const sellerDeals = [
+    {
+      id: 'TRUST-0845',
+      name: 'Shadowless Mewtwo PSA 10',
+      status: 'delivered' as DealStatus,
+      imageUrl: 'https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=200&h=200&fit=crop'
+    },
+    {
+      id: 'TRUST-1024',
+      name: 'Charizard Holo 1999',
+      status: 'funded' as DealStatus,
+    }
+  ]
+
+  const buyerDeals = [
+    {
+      id: 'TRUST-0992',
+      name: 'First Edition Base Set Booster',
+      status: 'shipped' as DealStatus,
+      imageUrl: 'https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=200&h=200&fit=crop'
+    },
+    {
+      id: 'TRUST-1024',
+      name: 'Charizard Holo 1999',
+      status: 'funded' as DealStatus,
+    }
+  ]
+
+  const activeDeals = userMode === 'seller' ? sellerDeals : buyerDeals;
 
   const currentHour = new Date().getHours()
   const greeting = currentHour < 12 ? "Good Morning" : currentHour < 18 ? "Good Afternoon" : "Good Evening"
@@ -166,80 +202,43 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Actions Required */}
-      {true && (
-        <div className="space-y-3 mt-4">
-          <h2 className="text-[16px] font-bold text-foreground px-1 flex items-center gap-1.5">
-            <AlertCircle className={`w-4 h-4 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`} /> Quick Actions Required
-          </h2>
-
-          <Card className="border border-border bg-white shadow-sm overflow-hidden">
-            <div className="p-3.5 flex items-center justify-between">
-              {userMode === 'buyer' ? (
-                <>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#10B981]/10 rounded-full flex items-center justify-center text-[#10B981] shrink-0 border border-[#10B981]/20">
-                      <AlertCircle className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-[14px] text-foreground leading-tight">Charizard Holo 1999</p>
-                      <p className="text-[12px] font-medium text-gray-500 mb-1">TRUST-1024</p>
-                      <p className="text-[12px] text-muted-foreground font-medium">Buyer is waiting to inspect the item.</p>
-                    </div>
-                  </div>
-                  <Button size="sm" className="bg-[#10B981] hover:bg-[#059669] text-white font-bold h-8 px-3" onClick={() => navigate("/timeline/TRUST-1024")}>
-                    Review Item
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center text-[#2563EB] shrink-0 border border-[#2563EB]/20">
-                      <Upload className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-[14px] text-foreground leading-tight">Charizard Holo 1999</p>
-                      <p className="text-[12px] font-medium text-gray-500 mb-1">TRUST-1024</p>
-                      <p className="text-[12px] text-muted-foreground font-medium">Buyer has funded the deal.</p>
-                    </div>
-                  </div>
-                  <Button size="sm" className="bg-[#2563EB] hover:bg-blue-700 text-white font-bold h-8 px-3" onClick={() => navigate("/add-tracking/deal-123")}>
-                    Add Tracking
-                  </Button>
-                </>
-              )}
-            </div>
-          </Card>
-        </div>
-      )}
+      <QuickActionsCard userMode={userMode} deals={activeDeals} />
 
       {/* Quick Insights */}
-      <div className="space-y-3 mt-6">
-        <h2 className="text-[16px] font-bold text-foreground px-1">Quick Insights</h2>
-        <div className="grid grid-cols-2 gap-2">
-          <Card className="shadow-sm border-border bg-white">
-            <CardContent className="p-3">
-              <p className={`text-[20px] font-extrabold leading-tight ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>{userMode === 'seller' ? '3' : '1'}</p>
-              <p className="text-[11px] text-muted-foreground font-bold mt-1 uppercase tracking-wider">{userMode === 'buyer' ? 'Active Purchases' : 'Active Deals'}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-sm border-border bg-white">
-            <CardContent className="p-3">
-              <p className={`text-[20px] font-extrabold leading-tight ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>1</p>
-              <p className="text-[11px] text-muted-foreground font-bold mt-1 uppercase tracking-wider">{userMode === 'buyer' ? 'Awaiting Delivery' : 'Awaiting Funds'}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-sm border-border bg-white">
-            <CardContent className="p-3">
-              <p className={`text-[20px] font-extrabold leading-tight ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>{userMode === 'seller' ? '1' : '2'}</p>
-              <p className="text-[11px] text-muted-foreground font-bold mt-1 uppercase tracking-wider">In Transit</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-sm border-border bg-white">
-            <CardContent className="p-3">
-              <p className={`text-[20px] font-extrabold leading-tight ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2563EB]'}`}>{userMode === 'seller' ? '16' : '4'}</p>
-              <p className="text-[11px] text-muted-foreground font-bold mt-1 uppercase tracking-wider">{userMode === 'buyer' ? 'Completed Purchases' : 'Completed Deals'}</p>
-            </CardContent>
-          </Card>
+      <div className="mt-6">
+        <h2 className="text-[16px] font-bold text-foreground px-1 mb-5">Quick Insights</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div 
+            onClick={() => navigate('/transactions?filter=active')}
+            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
+          >
+            <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '3' : '1'}</p>
+            <p className="text-[13px] font-medium text-gray-500 text-center">Active Deals</p>
+          </div>
+          
+          <div 
+            onClick={() => navigate('/transactions?filter=awaiting-delivery')}
+            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
+          >
+            <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>1</p>
+            <p className="text-[13px] font-medium text-gray-500 text-center">Awaiting Delivery</p>
+          </div>
+
+          <div 
+            onClick={() => navigate('/transactions?filter=in-transit')}
+            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
+          >
+            <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '1' : '2'}</p>
+            <p className="text-[13px] font-medium text-gray-500 text-center">In Transit</p>
+          </div>
+
+          <div 
+            onClick={() => navigate('/transactions?filter=completed')}
+            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
+          >
+            <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '16' : '4'}</p>
+            <p className="text-[13px] font-medium text-gray-500 text-center">Completed</p>
+          </div>
         </div>
       </div>
 

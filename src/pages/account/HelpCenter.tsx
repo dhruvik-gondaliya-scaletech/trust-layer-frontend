@@ -36,23 +36,13 @@ export default function HelpCenter() {
         <div className="space-y-3">
           <h2 className="text-[14px] font-bold text-muted-foreground uppercase tracking-wider">Categories</h2>
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4">
-            <Topic title="Buying" />
-            <Topic title="Selling" />
+            <Topic title="Creating a Deal" />
             <Topic title="Payments" />
             <Topic title="Shipping" />
-            <Topic title="Security" />
-            <Topic title="Trust" />
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-[14px] font-bold text-muted-foreground uppercase tracking-wider">Popular Articles</h2>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4">
-            <Topic title="Buying safely" />
-            <Topic title="Seller protection" />
-            <Topic title="Platform fees" />
-            <Topic title="How disputes work" />
-            <Topic title="Funds on hold" />
+            <Topic title="Verification" />
+            <Topic title="Disputes" />
+            <Topic title="Reviews" />
+            <Topic title="Wallet" />
           </div>
         </div>
       </div>

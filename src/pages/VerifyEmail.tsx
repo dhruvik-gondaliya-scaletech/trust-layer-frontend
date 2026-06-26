@@ -90,12 +90,7 @@ export default function VerifyEmail() {
               Your email has been successfully verified and secured for TrustLayer transactions.
             </p>
 
-            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-8 flex items-start gap-3 text-left">
-              <Lock className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-              <p className="text-[13px] text-blue-900 font-medium leading-relaxed">
-                Your account is now protected and ready for secure transactions.
-              </p>
-            </div>
+
 
             {/* Progress Card */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 text-left w-full mb-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
@@ -134,7 +129,7 @@ export default function VerifyEmail() {
                 </li>
                 <li className="flex items-start gap-2 text-[13px] text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 shrink-0" />
-                  <span className="leading-snug">Get shipping notifications</span>
+                  <span className="leading-snug">Receive deal updates</span>
                 </li>
                 <li className="flex items-start gap-2 text-[13px] text-muted-foreground">
                   <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 shrink-0" />

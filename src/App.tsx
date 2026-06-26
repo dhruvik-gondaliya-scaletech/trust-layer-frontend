@@ -23,7 +23,7 @@ import ReviewSeller from "@/pages/ReviewSeller"
 import TransactionComplete from "@/pages/TransactionComplete"
 import AllTransactions from "@/pages/AllTransactions"
 import DealDetails from "@/pages/DealDetails"
-import AccountCenter from "@/pages/account/AccountCenter"
+
 import MyProfile from "@/pages/account/MyProfile"
 import VerificationCenter from "@/pages/account/VerificationCenter"
 import PaymentMethods from "@/pages/account/PaymentMethods"
@@ -31,12 +31,13 @@ import ShippingAddresses from "@/pages/account/ShippingAddresses"
 import Reviews from "@/pages/account/Reviews"
 import HelpCenter from "@/pages/account/HelpCenter"
 import ContactSupport from "@/pages/account/ContactSupport"
-import ReportIssue from "@/pages/account/ReportIssue"
-import TransactionProtection from "@/pages/account/TransactionProtection"
 import TermsConditions from "@/pages/account/TermsConditions"
 import PrivacyPolicy from "@/pages/account/PrivacyPolicy"
+import CookiePolicy from "@/pages/account/CookiePolicy"
+import RefundPolicy from "@/pages/account/RefundPolicy"
+import AboutTrustLayer from "@/pages/account/AboutTrustLayer"
+import ContactUs from "@/pages/account/ContactUs"
 import PublicProfilePreview from "@/pages/account/profile/PublicProfilePreview"
-import NotificationPreferences from "@/pages/account/NotificationPreferences"
 import { PageSkeleton } from "@/components/ui/page-skeleton"
 import React, { useState, useEffect } from "react"
 // Simplified MobileLayout - it just ensures the child fills the space, 
@@ -115,20 +116,25 @@ function App() {
           <Route path="/deal-details/:id" element={<MobileLayout><DealDetails /></MobileLayout>} />
 
           {/* Account Center Routes */}
-          <Route path="/account" element={<MobileLayout><AccountCenter /></MobileLayout>} />
+
           <Route path="/profile" element={<MobileLayout><WithSkeleton title="My Profile"><MyProfile /></WithSkeleton></MobileLayout>} />
           <Route path="/profile/preview" element={<MobileLayout><PublicProfilePreview /></MobileLayout>} />
           <Route path="/verification-center" element={<MobileLayout><WithSkeleton title="Verification Center"><VerificationCenter /></WithSkeleton></MobileLayout>} />
           <Route path="/payment-methods" element={<MobileLayout><WithSkeleton title="Payment Methods"><PaymentMethods /></WithSkeleton></MobileLayout>} />
           <Route path="/shipping-addresses" element={<MobileLayout><WithSkeleton title="Shipping Addresses"><ShippingAddresses /></WithSkeleton></MobileLayout>} />
           <Route path="/reviews" element={<MobileLayout><WithSkeleton title="Reviews"><Reviews /></WithSkeleton></MobileLayout>} />
-          <Route path="/notification-preferences" element={<MobileLayout><WithSkeleton title="Notification Preferences"><NotificationPreferences /></WithSkeleton></MobileLayout>} />
           <Route path="/help-center" element={<MobileLayout><WithSkeleton title="Help Center"><HelpCenter /></WithSkeleton></MobileLayout>} />
           <Route path="/contact-support" element={<MobileLayout><WithSkeleton title="Contact Support"><ContactSupport /></WithSkeleton></MobileLayout>} />
-          <Route path="/report-issue" element={<MobileLayout><WithSkeleton title="Report Issue"><ReportIssue /></WithSkeleton></MobileLayout>} />
-          <Route path="/transaction-protection" element={<MobileLayout><WithSkeleton title="Transaction Protection"><TransactionProtection /></WithSkeleton></MobileLayout>} />
+          
+          {/* Company Routes */}
+          <Route path="/about" element={<MobileLayout><WithSkeleton title="About TrustLayer"><AboutTrustLayer /></WithSkeleton></MobileLayout>} />
+          <Route path="/contact-us" element={<MobileLayout><WithSkeleton title="Contact Us"><ContactUs /></WithSkeleton></MobileLayout>} />
+
+          {/* Legal Routes */}
           <Route path="/terms" element={<MobileLayout><WithSkeleton title="Terms & Conditions"><TermsConditions /></WithSkeleton></MobileLayout>} />
           <Route path="/privacy-policy" element={<MobileLayout><WithSkeleton title="Privacy Policy"><PrivacyPolicy /></WithSkeleton></MobileLayout>} />
+          <Route path="/cookie-policy" element={<MobileLayout><WithSkeleton title="Cookie Policy"><CookiePolicy /></WithSkeleton></MobileLayout>} />
+          <Route path="/refund-policy" element={<MobileLayout><WithSkeleton title="Refund Policy"><RefundPolicy /></WithSkeleton></MobileLayout>} />
 
           <Route path="*" element={<MobileLayout><PlaceholderPage title="404 Not Found" /></MobileLayout>} />
         </Routes>

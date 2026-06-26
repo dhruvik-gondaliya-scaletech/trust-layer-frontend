@@ -103,7 +103,7 @@ export default function VerifyPhone() {
               {userPhone}
             </p>
             <p className="text-[15px] text-muted-foreground leading-relaxed px-2 mb-8">
-              Your phone number has been successfully verified and will be used for transaction updates, shipping alerts, and account recovery.
+              Your phone number has been successfully verified and added to your TrustLayer account. You're one step closer to completing your trusted profile.
             </p>
 
             <div className="bg-white border border-gray-100 rounded-2xl p-5 text-left w-full mb-8 shadow-sm">

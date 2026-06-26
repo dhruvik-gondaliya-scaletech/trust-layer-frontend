@@ -1,22 +1,28 @@
 import * as React from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ChevronLeft, Star, ShieldCheck, CheckCircle2 } from "lucide-react"
+import { ChevronLeft, Star, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
 export default function ReviewSeller() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [rating, setRating] = React.useState(0)
   const [hoveredRating, setHoveredRating] = React.useState(0)
   const [comment, setComment] = React.useState("")
   const [isSubmitted, setIsSubmitted] = React.useState(false)
 
+  const userMode = new URLSearchParams(location.search).get('mode') === 'buyer' ? 'buyer' : 'seller'
+  const isReviewingSeller = userMode === 'buyer'
+  
+  const headerText = isReviewingSeller ? 'Review Seller' : 'Review Buyer'
+  const targetUsername = isReviewingSeller ? '@vintage_vault' : '@alex_johnson'
+  const subtitleText = isReviewingSeller ? 'How was your experience with this seller?' : 'How was your experience with this buyer?'
+  const placeholderText = isReviewingSeller ? 'Share your experience with this seller...' : 'Share your experience with this buyer...'
+
   const handleSubmit = () => {
     setIsSubmitted(true)
-    setTimeout(() => {
-      navigate("/transaction-complete/TRUST-1024")
-    }, 2000)
   }
 
   if (isSubmitted) {
@@ -30,11 +36,17 @@ export default function ReviewSeller() {
         >
           <CheckCircle2 className="w-10 h-10 text-green-600" />
         </motion.div>
-        <h2 className="text-2xl font-bold mb-4">Review Submitted</h2>
-        <p className="text-muted-foreground leading-relaxed max-w-[300px]">
-          Your review has been saved.<br/><br/>
-          Reviews become visible once both parties have submitted feedback or after the review window closes.
+        <h2 className="text-[22px] font-bold mb-3">Review Submitted</h2>
+        <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[300px] mb-8">
+          Thank you for sharing your feedback.<br/>
+          Your review has been added successfully.
         </p>
+        <Button 
+          className="w-full max-w-[300px] h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white" 
+          onClick={() => navigate(`/dashboard?mode=${userMode}`)}
+        >
+          Back to Dashboard
+        </Button>
       </div>
     )
   }
@@ -46,18 +58,22 @@ export default function ReviewSeller() {
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors">
           <ChevronLeft className="h-6 w-6" />
         </button>
-        <span className="text-[15px] font-bold">Review Seller</span>
+        <span className="text-[15px] font-bold">{headerText}</span>
         <div className="w-10"></div>
       </div>
 
       <div className="flex-1 px-6 pt-8 pb-32">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4 text-2xl font-bold text-gray-400">
-            @
+          <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4 text-2xl font-bold text-gray-400 overflow-hidden">
+            {isReviewingSeller ? (
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Seller" className="w-full h-full object-cover" />
+            ) : (
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" alt="Buyer" className="w-full h-full object-cover" />
+            )}
           </div>
-          <h1 className="text-[22px] font-extrabold tracking-tight mb-2">Rate @vintage_vault</h1>
+          <h1 className="text-[22px] font-extrabold tracking-tight mb-2">Rate {targetUsername}</h1>
           <p className="text-[14px] text-muted-foreground">
-            How was your experience with this seller?
+            {subtitleText}
           </p>
         </div>
 
@@ -84,21 +100,11 @@ export default function ReviewSeller() {
         <div className="space-y-3 mb-8">
           <label className="text-[14px] font-bold text-gray-900">Leave a Comment (Optional)</label>
           <Textarea 
-            placeholder="What went well? What could be improved?" 
+            placeholder={placeholderText} 
             className="min-h-[140px] bg-white border-gray-200 text-[14px] rounded-xl resize-none"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
-        </div>
-
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
-          <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[13px] font-bold text-blue-900 mb-1">Anti-Retaliation Rules</p>
-            <p className="text-[12px] text-blue-800/80 leading-relaxed font-medium">
-              Your review remains hidden. Reviews become visible only when both parties submit reviews OR the 3-day review window expires.
-            </p>
-          </div>
         </div>
       </div>
 

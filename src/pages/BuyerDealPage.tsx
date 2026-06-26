@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Shield, Check, X, Star, ChevronLeft, ShieldCheck, Trophy, Lock, MessageCircle, FileText, Image as ImageIcon, Video, CheckCircle2, ChevronRight, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { TrustProfileCard } from "@/components/trust-profile-card"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function BuyerDealPage() {
@@ -256,46 +257,20 @@ export default function BuyerDealPage() {
         </div>
 
         {/* SECTION 4: SELLER TRUST PROFILE */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 relative overflow-hidden">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-[16px] shadow-sm relative shrink-0">
-                VI
-                <div className="absolute -bottom-1 -right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center">
-                   <Check className="w-2 h-2 text-white stroke-[3]" />
-                </div>
-              </div>
-              <div>
-                <p className="font-bold text-[15px] text-foreground flex items-center gap-1.5">
-                  @vintage_vault
-                  <span className="bg-green-50 text-green-700 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
-                    <Star className="w-2.5 h-2.5 fill-green-600 text-green-600" /> TRUSTED SELLER
-                  </span>
-                </p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="text-[12px] font-semibold text-blue-600">Identity Verified</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-right flex flex-col items-end">
-              <div className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase mb-1">Trust Score</div>
-              <div className="text-[20px] font-black text-foreground leading-none">
-                 96
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
-              <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Successful Deals</div>
-              <div className="text-[13px] font-bold text-foreground">184</div>
-            </div>
-            <div className="bg-gray-50/80 p-2.5 rounded-xl flex flex-col items-start justify-center">
-              <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Member Since</div>
-              <div className="text-[13px] font-bold text-foreground">2022</div>
-            </div>
-          </div>
+        <div className="mb-6">
+          <TrustProfileCard 
+            variant="medium" 
+            user={{
+              username: "@vintage_vault",
+              avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+              trustScore: 96,
+              rating: 4.9,
+              reviewCount: 184,
+              successfulDeals: 184,
+              memberSince: 2022,
+              isTrustedMember: true
+            }} 
+          />
         </div>
 
         {/* SECTION 5: TRUSTLAYER PROTECTION TIMELINE */}
@@ -351,7 +326,7 @@ export default function BuyerDealPage() {
             </div>
             <div className="flex justify-between text-muted-foreground">
               <span>
-                {feeOption === 0 ? "Your Fee Share (non-refundable)" : feeOption === 1 ? "Platform Fee (non-refundable)" : "Platform Fee Included By Seller (non-refundable)"}
+                {feeOption === 0 ? "Your Fee Share (non-refundable)" : "Platform Fee (non-refundable)"}
               </span>
               <span className="font-medium text-foreground">
                 {feeOption === 2 ? "$0" : `$${buyerFeeShare.toFixed(0)}`}
@@ -368,21 +343,6 @@ export default function BuyerDealPage() {
             </div>
           </div>
 
-          <div className="mt-4 p-4 bg-blue-50/60 rounded-2xl border border-blue-100 flex flex-col gap-2">
-             <div className="flex items-center gap-2">
-               <ShieldCheck className="w-4 h-4 text-blue-600" />
-               <span className="text-[13px] font-bold text-blue-900">The Platform Fee covers:</span>
-             </div>
-             <div className="text-[12px] text-blue-800/80 leading-relaxed mt-1">
-               <ul className="list-disc pl-4 space-y-1">
-                 <li>TrustLayer Protection</li>
-                 <li>Fraud Prevention</li>
-                 <li>Secure Payment Processing</li>
-                 <li>Dispute Resolution Support</li>
-               </ul>
-               <p className="mt-2.5 text-[11px] font-semibold opacity-80">Platform fees are non-refundable once the transaction is funded.</p>
-             </div>
-          </div>
         </div>
       </div>
 
@@ -492,33 +452,57 @@ export default function BuyerDealPage() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
+              className="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl relative"
             >
-              <div className="p-8 flex flex-col items-center text-center">
-                {/* Animated checkmark */}
-                <motion.div 
-                  initial={{ scale: 0, rotate: -45 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
-                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)] relative"
-                >
-                  <div className="absolute inset-0 rounded-full border-4 border-green-500 opacity-20 animate-pulse" />
-                  <Check className="w-10 h-10 text-green-600 stroke-[3]" />
-                </motion.div>
+              <div className="relative p-0 flex flex-col items-center">
+                {/* Top Header Area with Gradient */}
+                <div className="w-full bg-gradient-to-b from-green-50 via-white to-white pt-12 pb-4 px-8 flex flex-col items-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.15),transparent_60%)]"></div>
+                  
+                  {/* Premium animated checkmark */}
+                  <div className="relative mb-6">
+                    <motion.div 
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
+                      className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(34,197,94,0.4)] relative z-10"
+                    >
+                      <Check className="w-12 h-12 text-white stroke-[3] drop-shadow-md" />
+                    </motion.div>
+                    
+                    {/* Pulsing rings */}
+                    <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20" style={{ animationDuration: '3s' }}></div>
+                    <div className="absolute -inset-6 border border-green-500/20 rounded-full animate-pulse" style={{ animationDuration: '2s' }}></div>
+                    <div className="absolute -inset-12 border border-green-500/10 rounded-full animate-pulse delay-75" style={{ animationDuration: '2.5s' }}></div>
+                  </div>
+                  
+                  <h2 className="text-2xl font-extrabold text-gray-900 mb-2 relative z-10 tracking-tight">Feedback Sent</h2>
+                  <p className="text-[12px] font-bold text-green-600 uppercase tracking-widest relative z-10 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                    Listing Improvement Requested
+                  </p>
+                </div>
                 
-                <h2 className="text-xl font-bold text-foreground mb-3">Listing Improvement Requested</h2>
-                <p className="text-[14px] text-muted-foreground mb-8 leading-relaxed px-2">
-                  Your feedback has been sent to the seller. The seller can review your comments and update the listing before republishing it for future buyers.
-                </p>
+                {/* Body Content */}
+                <div className="px-8 pb-8 pt-4 w-full text-center relative z-10">
+                  <p className="text-[15px] text-gray-600 mb-8 leading-relaxed">
+                    We've securely forwarded your notes to the seller. They can review your feedback and update the listing before republishing it.
+                  </p>
 
-                <div className="w-full">
-                  <Button 
-                    variant="ghost"
-                    className="w-full h-[52px] text-[15px] font-bold rounded-xl text-muted-foreground hover:bg-gray-100"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Close
-                  </Button>
+                  <div className="w-full space-y-3">
+                    <Button 
+                      className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20 transition-all"
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      Return to Dashboard
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      className="w-full h-[48px] text-[14px] font-bold rounded-2xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                      onClick={() => setShowFeedbackSuccess(false)}
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
