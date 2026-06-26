@@ -1,11 +1,12 @@
 import * as React from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function TrackingSuccess() {
   const navigate = useNavigate()
+  const { id } = useParams()
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
@@ -28,7 +29,7 @@ export default function TrackingSuccess() {
           transition={{ delay: 0.2 }}
           className="text-2xl font-extrabold text-foreground mb-3"
         >
-          Tracking Information Added
+          Tracking information uploaded successfully.
         </motion.h1>
 
         <motion.div 
@@ -38,7 +39,7 @@ export default function TrackingSuccess() {
           className="text-muted-foreground text-[15px] max-w-[280px] mx-auto space-y-4"
         >
           <p>
-            Shipment details have been shared with the buyer.
+            The buyer has been notified and can now track the shipment.
           </p>
           <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
             <div className="flex items-center gap-3 text-left">
@@ -61,10 +62,10 @@ export default function TrackingSuccess() {
         className="p-5 pb-8 space-y-3 bg-white border-t border-gray-100"
       >
         <Button 
-          onClick={() => navigate("/timeline/deal-123")} 
+          onClick={() => navigate(`/deal-details/${id || 'TRUST-1024'}`)} 
           className="w-full h-14 text-[16px] font-bold shadow-sm"
         >
-          Return To Deal <ArrowRight className="ml-2 w-5 h-5" />
+          View Deal <ArrowRight className="ml-2 w-5 h-5" />
         </Button>
       </motion.div>
     </div>

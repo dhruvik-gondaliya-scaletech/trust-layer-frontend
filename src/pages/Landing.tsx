@@ -71,9 +71,9 @@ export default function Landing() {
               <Lock className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-bold text-[15px] mb-1">Buyer funds deal</h3>
+              <h3 className="font-bold text-[15px] mb-1">Buyer funds the deal</h3>
               <p className="text-muted-foreground text-[14px] leading-snug">
-                Funds are held by TrustLayer. Seller is cleared to ship.
+                The buyer completes payment. The transaction moves to the shipping stage.
               </p>
             </div>
           </div>

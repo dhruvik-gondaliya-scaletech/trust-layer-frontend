@@ -56,7 +56,6 @@ export default function Wallet() {
               <div>
                 <p className="text-primary-foreground/80 text-xs font-medium">Funds On Hold</p>
                 <p className="font-bold mt-1 text-[18px]">$8,500.00</p>
-                <p className="text-[10px] text-primary-foreground/60 mt-1 leading-tight">Funds currently reserved for active transactions.</p>
               </div>
               <div>
                 <p className="text-primary-foreground/80 text-xs font-medium">Ready to Withdraw</p>

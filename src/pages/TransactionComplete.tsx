@@ -34,7 +34,7 @@ export default function TransactionComplete() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
           className="text-[15px] text-muted-foreground leading-relaxed max-w-[300px] mb-8"
         >
-          Funds have been released and this transaction is now closed.
+          Funds have been released and this transaction is now completed.
         </motion.p>
 
         <motion.div 

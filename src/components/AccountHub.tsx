@@ -8,7 +8,7 @@ import {
   MessageSquare, Wallet, Award, Settings, 
   MapPin, Bell, Shield, Globe, HelpCircle, 
   AlertTriangle, LogOut, Briefcase, ChevronRight, User, Key, Check,
-  Star, MessageCircle
+  Star, MessageCircle, Building2, FileText, Cookie, RefreshCw, Info
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -115,7 +115,6 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                       { icon: <User />, label: "My Profile", route: "/profile" },
                       { icon: <Wallet />, label: "Payment Methods", route: "/payment-methods" },
                       { icon: <MapPin />, label: "Shipping Addresses", route: "/shipping-addresses" },
-                      { icon: <Bell />, label: "Notification Preferences", route: "/notification-preferences" },
                     ].map((item, i) => (
                       <div 
                         key={i} 
@@ -148,8 +147,72 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                     {[
                       { icon: <HelpCircle />, label: "Help Center", route: "/help-center" },
                       { icon: <MessageCircle />, label: "Contact Support", route: "/contact-support" },
-                      { icon: <AlertTriangle />, label: "Report Issue", route: "/report-issue" },
-                      { icon: <Shield />, label: "Transaction Protection", route: "/transaction-protection" },
+                    ].map((item, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => {
+                          if (item.route) {
+                            navigate(item.route);
+                            onClose();
+                          }
+                        }}
+                        className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
+                      >
+                        <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
+                          {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
+                        </div>
+                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
+                        <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* COMPANY SECTION */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.75 }}
+                >
+                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Company</h3>
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    {[
+                      { icon: <Building2 />, label: "About TrustLayer", route: "/about" },
+                      { icon: <MessageSquare />, label: "Contact Us", route: "/contact-us" },
+                    ].map((item, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => {
+                          if (item.route) {
+                            navigate(item.route);
+                            onClose();
+                          }
+                        }}
+                        className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
+                      >
+                        <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
+                          {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
+                        </div>
+                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
+                        <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* LEGAL SECTION */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.78 }}
+                >
+                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Legal</h3>
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    {[
+                      { icon: <FileText />, label: "Terms & Conditions", route: "/terms" },
+                      { icon: <ShieldCheck />, label: "Privacy Policy", route: "/privacy-policy" },
+                      { icon: <Cookie />, label: "Cookie Policy", route: "/cookie-policy" },
+                      { icon: <RefreshCw />, label: "Refund Policy", route: "/refund-policy" },
                     ].map((item, i) => (
                       <div 
                         key={i} 
@@ -176,7 +239,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}
-                  className="py-4"
+                  className="pt-6 pb-4"
                 >
                   <div 
                     onClick={() => setShowLogoutConfirm(true)}
@@ -187,18 +250,14 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   </div>
                 </motion.div>
 
-                {/* BOTTOM PREMIUM AREA */}
+                {/* BOTTOM FOOTER */}
                 <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="flex flex-col items-center justify-center pt-2 pb-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.85 }}
+                  className="pb-8 text-center"
                 >
-                  <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2 border border-emerald-100">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-[13px] font-extrabold text-gray-700 uppercase tracking-widest mb-1">TrustLayer Protection</h4>
-                  <p className="text-[12px] font-bold text-gray-400">Active Since Jan 2026</p>
+                  <p className="text-[12px] font-semibold text-gray-400">© 2026 TrustLayer</p>
                 </motion.div>
 
               </div>

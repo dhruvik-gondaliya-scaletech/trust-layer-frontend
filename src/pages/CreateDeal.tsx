@@ -127,6 +127,12 @@ export default function CreateDeal() {
   const [isInsured, setIsInsured] = React.useState(false)
   const [shippingCost, setShippingCost] = React.useState("0")
 
+  // Meeting Details State
+  const [meetingLocation, setMeetingLocation] = React.useState("")
+  const [meetingDate, setMeetingDate] = React.useState("")
+  const [meetingTime, setMeetingTime] = React.useState("")
+  const [meetingNotes, setMeetingNotes] = React.useState("")
+
   // Step 4 State
   const [feeOption, setFeeOption] = React.useState(() => {
     return Number(localStorage.getItem('feeOption')) || 1
@@ -299,12 +305,12 @@ export default function CreateDeal() {
 
   // Fees Logic
   const itemPriceNum = parseFloat(price) || 0
-  const shipCostNum = parseFloat(shippingCost) || 0
+  const shipCostNum = orderType === "In-Person Transaction" ? 0 : (parseFloat(shippingCost) || 0)
   const platformFee = (itemPriceNum + shipCostNum) * 0.035 + 0.30
 
   // Fee option mapping: 0 = Split, 1 = Buyer Pays, 2 = Seller Pays
   const sellerFee = feeOption === 2 ? platformFee : feeOption === 0 ? platformFee / 2 : 0
-  const sellerEarnings = itemPriceNum + shipCostNum - sellerFee
+  const sellerEarnings = itemPriceNum - sellerFee
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-[180px]">
@@ -427,7 +433,7 @@ export default function CreateDeal() {
           label={
             step === 1 ? "Item details" :
               step === 2 ? "Proof & Verification" :
-                step === 3 ? "Shipping" :
+                step === 3 ? (orderType === "In-Person Transaction" ? "Meeting Details" : "Shipping") :
                   step === 4 ? "Fees" : "Review deal"
           }
           className="mb-8"
@@ -744,81 +750,56 @@ export default function CreateDeal() {
 
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground">Handling Time</label>
-                <CustomSelect
-                  placeholder="Select handling time"
-                  value={handlingTime}
-                  onChange={setHandlingTime}
-                  options={[
-                    { value: "Ship within 1–2 business days", label: "Ship within 1–2 business days" },
-                    { value: "Ship within 3–5 business days", label: "Ship within 3–5 business days" }
-                  ]}
-                />
-                <p className="text-[12px] text-amber-600 font-medium flex items-center gap-1 mt-1">
-                  <Info className="w-3.5 h-3.5 shrink-0" /> If you do not ship within the selected handling time, the transaction may be automatically cancelled.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            {orderType === "In-Person Transaction" ? (
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-foreground">Carrier</label>
-                  <CustomSelect
-                    placeholder="Select carrier"
-                    value={carrier}
-                    onChange={setCarrier}
-                    options={[
-                      { value: "USPS", label: "USPS" },
-                      { value: "UPS", label: "UPS" },
-                      { value: "FedEx", label: "FedEx" },
-                      { value: "Other", label: "Other" }
-                    ]}
-                  />
+                  <label className="text-[13px] font-medium text-foreground">Meeting Location (Required)</label>
+                  <Input placeholder="e.g. Starbucks, 123 Main St" value={meetingLocation} onChange={e => setMeetingLocation(e.target.value)} />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[13px] font-medium text-foreground">Shipping Type</label>
-                  <CustomSelect
-                    placeholder="Select type"
-                    value={shippingType}
-                    onChange={setShippingType}
-                    options={[
-                      { value: "Standard", label: "Standard" },
-                      { value: "Priority", label: "Priority" }
-                    ]}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-foreground">Meeting Date (Required)</label>
+                    <Input type="date" value={meetingDate} onChange={e => setMeetingDate(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-foreground">Meeting Time</label>
+                    <Input type="time" value={meetingTime} onChange={e => setMeetingTime(e.target.value)} />
+                  </div>
+                </div>
+                <div className="space-y-2 mt-4">
+                  <label className="text-[13px] font-medium text-foreground">Notes (Optional)</label>
+                  <textarea
+                    className="flex w-full rounded-2xl border border-input bg-card px-4 py-3 text-[16px] shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[100px]"
+                    placeholder="Any specific details about the meetup..."
+                    value={meetingNotes}
+                    onChange={e => setMeetingNotes(e.target.value)}
                   />
                 </div>
               </div>
-
-              {carrier === "Other" && (
-                <div className="space-y-4 animate-in slide-in-from-top-2">
-                  <div className="space-y-2">
-                    <label className="text-[13px] font-medium text-foreground">Custom Carrier</label>
-                    <Input placeholder="Enter carrier name" value={customCarrier} onChange={e => setCustomCarrier(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[13px] font-medium text-foreground">Carrier Tracking URL</label>
-                    <Input placeholder="Enter tracking URL (e.g. https://...)" value={customTrackingUrl} onChange={e => setCustomTrackingUrl(e.target.value)} />
-                  </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[13px] font-medium text-foreground">Handling Time</label>
+                  <CustomSelect
+                    placeholder="Select handling time"
+                    value={handlingTime}
+                    onChange={setHandlingTime}
+                    options={[
+                      { value: "Ship within 1–2 business days", label: "Ship within 1–2 business days" },
+                      { value: "Ship within 3–5 business days", label: "Ship within 3–5 business days" }
+                    ]}
+                  />
+                  <p className="text-[12px] text-amber-600 font-medium flex items-center gap-1 mt-1">
+                    <Info className="w-3.5 h-3.5 shrink-0" /> If you do not ship within the selected handling time, the transaction may be automatically cancelled.
+                  </p>
                 </div>
-              )}
 
-              <div className="space-y-2 mt-4">
-                <label className="text-[13px] font-medium text-foreground">Shipping Cost (USD)</label>
-                <Input type="number" placeholder="0" value={shippingCost} onChange={e => setShippingCost(e.target.value)} />
-              </div>
-
-              <div className="flex items-center gap-2 mt-4 p-4 border rounded-2xl cursor-pointer hover:bg-gray-50" onClick={() => setIsInsured(!isInsured)}>
-                <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${isInsured ? 'bg-primary border-primary text-white' : 'border-input'}`}>
-                  {isInsured && <Check className="w-3.5 h-3.5" />}
-                </div>
-                <div className="flex-1">
-                  <span className="font-semibold text-[14px] block">Insured Shipment</span>
-                  <span className="text-[12px] text-muted-foreground">Insurance amount will be entered later during tracking upload.</span>
+                <div className="space-y-2 mt-4">
+                  <label className="text-[13px] font-medium text-foreground">Shipping Cost (USD)</label>
+                  <Input type="number" placeholder="0" value={shippingCost} onChange={e => setShippingCost(e.target.value)} />
                 </div>
               </div>
-
-            </div>
+            )}
           </div>
         )}
 
@@ -848,7 +829,7 @@ export default function CreateDeal() {
 
             <div className="mt-3 text-[13px] text-muted-foreground p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p>The selected fee structure will be shown to the buyer before payment confirmation.</p>
+              <p>Shipping charges are paid separately by the buyer and do not affect your estimated payout.</p>
             </div>
 
             <div className="mt-8 border rounded-2xl overflow-hidden">
@@ -877,10 +858,12 @@ export default function CreateDeal() {
                       <span className="text-muted-foreground">Item Price</span>
                       <span className="font-medium">${itemPriceNum.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-[14px]">
-                      <span className="text-muted-foreground">Shipping Charge</span>
-                      <span className="font-medium">{shipCostNum === 0 ? "Free" : `$${shipCostNum.toFixed(2)}`}</span>
-                    </div>
+                    {orderType !== "In-Person Transaction" && (
+                      <div className="flex justify-between text-[14px]">
+                        <span className="text-muted-foreground">Shipping Charge</span>
+                        <span className="font-medium text-blue-600">Paid by Buyer</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-[14px]">
                       <span className="text-muted-foreground">Platform Fee (3.5% + $0.30) <span className="opacity-80 text-[11px]">(non-refundable)</span></span>
                       <span className="font-medium">${platformFee.toFixed(2)}</span>
@@ -1026,6 +1009,18 @@ export default function CreateDeal() {
                         <div className="flex justify-between items-center text-[15px]">
                           <span className="text-muted-foreground">Insurance</span>
                           <span className="font-medium text-right">{isInsured ? "Yes" : "No"}</span>
+                        </div>
+                      </>
+                    )}
+                    {orderType === "In-Person Transaction" && (
+                      <>
+                        <div className="flex justify-between items-center text-[15px]">
+                          <span className="text-muted-foreground">Location</span>
+                          <span className="font-medium text-right">{meetingLocation || "Not specified"}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-[15px]">
+                          <span className="text-muted-foreground">Date / Time</span>
+                          <span className="font-medium text-right">{meetingDate ? `${meetingDate} ${meetingTime}` : "Not specified"}</span>
                         </div>
                       </>
                     )}
@@ -1264,20 +1259,9 @@ export default function CreateDeal() {
       </BottomSheet>
 
       <BottomActionBar>
-        {step === 2 && isScoreMaxed ? (
-          <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <Button onClick={nextStep} className="w-full h-14 text-[16px] bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
-              <Rocket className="w-5 h-5" /> Publish Trusted Deal
-            </Button>
-            <Button variant="outline" className="w-full h-14 text-[16px] font-bold border-blue-200 text-blue-700 hover:bg-blue-50">
-              Preview Listing
-            </Button>
-          </div>
-        ) : (
-          <Button onClick={nextStep} className="w-full h-14 text-[16px]">
-            {step === 5 ? "Publish Deal" : "Continue"}
-          </Button>
-        )}
+        <Button onClick={nextStep} className="w-full h-14 text-[16px] font-semibold rounded-2xl bg-blue-600 hover:bg-blue-700 text-white">
+          {step === 5 ? "Publish Deal" : "Continue"}
+        </Button>
       </BottomActionBar>
     </div>
   )

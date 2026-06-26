@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
 import { ChevronLeft, Star, MapPin, ShieldCheck, Mail, Phone } from "lucide-react"
+import { TrustProfileCard } from "@/components/trust-profile-card"
 
 export default function PublicProfilePreview() {
   const navigate = useNavigate()
@@ -18,33 +19,21 @@ export default function PublicProfilePreview() {
       </div>
 
       <div className="flex-1 pb-10">
-        <div className="bg-white border-b border-gray-100 pb-8 pt-8">
-          <div className="px-5 flex flex-col items-center text-center">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full border-2 border-white overflow-hidden bg-white shadow-md">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" alt="Alex Johnson" className="w-full h-full object-cover" />
-              </div>
-            </div>
-            
-            <h1 className="text-[22px] font-extrabold mt-3">Alex Johnson</h1>
-            <p className="text-gray-500 font-semibold text-[14px]">@alexj_collectibles</p>
-
-            <div className="flex items-center gap-1 mt-2 mb-4 text-yellow-400 justify-center">
-              {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
-              <span className="text-gray-700 font-bold ml-1 text-[13px]">5.0 • <span className="text-gray-500 font-medium">50+ Completed Deals</span></span>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-2 mt-1">
-              <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-100">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span className="text-[13px] font-medium">TrustLayer Verified</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-gray-50 text-gray-700 px-3 py-1.5 rounded-full border border-gray-200">
-                <MapPin className="w-3.5 h-3.5" />
-                <span className="text-[13px] font-medium">Austin, TX</span>
-              </div>
-            </div>
-          </div>
+        <div className="bg-white border-b border-gray-100 pb-8 pt-8 px-5 flex justify-center">
+          <TrustProfileCard 
+            variant="large"
+            className="border-0 shadow-none bg-transparent p-0"
+            user={{
+              username: "@vintage_vault",
+              avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+              trustScore: 96,
+              rating: 4.9,
+              reviewCount: 184,
+              successfulDeals: 184,
+              memberSince: 2022,
+              isTrustedMember: true
+            }}
+          />
         </div>
 
         <div className="px-5 pt-6 space-y-6">

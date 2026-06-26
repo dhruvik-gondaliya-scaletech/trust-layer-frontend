@@ -32,11 +32,11 @@ export default function TermsConditions() {
             <h3 className="font-bold text-[16px]">3. Marketplace Rules</h3>
             <p>Users must comply with all local laws and regulations. Fraudulent activity, misrepresentation, and prohibited items are strictly forbidden.</p>
 
-            <h3 className="font-bold text-[16px]">4. Escrow and Payments</h3>
-            <p>TrustLayer holds funds in escrow until both parties confirm the transaction is complete to the agreed specifications.</p>
+            <h3 className="font-bold text-[16px]">4. Payments and Funds on Hold</h3>
+            <p>TrustLayer holds funds securely on hold until both parties confirm the transaction is complete to the agreed specifications.</p>
             
             <h3 className="font-bold text-[16px]">5. Liability</h3>
-            <p>TrustLayer acts as a facilitator and is not liable for disputes arising outside the scope of our escrow protection policies.</p>
+            <p>TrustLayer acts as a facilitator and is not liable for disputes arising outside the scope of our secure hold protection policies.</p>
           </div>
         </div>
       </div>

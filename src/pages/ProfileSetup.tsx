@@ -7,6 +7,16 @@ import { BottomActionBar } from "@/components/ui/bottom-action-bar";
 
 export default function ProfileSetup() {
   const navigate = useNavigate();
+  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPhotoPreview(url);
+    }
+  };
 
   const handleSetup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +45,28 @@ export default function ProfileSetup() {
         </p>
 
         <form id="profile-form" onSubmit={handleSetup} className="space-y-6">
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center border-2 border-dashed border-gray-300 mb-3 cursor-pointer hover:bg-gray-100 transition-colors">
-              <Camera className="w-8 h-8 text-muted-foreground" />
+          <div className="flex flex-col items-center mb-6 relative">
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handlePhotoUpload} 
+            />
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center border-2 border-dashed border-gray-300 mb-3 cursor-pointer hover:bg-gray-100 transition-colors overflow-hidden group relative"
+            >
+              {photoPreview ? (
+                <>
+                  <img src={photoPreview} alt="Profile preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="w-6 h-6 text-white" />
+                  </div>
+                </>
+              ) : (
+                <Camera className="w-8 h-8 text-muted-foreground group-hover:scale-110 transition-transform" />
+              )}
             </div>
             <p className="text-[14px] font-medium text-foreground mb-1">Profile Photo (Optional)</p>
             <p className="text-[12px] text-muted-foreground text-center">Add a profile picture to help build trust.</p>
