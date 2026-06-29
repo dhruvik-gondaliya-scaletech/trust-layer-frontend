@@ -20,6 +20,7 @@ export default function DealDetails() {
   // Local state for expandable sections
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
   const [showDeliveryConfirmModal, setShowDeliveryConfirmModal] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
   
   // Mock data for the specific deal
   const dealId = id || "TRUST-1024"
@@ -41,6 +42,9 @@ export default function DealDetails() {
   const userRole: string = "seller" // Fixed to "seller" as per new routing architecture
   const isSeller = userRole === "seller"
   const orderType: string = "Online Transaction" // Defaulting to Online for tracking flow
+  
+  const trackingNumber: string | null = "9400123456789012345678"
+  const carrier = "USPS Priority"
 
   
   const theme = {
@@ -186,7 +190,25 @@ export default function DealDetails() {
   ]
 
   const handleCopy = (text: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text)
+    setIsCopied(true)
+    setTimeout(() => {
+      setIsCopied(false)
+    }, 2000)
+  }
+
+  const handleTrackPackage = (carrierName: string, trackNum: string | null) => {
+    if (!trackNum) return;
+    let url = "";
+    const lowerCarrier = carrierName.toLowerCase();
+    if (lowerCarrier.includes("usps")) url = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackNum}`;
+    else if (lowerCarrier.includes("ups")) url = `https://www.ups.com/track?tracknum=${trackNum}`;
+    else if (lowerCarrier.includes("fedex")) url = `https://www.fedex.com/fedextrack/?trknbr=${trackNum}`;
+    else if (lowerCarrier.includes("dhl")) url = `https://www.dhl.com/global-en/home/tracking.html?tracking-id=${trackNum}`;
+    else url = `https://google.com/search?q=${trackNum}`;
+    
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   const toggleSection = (section: string) => {
@@ -366,13 +388,22 @@ export default function DealDetails() {
                 <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
                   <Truck className="w-4 h-4 text-orange-600" />
                 </div>
-                <h3 className="font-bold text-[15px] text-gray-900">USPS Priority</h3>
+                <h3 className="font-bold text-[15px] text-gray-900">{carrier}</h3>
               </div>
               
               {status !== "Awaiting Shipment" && (
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleCopy("9400123456789012345678")}>
-                  <span className="text-[12px] font-bold text-gray-600 tracking-wide">940012345...</span>
-                  <Copy className="w-3 h-3 text-gray-400" />
+                <div 
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1 bg-gray-50 rounded-full border border-gray-100 transition-colors",
+                    trackingNumber ? "cursor-pointer hover:bg-gray-100" : "opacity-50 cursor-not-allowed"
+                  )}
+                  onClick={() => trackingNumber && handleCopy(trackingNumber)}
+                  title={!trackingNumber ? "Tracking information is not available yet." : "Copy tracking number"}
+                >
+                  <span className="text-[12px] font-bold text-gray-600 tracking-wide">
+                    {trackingNumber ? `${trackingNumber.substring(0, 9)}...` : 'N/A'}
+                  </span>
+                  {isCopied ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-gray-400" />}
                 </div>
               )}
             </div>
@@ -388,100 +419,19 @@ export default function DealDetails() {
             )}
             
             {status !== "Awaiting Shipment" && (
-              <Button variant="outline" className="w-full text-[13px] font-bold border-gray-200">
+              <Button 
+                variant="outline" 
+                className="w-full text-[13px] font-bold border-gray-200"
+                onClick={() => trackingNumber && handleTrackPackage(carrier, trackingNumber)}
+                disabled={!trackingNumber}
+                title={!trackingNumber ? "Tracking information is not available yet." : undefined}
+              >
                 Track Package <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </Card>
         )}
 
-        {/* 7. More Details (Expandable Sections) */}
-        <div className="space-y-2 mt-6">
-          <h3 className="text-[13px] font-bold text-gray-500 uppercase tracking-wider px-2 mb-3">More Details</h3>
-          
-          {/* Documents */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300">
-            <button 
-              onClick={() => toggleSection('documents')}
-              className="w-full p-4 flex justify-between items-center font-bold text-[15px] text-gray-900"
-            >
-              <div className="flex items-center gap-3">
-                <FileText className="w-5 h-5 text-gray-400" /> Documents
-              </div>
-              {expandedSection === 'documents' ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-            </button>
-            <AnimatePresence>
-              {expandedSection === 'documents' && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="px-4 pb-4"
-                >
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <Button variant="outline" className="h-12 flex flex-col justify-center items-center gap-1 border-gray-200 bg-gray-50 hover:bg-gray-100">
-                      <span className="text-[11px] uppercase font-bold text-gray-600">Invoice</span>
-                    </Button>
-                    <Button variant="outline" className="h-12 flex flex-col justify-center items-center gap-1 border-gray-200 bg-gray-50 hover:bg-gray-100">
-                      <span className="text-[11px] uppercase font-bold text-gray-600">Shipping Label</span>
-                    </Button>
-                    <Button variant="outline" className="h-12 flex flex-col justify-center items-center gap-1 border-gray-200 bg-gray-50 hover:bg-gray-100" disabled={status !== "Completed"}>
-                      <span className="text-[11px] uppercase font-bold text-gray-600">Receipt</span>
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Activity History */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300">
-            <button 
-              onClick={() => toggleSection('activity')}
-              className="w-full p-4 flex justify-between items-center font-bold text-[15px] text-gray-900"
-            >
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-gray-400" /> Activity History
-              </div>
-              {expandedSection === 'activity' ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-            </button>
-            <AnimatePresence>
-              {expandedSection === 'activity' && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="px-4 pb-4"
-                >
-                  <div className="space-y-4 pt-2">
-                    {activityLog.map((log) => (
-                      <div key={log.id} className="flex gap-3 items-start">
-                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0 border mt-0.5", theme.bgLight, theme.borderLight)}>
-                          <log.icon className={cn("w-4 h-4", theme.text)} />
-                        </div>
-                        <div>
-                          <p className="text-[14px] font-bold text-gray-900">{log.action}</p>
-                          <p className="text-[12px] font-semibold text-gray-400">{log.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          {/* Support */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300">
-             <button className="w-full p-4 flex justify-between items-center font-bold text-[15px] text-gray-900 hover:bg-gray-50 transition-colors">
-               <div className="flex items-center gap-3">
-                 <Headphones className="w-5 h-5 text-gray-400" /> Support
-               </div>
-               <ArrowRight className="w-5 h-5 text-gray-300" />
-             </button>
-          </div>
-          
-        </div>
       </div>
 
       {/* 8. Primary Action */}
@@ -584,6 +534,21 @@ export default function DealDetails() {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isCopied && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-[120px] left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-3 z-50 whitespace-nowrap"
+          >
+            <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Check className="w-3 h-3 text-green-400" />
+            </div>
+            <span className="text-[13px] font-medium tracking-wide">Tracking number copied</span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

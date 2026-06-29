@@ -4,7 +4,6 @@ import { motion } from "framer-motion"
 import { ChevronLeft, Star, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function ReviewSeller() {
   const navigate = useNavigate()
@@ -19,7 +18,9 @@ export default function ReviewSeller() {
   
   const headerText = isReviewingSeller ? 'Review Seller' : 'Review Buyer'
   const targetUsername = isReviewingSeller ? '@vintage_vault' : '@alex_johnson'
-  const subtitleText = isReviewingSeller ? 'How was your experience with this seller?' : 'How was your experience with this buyer?'
+  const descriptionText = isReviewingSeller 
+    ? 'Your transaction has been completed successfully.\nPlease rate your experience with this seller.' 
+    : 'Your transaction has been completed successfully.\nPlease rate your experience with this buyer.'
   const placeholderText = isReviewingSeller ? 'Share your experience with this seller...' : 'Share your experience with this buyer...'
 
   const handleSubmit = () => {
@@ -64,22 +65,25 @@ export default function ReviewSeller() {
       </div>
 
       <div className="flex-1 px-5 pt-8 animate-in fade-in duration-500">
-        <div className="mb-8">
-          <TransactionProgress state="Review Phase" userRole={userMode} />
+        <div className="flex flex-col items-center text-center space-y-2 mb-8">
+          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-2">
+            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          </div>
+          <h2 className="text-[18px] font-bold text-gray-900">Transaction Completed</h2>
+          <p className="text-[14px] text-gray-500 leading-relaxed max-w-[280px] whitespace-pre-line">
+            {descriptionText}
+          </p>
         </div>
         
         <div className="text-center space-y-2 mb-8">
-          <div className="h-16 w-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl font-bold text-gray-400 overflow-hidden">
+          <div className="h-16 w-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3 overflow-hidden shadow-sm border-2 border-white ring-1 ring-gray-100">
             {isReviewingSeller ? (
               <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Seller" className="w-full h-full object-cover" />
             ) : (
               <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" alt="Buyer" className="w-full h-full object-cover" />
             )}
           </div>
-          <h1 className="text-[22px] font-extrabold tracking-tight mb-2">Rate {targetUsername}</h1>
-          <p className="text-[14px] text-muted-foreground">
-            {subtitleText}
-          </p>
+          <h1 className="text-[18px] font-extrabold tracking-tight mb-2">{targetUsername}</h1>
         </div>
 
         <div className="flex justify-center gap-2 mb-10">

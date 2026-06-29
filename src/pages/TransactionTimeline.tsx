@@ -131,17 +131,41 @@ export default function TransactionTimeline() {
               <CardContent className="p-5 space-y-4">
                 <h2 className="font-semibold text-[18px]">Tracking Information</h2>
                 <div className="space-y-3">
+                  {/* Conditional Insurance Block */}
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                    <span className="text-muted-foreground text-[14px] flex items-center gap-1.5">
+                      Shipping Insurance {true && <ShieldCheck className="w-4 h-4 text-gray-400" />}
+                    </span>
+                    {true ? (
+                      <span className="font-bold text-[12px] bg-green-50 text-green-700 px-2 py-1 rounded flex items-center gap-1">
+                        <span className="text-[14px]">🛡</span> Insured Shipment
+                      </span>
+                    ) : (
+                      <span className="font-bold text-[13px] bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        Not Insured
+                      </span>
+                    )}
+                  </div>
+                  {true && (
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                      <span className="text-muted-foreground text-[14px]">Coverage Amount</span>
+                      <span className="font-bold text-[14px]">$4,300</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                    <span className="text-muted-foreground text-[14px]">Estimated Delivery</span>
+                    <span className="font-bold text-[14px]">Jul 02, 2026</span>
+                  </div>
+                  
                   <div className="flex justify-between items-center pb-2 border-b border-gray-50">
                     <span className="text-muted-foreground text-[14px]">Carrier</span>
                     <span className="font-bold text-[14px]">USPS</span>
                   </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-50">
+                  
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground text-[14px]">Tracking Number</span>
                     <span className="font-bold text-[14px]">940010920556801844</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground text-[14px]">Shipment Date</span>
-                    <span className="font-bold text-[14px]">Oct 14, 2026</span>
                   </div>
                 </div>
                 
