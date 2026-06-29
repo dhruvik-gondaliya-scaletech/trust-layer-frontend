@@ -96,7 +96,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                     </div>
                   </motion.div>
                   
-                  <h2 className="text-[22px] font-extrabold text-gray-900 tracking-tight leading-none mb-1">Alex Johnson</h2>
+                  <h2 className="text-[22px] font-bold text-gray-900 tracking-tight leading-none mb-1">Alex Johnson</h2>
                 </div>
               </div>
 
@@ -109,7 +109,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
                 >
-                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Account</h3>
+                  <h3 className="text-[16px] font-semibold text-gray-900 mb-3 px-1">Account</h3>
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {[
                       { icon: <User />, label: "My Profile", route: "/profile" },
@@ -129,44 +129,14 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                           {React.cloneElement(item.icon as any, { className: "w-4 h-4" })}
                         </div>
-                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
+                        <span className="flex-1 text-[15px] font-medium tracking-normal leading-[24px] text-gray-700">{item.label}</span>
                         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 group-active:translate-x-1 transition-transform" />
                       </div>
                     ))}
                   </div>
                 </motion.div>
 
-                {/* SUPPORT SECTION */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                >
-                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Support</h3>
-                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    {[
-                      { icon: <HelpCircle />, label: "Help Center", route: "/help-center" },
-                      { icon: <MessageCircle />, label: "Contact Support", route: "/contact-support" },
-                    ].map((item, i) => (
-                      <div 
-                        key={i} 
-                        onClick={() => {
-                          if (item.route) {
-                            navigate(item.route);
-                            onClose();
-                          }
-                        }}
-                        className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
-                      >
-                        <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
-                          {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
-                        </div>
-                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
+
 
                 {/* COMPANY SECTION */}
                 <motion.div 
@@ -174,7 +144,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 }}
                 >
-                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Company</h3>
+                  <h3 className="text-[16px] font-semibold text-gray-900 mb-3 px-1">Company</h3>
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {[
                       { icon: <Building2 />, label: "About TrustLayer", route: "/about" },
@@ -193,7 +163,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
                           {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
                         </div>
-                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
+                        <span className="flex-1 text-[15px] font-medium tracking-normal leading-[24px] text-gray-700">{item.label}</span>
                         <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
                       </div>
                     ))}
@@ -206,7 +176,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.78 }}
                 >
-                  <h3 className="text-[16px] font-extrabold text-gray-900 mb-3 px-1">Legal</h3>
+                  <h3 className="text-[16px] font-semibold text-gray-900 mb-3 px-1">Legal</h3>
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     {[
                       { icon: <FileText />, label: "Terms & Conditions", route: "/terms" },
@@ -227,7 +197,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
                           {React.cloneElement(item.icon as any, { className: "w-5 h-5" })}
                         </div>
-                        <span className="flex-1 text-[14px] font-bold text-gray-700">{item.label}</span>
+                        <span className="flex-1 text-[15px] font-medium tracking-normal leading-[24px] text-gray-700">{item.label}</span>
                         <ChevronRight className="w-4 h-4 text-gray-300 group-active:translate-x-1 transition-transform" />
                       </div>
                     ))}
@@ -246,7 +216,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                     className="border-2 border-rose-100 bg-rose-50/50 hover:bg-rose-50 text-rose-600 rounded-2xl p-4 flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-sm"
                   >
                     <LogOut className="w-5 h-5" />
-                    <span className="text-[15px] font-extrabold">Sign Out</span>
+                    <span className="text-[15px] font-semibold">Sign Out</span>
                   </div>
                 </motion.div>
 
@@ -257,7 +227,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                   transition={{ delay: 0.85 }}
                   className="pb-8 text-center"
                 >
-                  <p className="text-[12px] font-semibold text-gray-400">© 2026 TrustLayer</p>
+                  <p className="text-[12px] font-normal text-gray-400">© 2026 TrustLayer</p>
                 </motion.div>
 
               </div>

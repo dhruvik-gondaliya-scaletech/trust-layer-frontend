@@ -2,6 +2,7 @@ import * as React from "react"
 import { useNavigate } from "react-router-dom"
 import { 
   ChevronLeft,
+  ChevronRight,
   Check,
   CheckCircle2
 } from "lucide-react"
@@ -246,8 +247,41 @@ export default function Notifications() {
       setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true } : n))
     }
     
-    // Navigate to Deal Details page
-    navigate(`/deal-details/${notification.dealId}`)
+    switch (notification.title) {
+      case 'Deal published successfully':
+      case 'Buyer confirmed delivery':
+        navigate(`/deal-details/${notification.dealId}`);
+        break;
+      case 'Buyer requested listing updates':
+        navigate(`/review-feedback/${notification.dealId}`);
+        break;
+      case 'Payment received':
+        navigate(`/add-tracking/${notification.dealId}`);
+        break;
+      case 'Tracking shared with buyer':
+      case 'Payment completed':
+      case 'Seller is preparing your shipment':
+      case 'Tracking information available':
+      case 'Please review your delivery':
+      case 'Review period ending soon':
+        navigate(`/timeline/${notification.dealId}`);
+        break;
+      case 'Funds released':
+        navigate('/wallet');
+        break;
+      case 'Buyer reported an issue':
+      case 'Seller responded to your dispute':
+        navigate(`/dispute-flow/${notification.dealId}`);
+        break;
+      case 'Deal approved':
+        navigate(`/fund-escrow/${notification.dealId}`);
+        break;
+      case 'Transaction completed':
+        navigate(`/review-seller/${notification.dealId}`);
+        break;
+      default:
+        navigate(`/deal-details/${notification.dealId}`);
+    }
   }
 
   // Sort by reverse order based on ID for visual timeline effect
@@ -383,7 +417,7 @@ export default function Notifications() {
                         animate={{ opacity: 1, y: 0 }}
                         key={item.id} 
                         onClick={() => handleNotificationClick(item)}
-                        className={`p-[18px] rounded-[18px] border relative overflow-hidden flex gap-4 items-start cursor-pointer transition-colors shadow-[0_2px_10px_rgba(15,23,42,0.05)]
+                        className={`p-[18px] pr-4 rounded-[18px] border relative overflow-hidden flex gap-3 items-center cursor-pointer active:scale-[0.98] transition-all shadow-[0_2px_10px_rgba(15,23,42,0.05)]
                           ${item.isRead ? 'bg-[#FCFCFD] border-[#EEF2F7]' : 'bg-white border-[#E9EDF5]'}
                         `}
                       >
@@ -440,27 +474,14 @@ export default function Notifications() {
                             </div>
                           )}
                           
-                          <div className={item.person || item.highlight ? 'mb-3 pr-3' : (item.isRead ? 'opacity-70 mb-3' : 'mb-3')}>
+                          <div className={item.person || item.highlight ? 'mb-1 pr-3' : (item.isRead ? 'opacity-70 mb-1' : 'mb-1')}>
                             <p className={`text-[14px] leading-relaxed line-clamp-2 ${!item.isRead ? 'text-gray-700 font-medium' : 'text-gray-500 font-medium'}`}>
                               {item.message}
                             </p>
                           </div>
-                          
-                          {item.ctaText && (
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (item.title === 'Buyer requested listing updates') {
-                                  navigate(`/review-feedback/${item.dealId}`);
-                                } else {
-                                  navigate(`/deal-details/${item.dealId}?role=${item.role === 'selling' ? 'seller' : 'buyer'}`);
-                                }
-                              }}
-                              className="w-[calc(100%-12px)] bg-primary text-white text-[13px] font-bold py-2.5 rounded-lg shadow-sm mt-1"
-                            >
-                              {item.ctaText}
-                            </button>
-                          )}
+                        </div>
+                        <div className="shrink-0 text-gray-300">
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </motion.div>
                     ))}

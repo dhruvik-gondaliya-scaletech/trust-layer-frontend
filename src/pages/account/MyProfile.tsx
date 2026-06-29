@@ -92,95 +92,7 @@ export default function MyProfile() {
           
           <h2 className="text-[22px] font-extrabold text-gray-900 leading-none mb-1">Alex Johnson</h2>
           <p className="text-[14px] font-bold text-gray-500 mb-3">Austin, Texas • United States</p>
-          
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-100">
-              <Mail className="w-3.5 h-3.5" />
-              <span className="text-[12px] font-bold">Email Verified</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-100">
-              <Phone className="w-3.5 h-3.5" />
-              <span className="text-[12px] font-bold">Phone Verified</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full border border-gray-200">
-              <span className="text-[12px] font-bold">Member Since March 2026</span>
-            </div>
-          </div>
-          <p className="text-[13px] text-gray-500 font-medium">Trust begins with a complete profile. Complete profiles help buyers feel confident.</p>
         </div>
-
-        {/* PROFILE COMPLETION */}
-        {progress === 100 ? (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-sm border border-emerald-100 overflow-hidden"
-          >
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-5 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm border border-emerald-200">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-baseline gap-2 mb-1">
-                  <h3 className="text-[15px] font-extrabold text-emerald-900">Profile Complete</h3>
-                  <span className="text-[14px] font-extrabold text-emerald-600">100%</span>
-                </div>
-                <p className="text-[13px] font-medium text-emerald-800/80 leading-relaxed mb-4">
-                  Your profile is ready for secure buying and selling.
-                </p>
-                <Button 
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm font-bold h-10 px-4 text-[13px] rounded-xl w-full"
-                  onClick={() => navigate('/profile/preview')}
-                >
-                  View Public Profile
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 overflow-hidden">
-            <div className="flex justify-between items-end mb-2">
-              <h3 className="text-[15px] font-extrabold text-gray-900">Complete Your Profile</h3>
-              <motion.span 
-                key={progress}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-[24px] font-extrabold text-blue-600 leading-none"
-              >
-                {progress}%
-              </motion.span>
-            </div>
-            <div className="h-2.5 bg-gray-100 rounded-full w-full overflow-hidden mb-4 relative">
-              <motion.div 
-                className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full" 
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 1, type: 'spring', bounce: 0.2 }}
-              />
-            </div>
-            <p className="text-[13px] font-medium text-gray-500 mb-4">Complete these to build buyer confidence.</p>
-            
-            <div className="space-y-2">
-              <h4 className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">Remaining Steps</h4>
-              <div className="space-y-1">
-                <AnimatePresence>
-                  {missingItems.map(item => (
-                    <motion.button 
-                      key={item.id}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                      onClick={item.action}
-                      className="flex items-center gap-2 text-[13px] font-bold text-blue-600 hover:text-blue-700 active:scale-[0.98] transition-all w-full text-left py-2"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-600" /> {item.title}
-                    </motion.button>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ABOUT ME */}
         <div className="space-y-3">
@@ -229,11 +141,60 @@ export default function MyProfile() {
           </div>
         </div>
 
-        {/* SHIPPING ADDRESS */}
+        {/* TRUST & VERIFICATION */}
         <div className="space-y-3">
-          <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">Shipping</h3>
+          <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">Trust & Verification</h3>
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <EditRow icon={MapPin} title="Primary Address" value="123 Main St, Austin, TX" onClick={() => navigate('/shipping-addresses')} />
+            <div className="flex items-center gap-3 p-4 border-b border-gray-50">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <Mail className="w-4 h-4" />
+              </div>
+              <span className="text-[14px] font-bold text-gray-900 flex-1">Email Verified</span>
+            </div>
+            <div className="flex items-center gap-3 p-4 border-b border-gray-50">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <Phone className="w-4 h-4" />
+              </div>
+              <span className="text-[14px] font-bold text-gray-900 flex-1">Phone Verified</span>
+            </div>
+            <div className="flex items-center gap-3 p-4 border-b border-gray-50">
+              <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
+              <span className="text-[14px] font-bold text-gray-900 flex-1">Member Since March 2026</span>
+            </div>
+            
+            <div className="p-4 border-b border-gray-50 last:border-0">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[14px] font-bold text-gray-900">Profile Completion</span>
+                <span className="text-[14px] font-bold text-blue-600">{progress}%</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full w-full overflow-hidden mb-3 relative">
+                <motion.div 
+                  className="absolute top-0 left-0 bottom-0 bg-blue-600 rounded-full" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                />
+              </div>
+              {progress < 100 && (
+                <div className="mt-3">
+                  <span className="text-[12px] font-bold text-gray-500 mb-2 block uppercase tracking-wider">Remaining Steps</span>
+                  <div className="space-y-2">
+                    {missingItems.map(item => (
+                      <div key={item.id} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+                        <button 
+                          onClick={item.action}
+                          className="text-[13px] font-bold text-blue-600 hover:text-blue-700 text-left"
+                        >
+                          {item.title}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -245,13 +206,6 @@ export default function MyProfile() {
           </div>
         </div>
 
-        {/* PUBLIC PROFILE PREVIEW */}
-        <div className="space-y-3">
-          <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">Public Profile</h3>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <EditRow icon={User} title="Profile Preview" value="See how others view your profile." onClick={() => navigate('/profile/preview')} />
-          </div>
-        </div>
 
         {/* DANGER ZONE */}
         <div className="space-y-3 pb-6">

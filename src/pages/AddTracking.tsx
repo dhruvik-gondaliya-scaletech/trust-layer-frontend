@@ -1,6 +1,7 @@
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
-import { ChevronLeft, Package, Upload, FileText, X } from "lucide-react"
+import { ChevronLeft, Package, Upload, FileText, X, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,6 +15,7 @@ export default function AddTracking() {
   const { id } = useParams()
   const [carrier, setCarrier] = React.useState("")
   const [trackingNumber, setTrackingNumber] = React.useState("")
+  const [isInsured, setIsInsured] = React.useState(false)
   const [shippingDate, setShippingDate] = React.useState("")
   const [notes, setNotes] = React.useState("")
   const [customCarrier, setCustomCarrier] = React.useState("")
@@ -38,6 +40,7 @@ export default function AddTracking() {
       fileInputRef.current.value = ""
     }
   }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] pb-[140px]">
@@ -92,13 +95,15 @@ export default function AddTracking() {
             <Input 
               placeholder="Enter tracking number" 
               value={trackingNumber} 
-              onChange={e => setTrackingNumber(e.target.value)} 
+              onChange={e => setTrackingNumber(e.target.value)}
+              maxLength={50}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
-              Shipping Date
+            <label className="text-[13px] font-medium text-foreground flex flex-col">
+              <span>Estimated Delivery Date</span>
+              <span className="text-[12px] text-gray-500 font-normal mt-0.5">When do you expect the buyer to receive the package?</span>
             </label>
             <CustomDatePicker 
               value={shippingDate} 
@@ -168,13 +173,65 @@ export default function AddTracking() {
             />
           </div>
         </div>
+
+        {/* Optional Insurance Card */}
+        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-1.5">
+              <ShieldCheck className="w-5 h-5 text-blue-600" />
+              Shipment Insurance <span className="text-gray-400 font-normal text-[14px]">(Optional)</span>
+            </h3>
+          </div>
+          
+          <div className="space-y-1">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                checked={isInsured}
+                onChange={(e) => setIsInsured(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+              />
+              <span className="text-[14px] font-medium text-foreground">
+                This shipment is insured
+              </span>
+            </label>
+            <p className="text-[13px] text-gray-500 pl-8 leading-relaxed">
+              Protect this shipment with carrier insurance for additional coverage during transit.
+            </p>
+          </div>
+
+
+        </div>
       </div>
 
       <BottomActionBar>
         <Button 
           className="w-full h-14 text-[16px] font-bold shadow-sm"
-          onClick={() => navigate(`/tracking-success/${id || 'TRUST-1024'}`)}
-          disabled={!carrier || !trackingNumber || !shippingDate || (carrier === "Other" && !customCarrier)}
+          onClick={() => navigate(`/tracking-success/${id || 'TRUST-1024'}`, {
+            state: {
+              carrier: carrier === "Other" ? customCarrier : carrier,
+              trackingNumber,
+              isInsured,
+              shippingDate
+            }
+          })}
+          disabled={
+            !carrier || 
+            !trackingNumber || 
+            trackingNumber.length > 50 ||
+            !shippingDate || 
+            (() => {
+              if (!shippingDate) return true;
+              const parts = shippingDate.split('/');
+              if (parts.length !== 3) return true;
+              const [m, d, y] = parts.map(Number);
+              const dt = new Date(y, m - 1, d);
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              return dt < today;
+            })() ||
+            (carrier === "Other" && !customCarrier)
+          }
         >
           Upload Tracking
         </Button>
