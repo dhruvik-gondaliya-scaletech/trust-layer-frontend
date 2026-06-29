@@ -235,6 +235,11 @@ export default function CreateDeal() {
     } else if (step < totalSteps) {
       setStep(step + 1)
     } else {
+      const mode = new URLSearchParams(window.location.search).get("mode")
+      if (mode === "edit") {
+        localStorage.removeItem("dealDeclined")
+        localStorage.setItem("dealRepublished", "true")
+      }
       navigate("/deal-published")
     }
   }

@@ -4,7 +4,7 @@ import { AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
-export type DealStatus = 'draft' | 'open' | 'funded' | 'shipped' | 'delivered' | 'disputed' | 'return_approved' | 'return_shipped' | 'return_delivered' | 'return_completed' | 'cancelled' | 'completed';
+export type DealStatus = 'draft' | 'open' | 'funded' | 'shipped' | 'delivered' | 'disputed' | 'return_approved' | 'return_shipped' | 'return_delivered' | 'return_completed' | 'cancelled' | 'completed' | 'declined';
 
 export interface QuickActionDeal {
   id: string;
@@ -28,6 +28,7 @@ interface QuickActionContent {
 function getQuickActionContent(status: DealStatus, userMode: 'buyer' | 'seller', id: string): QuickActionContent {
   if (userMode === 'seller') {
     switch (status) {
+      case 'declined': return { statusLabel: 'ACTION REQUIRED', title: 'Buyer requested changes', ctaText: 'Review Feedback', ctaRoute: `/review-feedback/${id}` };
       case 'draft': return { statusLabel: 'DRAFT', title: 'Complete Setup', ctaText: 'Continue Setup', ctaRoute: '/create-deal' };
       case 'open': return { statusLabel: 'WAITING FOR BUYER', title: 'Deal Ready', ctaText: 'Share Deal', ctaRoute: `/deal-details/${id}` };
       case 'funded': return { statusLabel: 'PAYMENT RECEIVED', title: 'Upload Tracking Details', ctaText: 'Add Tracking', ctaRoute: `/add-tracking/${id}` };
@@ -62,6 +63,7 @@ function getQuickActionContent(status: DealStatus, userMode: 'buyer' | 'seller',
 }
 
 const priorityMap: Record<DealStatus, number> = {
+  declined: 0,
   delivered: 1,
   return_delivered: 2,
   shipped: 3,
@@ -71,9 +73,9 @@ const priorityMap: Record<DealStatus, number> = {
   return_shipped: 7,
   open: 8,
   draft: 9,
-  return_completed: 10,
-  cancelled: 11,
-  completed: 12
+  return_completed: 11,
+  cancelled: 12,
+  completed: 13
 };
 
 export function QuickActionsCard({ userMode, deals }: QuickActionsCardProps) {

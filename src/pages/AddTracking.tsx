@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { CustomSelect } from "@/components/ui/custom-select"
 import { CustomDatePicker } from "@/components/ui/custom-date-picker"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
+import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function AddTracking() {
   const navigate = useNavigate()
@@ -52,7 +53,9 @@ export default function AddTracking() {
       </div>
 
       <div className="flex-1 px-5 pt-6 animate-in fade-in duration-500 space-y-6">
-        <div className="text-center space-y-2 mb-8">
+        <TransactionProgress state="Seller Preparing Shipment" userRole="seller" />
+
+        <div className="text-center space-y-2 mb-8 mt-4">
           <div className="h-16 w-16 mx-auto bg-blue-50 flex items-center justify-center rounded-full border border-blue-100 shadow-sm">
             <Package className="h-8 w-8 text-blue-600" />
           </div>

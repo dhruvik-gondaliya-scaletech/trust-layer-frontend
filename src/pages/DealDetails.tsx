@@ -1,21 +1,20 @@
 import * as React from "react"
 import { useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { 
-  ChevronLeft, CheckCircle2, Download, Headphones, 
-  Package, MapPin, Truck, Check, ShieldCheck, 
-  Copy, ArrowRight, FileText, User, Upload, MessageSquare,
-  Clock, CreditCard, Activity, Star, ChevronDown, ChevronUp, AlertCircle
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { BottomActionBar } from "@/components/ui/bottom-action-bar"
-import { cn } from "@/lib/utils"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
+import { ArrowUpRight, CheckCircle2, ChevronLeft, CreditCard, MessageCircle, Package, Shield, ShieldCheck, Truck, AlertCircle, Activity, Check, MapPin, Star, ArrowRight, Copy, FileText, ChevronUp, ChevronDown, Clock, Headphones, Upload } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { TransactionProgress, type TransactionState } from "@/components/ui/transaction-progress"
+import { BottomActionBar } from "@/components/ui/bottom-action-bar"
 
 export default function DealDetails() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const role = searchParams.get('role') || 'buyer'
   
   // Local state for expandable sections
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
@@ -166,20 +165,15 @@ export default function DealDetails() {
 
   const statusContent = getStatusContent()
   
-  const milestones = orderType === "In-Person Transaction" ? [
-    { id: 'created', label: 'Deal Created', date: 'Jun 18, 10:00 AM', completed: true },
-    { id: 'funded', label: 'Buyer Payment Completed', date: 'Jun 18, 11:30 AM', completed: true },
-    { id: 'scheduled', label: 'Meeting Scheduled', date: 'Jun 19, 09:15 AM', completed: status === "Item Exchanged" || status === "Completed" },
-    { id: 'exchanged', label: 'Item Exchanged', date: 'Jun 20, 02:45 PM', completed: status === "Completed" },
-    { id: 'confirmed', label: 'Buyer Confirmed Receipt', date: 'Jun 20, 05:00 PM', completed: status === "Completed" },
-    { id: 'released', label: 'Funds Released', date: 'Jun 20, 05:05 PM', completed: status === "Completed" },
-  ] : [
-    { id: 'created', label: 'Deal Created', date: 'Jun 18, 10:00 AM', completed: true },
-    { id: 'funded', label: 'Payment Received', date: 'Jun 18, 11:30 AM', completed: true },
-    { id: 'shipped', label: 'Package Shipped', date: 'Jun 19, 09:15 AM', completed: status !== "Awaiting Shipment" },
-    { id: 'delivered', label: 'Package Delivered', date: 'Jun 20, 02:45 PM', completed: status === "Completed" || status === "Awaiting Buyer Confirmation" },
-    { id: 'released', label: 'Funds Released', date: 'Jun 20, 05:05 PM', completed: status === "Completed" },
-  ]
+  const getTransactionState = (): TransactionState => {
+    if (status === "Completed") return "Transaction Completed"
+    if (status === "Awaiting Buyer Confirmation") return "Buyer Receives Package"
+    if (status === "In Transit") return "Tracking Uploaded"
+    if (status === "Awaiting Shipment") return role === "seller" ? "Seller Preparing Shipment" : "Payment Completed"
+    if (status === "Meeting Scheduled") return role === "seller" ? "Seller Preparing Shipment" : "Payment Completed"
+    if (status === "Item Exchanged") return "Buyer Receives Package"
+    return "Payment Completed"
+  }
 
   const activityLog = [
     { id: 1, action: "Funds released to seller", time: "Jun 20, 5:05 PM", icon: CreditCard },
@@ -268,42 +262,8 @@ export default function DealDetails() {
           </div>
         </motion.div>
 
-        {/* 3. Progress Journey (5 visual milestones) */}
-        <Card className="p-5 border-gray-100 shadow-sm rounded-2xl">
-          <h3 className="font-bold text-[16px] mb-5 text-gray-900 flex items-center gap-2">
-            <Activity className={cn("w-4 h-4", theme.text)} /> Progress
-          </h3>
-          
-          <div className="flex justify-between items-center relative">
-            {/* Connecting line */}
-            <div className="absolute left-[10%] right-[10%] top-4 h-[2px] bg-gray-100 z-0">
-              <div 
-                className={cn("h-full transition-all duration-500", theme.bg)}
-                style={{ 
-                  width: orderType === "In-Person Transaction" 
-                    ? (status === "Completed" ? "100%" : status === "Item Exchanged" ? "60%" : status === "Meeting Scheduled" ? "40%" : "20%")
-                    : (status === "Completed" ? "100%" : status === "Awaiting Buyer Confirmation" ? "75%" : status === "In Transit" ? "50%" : status === "Awaiting Shipment" ? "25%" : "0%") 
-                }}
-              />
-            </div>
-            
-            {milestones.map((milestone, index) => (
-              <div key={milestone.id} className="relative z-10 flex flex-col items-center gap-2 group" style={{ width: `${100/milestones.length}%` }}>
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-bold transition-colors shadow-sm",
-                  milestone.completed ? cn("border-2 border-white", theme.bg) : "bg-gray-100 text-gray-400 border-2 border-white"
-                )}>
-                  {milestone.completed ? <Check className="w-4 h-4" /> : index + 1}
-                </div>
-                <div className="text-center">
-                  <p className={cn("text-[10px] font-bold leading-tight max-w-[60px]", milestone.completed ? "text-gray-900" : "text-gray-400")}>
-                    {milestone.label}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* 3. Progress Journey */}
+        <TransactionProgress state={getTransactionState()} userRole={role as 'buyer' | 'seller'} theme={theme} />
 
         {/* 4. Unified Transaction Summary */}
         <Card className="p-0 border-gray-100 shadow-sm rounded-2xl overflow-hidden">
