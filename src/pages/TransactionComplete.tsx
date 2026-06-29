@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ShieldCheck, CheckCircle2, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function TransactionComplete() {
   const navigate = useNavigate()
@@ -12,7 +13,10 @@ export default function TransactionComplete() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
-      <div className="flex-1 flex flex-col items-center pt-20 px-6 pb-32 w-full max-w-[430px] mx-auto text-center">
+      <div className="px-5 pt-10 pb-4">
+        <TransactionProgress state="Transaction Completed" userRole={role as 'buyer' | 'seller'} />
+      </div>
+      <div className="flex-1 flex flex-col items-center pt-6 px-6 pb-32 w-full max-w-[430px] mx-auto text-center">
         <motion.div
           initial={{ scale: 0, rotate: -45 }}
           animate={{ scale: 1, rotate: 0 }}

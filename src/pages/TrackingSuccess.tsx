@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function TrackingSuccess() {
   const navigate = useNavigate()
@@ -10,7 +11,10 @@ export default function TrackingSuccess() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="px-5 pt-10">
+        <TransactionProgress state="Tracking Uploaded" userRole="seller" />
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center -mt-10">
         <motion.div 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}

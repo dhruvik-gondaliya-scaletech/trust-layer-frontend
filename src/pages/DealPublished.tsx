@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export default function DealPublished() {
   const navigate = useNavigate()
+  const isEdit = localStorage.getItem("dealRepublished") === "true"
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
@@ -25,7 +26,7 @@ export default function DealPublished() {
           <Check className="w-10 h-10 text-white" strokeWidth={3} />
         </div>
 
-        <h1 className="text-2xl font-bold mb-2">Deal published</h1>
+        <h1 className="text-2xl font-bold mb-2">{isEdit ? "Deal Updated Successfully" : "Deal published"}</h1>
         <p className="text-muted-foreground text-center text-[15px] mb-8 leading-relaxed">
           Send this link to your buyer. It's the only place they can fund this deal.
         </p>

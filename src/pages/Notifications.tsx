@@ -12,7 +12,9 @@ export default function Notifications() {
   const [filter, setFilter] = React.useState<'all' | 'selling' | 'buying'>('all')
   const [toasts, setToasts] = React.useState<{ id: number, message: string }[]>([])
 
-  const initialData = [
+  const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
+
+  const baseData = [
     {
       id: 11,
       role: 'selling',
@@ -146,6 +148,23 @@ export default function Notifications() {
       isRead: true
     }
   ]
+
+  const initialData = isDealDeclined ? [
+    {
+      id: 99,
+      role: 'selling',
+      userName: 'TrustLayer',
+      title: 'Buyer declined your deal',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      description: 'The buyer requested updates before proceeding. Review the feedback and update your listing.',
+      time: 'Just now',
+      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      isRead: false
+    },
+    ...baseData
+  ] : baseData
+
 
   const [notifications, setNotifications] = React.useState(initialData)
 

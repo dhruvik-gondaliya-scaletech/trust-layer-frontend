@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ChevronLeft, Home, Building2, MapPin, Check, Edit2, Trash2, Plus } from "lucide-react"
+import { ChevronLeft, Home, Building2, MapPin, Check, Edit2, Trash2, Plus, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,7 @@ type Address = {
   zip: string
   country: string
   phone: string
+  alternatePhone?: string
   isDefault?: boolean
   type: string
 }
@@ -44,7 +45,7 @@ export default function SelectShippingAddress() {
   const dealId = searchParams.get("dealId")
   const isOnboarding = searchParams.get("onboarding") === "true"
 
-  const [addresses, setAddresses] = React.useState<Address[]>(mockAddresses)
+  const [addresses, setAddresses] = React.useState<Address[]>(isOnboarding ? [] : mockAddresses)
   const [selectedAddressId, setSelectedAddressId] = React.useState<string>("1")
   
   // Address Sheet State
@@ -90,6 +91,11 @@ export default function SelectShippingAddress() {
     setSelectedAddressId(addrToSave.id)
     setIsAddressSheetOpen(false)
     setEditingAddressId(null)
+    
+    // Automatically redirect new buyers after they save their first address
+    if (isOnboarding && dealId) {
+      navigate(`/fund-escrow/${dealId}`)
+    }
   }
 
   const handleEditAddress = (id: string, e: React.MouseEvent) => {
@@ -162,14 +168,10 @@ export default function SelectShippingAddress() {
   const handleContinue = () => {
     if (addresses.length === 0) return;
     
-    if (isOnboarding) {
-      navigate(dealId ? `/onboarding-complete?dealId=${dealId}` : "/onboarding-complete")
+    if (dealId) {
+      navigate(`/fund-escrow/${dealId}`)
     } else {
-      if (dealId) {
-        navigate(`/dashboard?mode=buyer&dealId=${dealId}&onboardingSuccess=true`)
-      } else {
-        navigate("/dashboard")
-      }
+      navigate("/dashboard")
     }
   }
 
@@ -247,9 +249,21 @@ export default function SelectShippingAddress() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[13px] font-bold ml-1">Phone Number</label>
-              <Input value={addressForm.phone || ""} onChange={e => setAddressForm({...addressForm, phone: e.target.value})} type="tel" placeholder="+1 (555) 123-4567" required className="h-12 bg-gray-50/50" />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[13px] font-bold ml-1">Verified Phone Number (Read Only)</label>
+                <div className="relative">
+                  <Input value={addressForm.phone || "+1 (555) 123-4567"} readOnly className="h-12 bg-gray-100 border-gray-200 text-gray-600 pl-10 cursor-not-allowed" />
+                  <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                </div>
+                <p className="text-[12px] text-muted-foreground ml-1">This is your verified TrustLayer account phone number.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[13px] font-bold ml-1">Alternate Phone Number (Optional)</label>
+                <Input value={addressForm.alternatePhone || ""} onChange={e => setAddressForm({...addressForm, alternatePhone: e.target.value})} type="tel" placeholder="Enter an alternate contact number" className="h-12 bg-gray-50/50" />
+                <p className="text-[12px] text-muted-foreground ml-1 leading-relaxed">Use this if someone else will receive the package or if the courier should contact a different number.</p>
+              </div>
             </div>
 
             <div className="flex items-center gap-3 pt-4 pb-2 cursor-pointer" onClick={() => setAddressForm({...addressForm, isDefault: !addressForm.isDefault})}>

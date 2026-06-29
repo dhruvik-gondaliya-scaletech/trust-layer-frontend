@@ -24,6 +24,7 @@ import TransactionComplete from "@/pages/TransactionComplete"
 import AllTransactions from "@/pages/AllTransactions"
 import DealDetails from "@/pages/DealDetails"
 import SelectShippingAddress from "@/pages/SelectShippingAddress"
+import ReviewFeedback from "@/pages/ReviewFeedback"
 
 import MyProfile from "@/pages/account/MyProfile"
 import VerificationCenter from "@/pages/account/VerificationCenter"
@@ -116,6 +117,7 @@ function App() {
           <Route path="/wallet" element={<MobileLayout><Wallet /></MobileLayout>} />
           <Route path="/transactions" element={<MobileLayout><AllTransactions /></MobileLayout>} />
           <Route path="/deal-details/:id" element={<MobileLayout><DealDetails /></MobileLayout>} />
+          <Route path="/review-feedback/:id" element={<MobileLayout><ReviewFeedback /></MobileLayout>} />
 
           {/* Account Center Routes */}
 

@@ -48,6 +48,8 @@ export default function Dashboard() {
     }
   }, [dealIdToOpen, hasOnboardingSuccess, navigate]);
 
+  const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
+
   const sellerDeals = [
     {
       id: 'TRUST-0845',
@@ -58,7 +60,7 @@ export default function Dashboard() {
     {
       id: 'TRUST-1024',
       name: 'Charizard Holo 1999',
-      status: 'funded' as DealStatus,
+      status: (isDealDeclined ? 'declined' : 'funded') as DealStatus,
     }
   ]
 
@@ -88,7 +90,7 @@ export default function Dashboard() {
   const currentHour = new Date().getHours()
   const greeting = currentHour < 12 ? "Good Morning" : currentHour < 18 ? "Good Afternoon" : "Good Evening"
 
-  const actionRequired = [
+  const baseActionRequired = [
     {
       id: 1,
       type: 'orange',
@@ -109,6 +111,21 @@ export default function Dashboard() {
       Icon: AlertCircle,
     }
   ]
+
+  const actionRequired = isDealDeclined && userMode === 'seller' ? [
+    {
+      id: 99,
+      type: 'red',
+      title: 'Buyer declined your deal',
+      dealId: 'TRUST-1024',
+      description: 'The buyer requested updates before proceeding. Review the feedback and update your listing.',
+      time: 'Just now',
+      cta: 'Review Feedback',
+      ctaRoute: '/review-feedback/TRUST-1024',
+      Icon: AlertCircle,
+    },
+    ...baseActionRequired
+  ] : baseActionRequired
 
   const recentUpdates = [
     {

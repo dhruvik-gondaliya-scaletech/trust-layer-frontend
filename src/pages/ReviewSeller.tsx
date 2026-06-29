@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { ChevronLeft, Star, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function ReviewSeller() {
   const navigate = useNavigate()
@@ -62,9 +63,13 @@ export default function ReviewSeller() {
         <div className="w-10"></div>
       </div>
 
-      <div className="flex-1 px-6 pt-8 pb-32">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4 text-2xl font-bold text-gray-400 overflow-hidden">
+      <div className="flex-1 px-5 pt-8 animate-in fade-in duration-500">
+        <div className="mb-8">
+          <TransactionProgress state="Review Phase" userRole={userMode} />
+        </div>
+        
+        <div className="text-center space-y-2 mb-8">
+          <div className="h-16 w-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4 text-2xl font-bold text-gray-400 overflow-hidden">
             {isReviewingSeller ? (
               <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Seller" className="w-full h-full object-cover" />
             ) : (

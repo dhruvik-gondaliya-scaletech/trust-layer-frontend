@@ -4,6 +4,7 @@ import { Shield, Check, X, Star, ChevronLeft, ShieldCheck, Trophy, Lock, Message
 import { Button } from "@/components/ui/button"
 import { TrustProfileCard } from "@/components/trust-profile-card"
 import { motion, AnimatePresence } from "framer-motion"
+import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function BuyerDealPage() {
   const navigate = useNavigate()
@@ -34,6 +35,11 @@ export default function BuyerDealPage() {
   const [declineMessage, setDeclineMessage] = useState("")
 
   const handleDeclineSubmit = () => {
+    localStorage.setItem("dealDeclined", "true")
+    localStorage.setItem("declineReason", declineReason)
+    if (declineMessage) {
+      localStorage.setItem("declineMessage", declineMessage)
+    }
     setShowDeclineModal(false)
     setShowFeedbackSuccess(true)
   }
@@ -187,6 +193,9 @@ export default function BuyerDealPage() {
             <span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> 1 Cert</span>
           </div>
         </div>
+
+        {/* SECTION 1.5: PROGRESS TRACKER */}
+        <TransactionProgress state="Buyer Reviewing Deal" userRole="buyer" />
 
         {/* SECTION 2: PRODUCT DETAILS */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
@@ -481,16 +490,13 @@ export default function BuyerDealPage() {
                     <div className="absolute -inset-12 border border-green-500/10 rounded-full animate-pulse delay-75" style={{ animationDuration: '2.5s' }}></div>
                   </div>
                   
-                  <h2 className="text-2xl font-extrabold text-gray-900 mb-2 relative z-10 tracking-tight">Feedback Sent</h2>
-                  <p className="text-[12px] font-bold text-green-600 uppercase tracking-widest relative z-10 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                    Listing Improvement Requested
-                  </p>
+                  <h2 className="text-2xl font-extrabold text-gray-900 mb-2 relative z-10 tracking-tight text-center">Feedback sent to the seller</h2>
                 </div>
                 
                 {/* Body Content */}
                 <div className="px-8 pb-8 pt-4 w-full text-center relative z-10">
                   <p className="text-[15px] text-gray-600 mb-8 leading-relaxed">
-                    We've securely forwarded your notes to the seller. They can review your feedback and update the listing before republishing it.
+                    The seller has been notified and can update the deal before sharing it again.
                   </p>
 
                   <div className="w-full space-y-3">
@@ -499,13 +505,6 @@ export default function BuyerDealPage() {
                       onClick={() => navigate("/dashboard")}
                     >
                       Return to Dashboard
-                    </Button>
-                    <Button 
-                      variant="ghost"
-                      className="w-full h-[48px] text-[14px] font-bold rounded-2xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                      onClick={() => setShowFeedbackSuccess(false)}
-                    >
-                      Dismiss
                     </Button>
                   </div>
                 </div>

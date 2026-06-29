@@ -1,63 +1,47 @@
 import * as React from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { Shield, MapPin, Package, CheckCircle2, CircleDashed, ChevronLeft, ExternalLink, ShieldCheck, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, Shield, CheckCircle2, Clock, Truck, ShieldCheck, MapPin, Package, AlertCircle, RefreshCcw, Handshake, ExternalLink, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { TransactionProgress, type TransactionState } from "@/components/ui/transaction-progress"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
 
-type DealStatus = 'Funded' | 'Shipped' | 'Delivered' | 'Closed';
+type DealStatus = 'Funded' | 'Shipped' | 'Delivered' | 'Closed' | 'Declined' | 'Republished';
 
 export default function TransactionTimeline() {
   const navigate = useNavigate()
   const { id } = useParams()
   const [showConfirmModal, setShowConfirmModal] = React.useState(false)
   
-  // Dynamic status handling for the demo
-  const status: DealStatus = 
-    id === 'TRUST-0992' ? 'Shipped' :
-    id === 'TRUST-0845' ? 'Delivered' :
-    id === 'TRUST-0000' ? 'Closed' : 'Funded'
+  const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
+  const isDealRepublished = localStorage.getItem("dealRepublished") === "true"
   
-  const getTimelineSteps = () => {
-    switch(status) {
+  // Dynamic status handling for the demo
+  let status: DealStatus = 'Funded'
+  if (id === 'TRUST-0992') status = 'Shipped'
+  else if (id === 'TRUST-0845') status = 'Delivered'
+  else if (id === 'TRUST-0000') status = 'Closed'
+  else if (isDealDeclined) status = 'Declined'
+  else if (isDealRepublished) status = 'Republished'
+
+  const getTransactionState = (): TransactionState => {
+    switch (status) {
       case 'Funded':
-        return [
-          { label: "Deal Created", status: "completed", date: "Oct 12, 10:00 AM" },
-          { label: "Payment Received", status: "completed", date: "Oct 12, 11:30 AM" },
-          { label: "Waiting for Shipment", status: "current", date: "Oct 13, 09:15 AM" },
-          { label: "Package Delivered", status: "upcoming" },
-          { label: "Funds Released", status: "upcoming" }
-        ]
+        return 'Payment Completed'
       case 'Shipped':
-        return [
-          { label: "Deal Created", status: "completed", date: "Oct 12, 10:00 AM" },
-          { label: "Payment Received", status: "completed", date: "Oct 12, 11:30 AM" },
-          { label: "Waiting for Shipment", status: "completed", date: "Oct 13, 09:15 AM" },
-          { label: "Package Shipped", status: "current", date: "Oct 14, 02:00 PM" },
-          { label: "Package Delivered", status: "upcoming" },
-          { label: "Funds Released", status: "upcoming" }
-        ]
+        return 'Tracking Uploaded'
       case 'Delivered':
-        return [
-          { label: "Deal Created", status: "completed", date: "Oct 12, 10:00 AM" },
-          { label: "Payment Received", status: "completed", date: "Oct 12, 11:30 AM" },
-          { label: "Package Shipped", status: "completed", date: "Oct 14, 02:00 PM" },
-          { label: "Package Delivered", status: "current", date: "Oct 16, 04:30 PM" },
-          { label: "Funds Released", status: "upcoming" }
-        ]
+        return 'Review Phase'
       case 'Closed':
-        return [
-          { label: "Deal Created", status: "completed", date: "Oct 12, 10:00 AM" },
-          { label: "Payment Received", status: "completed", date: "Oct 12, 11:30 AM" },
-          { label: "Package Shipped", status: "completed", date: "Oct 14, 02:00 PM" },
-          { label: "Package Delivered", status: "completed", date: "Oct 16, 04:30 PM" },
-          { label: "Funds Released", status: "completed", date: "Oct 16, 05:00 PM" }
-        ]
+        return 'Transaction Completed'
+      case 'Declined':
+      case 'Republished':
+        return 'Deal Declined'
+      default:
+        return 'Payment Completed'
     }
   }
-
-  const steps = getTimelineSteps()
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] pb-[140px]">
@@ -83,20 +67,19 @@ export default function TransactionTimeline() {
       <div className="flex-1 px-5 pt-4 animate-in fade-in duration-500 space-y-6">
         
         {/* State A - Waiting for Shipment */}
-        {status === 'Funded' && (
+        {(status === 'Funded' || status === 'Declined' || status === 'Republished') && (
           <>
             <div className="text-center space-y-4 mt-6 mb-6">
               <div className="inline-flex items-center px-3 py-1 bg-orange-50/80 text-orange-600 rounded-full text-[12px] font-bold uppercase tracking-wider">
-                Waiting for Shipment
+                {status === 'Declined' ? 'Changes Requested' : status === 'Republished' ? 'Ready for Review' : 'Waiting for Shipment'}
               </div>
               <p className="text-[#64748B] text-[14px] px-2 leading-relaxed">
-                The seller is preparing your package.
-                <br />
-                Tracking information will appear here once the item has
-                <br />
-                been shipped.
-                <br />
-                We'll notify you as soon as shipping details are available.
+                {status === 'Declined' 
+                  ? "The buyer requested updates before proceeding. The seller is currently updating the listing." 
+                  : status === 'Republished'
+                  ? "The seller has updated the listing. The buyer will review it again."
+                  : "The seller is preparing your package.\nTracking information will appear here once the item has\nbeen shipped.\nWe'll notify you as soon as shipping details are available."
+                }
               </p>
             </div>
             <Card>
@@ -133,7 +116,7 @@ export default function TransactionTimeline() {
         )}
 
         {/* State B & C & D - Tracking Info */}
-        {status !== 'Funded' && status !== 'Closed' && (
+        {status !== 'Funded' && status !== 'Declined' && status !== 'Republished' && status !== 'Closed' && (
           <>
             <div className="text-center space-y-3 mt-4 mb-2">
               <div className="h-16 w-16 mx-auto bg-primary/10 flex items-center justify-center rounded-full">
@@ -213,38 +196,7 @@ export default function TransactionTimeline() {
         )}
 
         {/* Timeline */}
-        <Card>
-          <CardContent className="p-5">
-            <h2 className="font-semibold text-[18px] mb-6">Transaction Timeline</h2>
-
-            <div className="space-y-6">
-              {steps.map((step, idx) => (
-                <div key={idx} className="flex gap-4 relative">
-                  {idx !== steps.length - 1 && (
-                    <div className={`absolute left-[11px] top-[28px] bottom-[-28px] w-0.5 ${step.status === 'completed' ? 'bg-success' : 'bg-muted'}`} />
-                  )}
-
-                  <div className="relative z-10 flex-shrink-0 pt-1">
-                    {step.status === 'completed' && <CheckCircle2 className="h-6 w-6 text-success bg-background rounded-full" />}
-                    {step.status === 'current' && (
-                      <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
-                        <div className="h-3 w-3 bg-primary rounded-full" />
-                      </div>
-                    )}
-                    {step.status === 'upcoming' && <CircleDashed className="h-6 w-6 text-muted-foreground bg-background rounded-full" />}
-                  </div>
-
-                  <div className={`flex-1 pt-1 ${step.status === 'upcoming' ? 'opacity-50' : ''}`}>
-                    <h4 className={`font-semibold text-[15px] ${step.status === 'current' ? 'text-primary' : ''}`}>
-                      {step.label}
-                    </h4>
-                    {step.date && <p className="text-[13px] text-muted-foreground mt-0.5">{step.date}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <TransactionProgress state={getTransactionState()} />
 
         {/* State C - Delivered (Review Period) */}
         {status === 'Delivered' && (
