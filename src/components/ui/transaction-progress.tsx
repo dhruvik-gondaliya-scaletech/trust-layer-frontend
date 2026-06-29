@@ -38,31 +38,31 @@ export function TransactionProgress({ state, userRole = 'buyer', theme = { text:
       filledCount = 2
       break;
     case 'Payment Completed':
-      labels = ['Deal Published', 'Buyer Reviews', 'Payment Completed', 'Seller Ships', 'Tracking']
+      labels = ['Deal Published', 'Buyer Reviews', 'Payment Completed', 'Seller Ships', 'Tracking Added']
       filledCount = 3
       break;
     case 'Seller Preparing Shipment':
-      labels = ['Payment Completed', 'Preparing Shipment', 'Tracking', 'Delivery', 'Funds Released']
+      labels = ['Payment Completed', 'Preparing Shipment', 'Tracking Added', 'Confirm Delivery', 'Funds Released']
       filledCount = 2
       break;
     case 'Tracking Uploaded':
-      labels = ['Payment Completed', 'Seller Ships', 'Tracking Added', 'Delivery', 'Funds Released']
+      labels = ['Payment Received', 'Tracking Added', 'Buyer Tracks', 'Confirm Delivery', 'Funds Released']
       filledCount = 3
       break;
     case 'Buyer Receives Package':
-      labels = ['Tracking', 'Delivered', 'Buyer Inspection', 'Review', 'Funds Released']
-      filledCount = 2
+      labels = ['Tracking Added', 'Buyer Tracks', 'Confirm Delivery', 'Review', 'Funds Released']
+      filledCount = 3
       break;
     case 'Buyer Confirmed Delivery':
-      labels = ['Tracking', 'Delivered', 'Buyer Approved', 'Funds Released', 'Completed']
+      labels = ['Tracking Added', 'Buyer Tracks', 'Confirm Delivery', 'Funds Released', 'Completed']
       filledCount = 3
       break;
     case 'Review Phase':
-      labels = ['Delivered', 'Buyer Review', 'Seller Review', 'Funds Released', 'Completed']
-      filledCount = userRole === 'seller' ? 3 : 2
+      labels = ['Tracking Added', 'Confirm Delivery', 'Buyer Review', 'Seller Review', 'Funds Released']
+      filledCount = userRole === 'seller' ? 4 : 3
       break;
     case 'Transaction Completed':
-      labels = ['Delivered', 'Buyer Review', 'Seller Review', 'Funds Released', 'Completed']
+      labels = ['Tracking Added', 'Confirm Delivery', 'Funds Released', 'Transaction', 'Completed']
       filledCount = 5
       break;
     case 'Deal Declined':
