@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { motion } from "framer-motion"
-import { ChevronLeft, Check, Lock, AlertCircle } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, Check, Lock, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CustomSelect } from "@/components/ui/custom-select"
@@ -13,6 +13,61 @@ const COUNTRIES = [
   { value: "Canada", label: "Canada" },
   { value: "United Kingdom", label: "United Kingdom" },
   { value: "Australia", label: "Australia" },
+];
+
+const US_STATES = [
+  { value: "AL", label: "Alabama" },
+  { value: "AK", label: "Alaska" },
+  { value: "AZ", label: "Arizona" },
+  { value: "AR", label: "Arkansas" },
+  { value: "CA", label: "California" },
+  { value: "CO", label: "Colorado" },
+  { value: "CT", label: "Connecticut" },
+  { value: "DE", label: "Delaware" },
+  { value: "FL", label: "Florida" },
+  { value: "GA", label: "Georgia" },
+  { value: "HI", label: "Hawaii" },
+  { value: "ID", label: "Idaho" },
+  { value: "IL", label: "Illinois" },
+  { value: "IN", label: "Indiana" },
+  { value: "IA", label: "Iowa" },
+  { value: "KS", label: "Kansas" },
+  { value: "KY", label: "Kentucky" },
+  { value: "LA", label: "Louisiana" },
+  { value: "ME", label: "Maine" },
+  { value: "MD", label: "Maryland" },
+  { value: "MA", label: "Massachusetts" },
+  { value: "MI", label: "Michigan" },
+  { value: "MN", label: "Minnesota" },
+  { value: "MS", label: "Mississippi" },
+  { value: "MO", label: "Missouri" },
+  { value: "MT", label: "Montana" },
+  { value: "NE", label: "Nebraska" },
+  { value: "NV", label: "Nevada" },
+  { value: "NH", label: "New Hampshire" },
+  { value: "NJ", label: "New Jersey" },
+  { value: "NM", label: "New Mexico" },
+  { value: "NY", label: "New York" },
+  { value: "NC", label: "North Carolina" },
+  { value: "ND", label: "North Dakota" },
+  { value: "OH", label: "Ohio" },
+  { value: "OK", label: "Oklahoma" },
+  { value: "OR", label: "Oregon" },
+  { value: "PA", label: "Pennsylvania" },
+  { value: "RI", label: "Rhode Island" },
+  { value: "SC", label: "South Carolina" },
+  { value: "SD", label: "South Dakota" },
+  { value: "TN", label: "Tennessee" },
+  { value: "TX", label: "Texas" },
+  { value: "UT", label: "Utah" },
+  { value: "VT", label: "Vermont" },
+  { value: "VA", label: "Virginia" },
+  { value: "WA", label: "Washington" },
+  { value: "WV", label: "West Virginia" },
+  { value: "WI", label: "Wisconsin" },
+  { value: "WY", label: "Wyoming" },
+  { value: "DC", label: "District of Columbia" },
+  { value: "PR", label: "Puerto Rico" }
 ];
 
 type AddressForm = {
@@ -50,6 +105,8 @@ export default function AddShippingAddress() {
   })
   const [errors, setErrors] = React.useState<ValidationErrors>({})
   const [touched, setTouched] = React.useState<Record<string, boolean>>({})
+  const [isSaving, setIsSaving] = React.useState(false)
+  const [showToast, setShowToast] = React.useState("")
 
   // Re-validate whenever form or custom label changes
   React.useEffect(() => {
@@ -83,24 +140,27 @@ export default function AddShippingAddress() {
     e.preventDefault()
     
     const validationErrors = validateAddressForm(addressForm, customLabel)
+    // Touch all fields to show errors if they try to save with empty required fields
+    const allTouched: Record<string, boolean> = {
+      name: true, street: true, apt: true, zip: true, city: true, state: true, country: true, alternatePhone: true, customLabel: true
+    }
+    setTouched(allTouched)
+    
     if (Object.keys(validationErrors).length > 0) {
-      // Touch all fields to show errors
-      const allTouched: Record<string, boolean> = {
-        name: true, street: true, apt: true, zip: true, city: true, state: true, country: true, alternatePhone: true, customLabel: true
-      }
-      setTouched(allTouched)
       setErrors(validationErrors)
       return
     }
     
-    // In a real app, we would save this to the backend API here.
+    setIsSaving(true)
+    setShowToast("Shipping address saved successfully.")
     
-    // Once saved, redirect to the payment flow
-    if (dealId) {
-      navigate(`/fund-escrow/${dealId}`)
-    } else {
-      navigate("/dashboard")
-    }
+    setTimeout(() => {
+      if (dealId) {
+        navigate(`/fund-escrow/${dealId}`)
+      } else {
+        navigate("/account/shipping-addresses")
+      }
+    }, 1500)
   }
 
   return (
@@ -177,7 +237,15 @@ export default function AddShippingAddress() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[13px] font-bold ml-1">State</label>
-              <Input value={addressForm.state || ""} onChange={e => setAddressForm({...addressForm, state: cleanState(e.target.value)})} onBlur={() => handleBlur('state')} placeholder="TX" className={`h-12 bg-gray-50/50 ${touched.state && errors.state ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+              <div onBlur={() => handleBlur('state')}>
+                <CustomSelect 
+                  value={addressForm.state} 
+                  onChange={(val) => setAddressForm({...addressForm, state: val})} 
+                  options={US_STATES} 
+                  placeholder="Select State"
+                  className={touched.state && errors.state ? 'border-red-500' : ''} 
+                />
+              </div>
               {touched.state && errors.state && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.state}</p>}
             </div>
             <div className="space-y-2">
@@ -225,10 +293,32 @@ export default function AddShippingAddress() {
       </div>
       
       <BottomActionBar>
-        <Button disabled={Object.keys(errors).length > 0} type="submit" form="add-address-form" className="w-full h-14 text-[16px]">
-          Save & Continue
+        <Button 
+          disabled={Object.keys(errors).length > 0 || isSaving} 
+          type="submit" 
+          form="add-address-form" 
+          className={`w-full h-14 text-[16px] font-bold ${Object.keys(errors).length > 0 ? 'bg-blue-300 text-white opacity-100' : 'bg-primary'}`}
+        >
+          {isSaving ? "Saving..." : "Save & Continue"}
         </Button>
       </BottomActionBar>
+
+      {/* Toast Overlay */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed bottom-24 left-4 right-4 z-50 flex justify-center"
+          >
+            <div className="bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 w-full max-w-sm mx-auto">
+              <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+              <span className="text-[14px] font-bold">{showToast}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

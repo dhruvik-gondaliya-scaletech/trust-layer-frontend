@@ -1,27 +1,16 @@
 import * as React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ChevronLeft, Star, CheckCircle2 } from "lucide-react"
+import { ChevronLeft, Star, CheckCircle2, BadgeCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
 export default function ReviewSeller() {
   const navigate = useNavigate()
-  const location = useLocation()
   const [rating, setRating] = React.useState(0)
   const [hoveredRating, setHoveredRating] = React.useState(0)
   const [comment, setComment] = React.useState("")
   const [isSubmitted, setIsSubmitted] = React.useState(false)
-
-  const userMode = new URLSearchParams(location.search).get('mode') === 'buyer' ? 'buyer' : 'seller'
-  const isReviewingSeller = userMode === 'buyer'
-  
-  const headerText = isReviewingSeller ? 'Review Seller' : 'Review Buyer'
-  const targetUsername = isReviewingSeller ? '@vintage_vault' : '@alex_johnson'
-  const descriptionText = isReviewingSeller 
-    ? 'Your transaction has been completed successfully.\nPlease rate your experience with this seller.' 
-    : 'Your transaction has been completed successfully.\nPlease rate your experience with this buyer.'
-  const placeholderText = isReviewingSeller ? 'Share your experience with this seller...' : 'Share your experience with this buyer...'
 
   const handleSubmit = () => {
     setIsSubmitted(true)
@@ -45,7 +34,7 @@ export default function ReviewSeller() {
         </p>
         <Button 
           className="w-full max-w-[300px] h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white" 
-          onClick={() => navigate(`/dashboard?mode=${userMode}`)}
+          onClick={() => navigate('/dashboard?mode=buyer')}
         >
           Back to Dashboard
         </Button>
@@ -57,10 +46,10 @@ export default function ReviewSeller() {
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-20">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors">
+        <button onClick={() => navigate('/dashboard?mode=buyer')} className="p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors">
           <ChevronLeft className="h-6 w-6" />
         </button>
-        <span className="text-[15px] font-bold">{headerText}</span>
+        <span className="text-[15px] font-bold">Review Seller</span>
         <div className="w-10"></div>
       </div>
 
@@ -70,20 +59,22 @@ export default function ReviewSeller() {
             <CheckCircle2 className="w-6 h-6 text-green-600" />
           </div>
           <h2 className="text-[18px] font-bold text-gray-900">Transaction Completed</h2>
-          <p className="text-[14px] text-gray-500 leading-relaxed max-w-[280px] whitespace-pre-line">
-            {descriptionText}
+          <p className="text-[14px] text-gray-500 leading-relaxed max-w-[280px] whitespace-pre-line text-center mx-auto mt-2">
+            Your transaction has been completed successfully.
+            <br />
+            Please rate your experience with this seller.
           </p>
         </div>
         
-        <div className="text-center space-y-2 mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
           <div className="h-16 w-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3 overflow-hidden shadow-sm border-2 border-white ring-1 ring-gray-100">
-            {isReviewingSeller ? (
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Seller" className="w-full h-full object-cover" />
-            ) : (
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" alt="Buyer" className="w-full h-full object-cover" />
-            )}
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Seller" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-[18px] font-extrabold tracking-tight mb-2">{targetUsername}</h1>
+          <div className="flex items-center gap-1.5 mb-1">
+            <h1 className="text-[18px] font-extrabold tracking-tight">PokeMaster99</h1>
+            <BadgeCheck className="w-5 h-5 text-blue-500" />
+          </div>
+          <span className="text-[14px] text-gray-500 font-medium">@pokemaster99</span>
         </div>
 
         <div className="flex justify-center gap-2 mb-10">
@@ -109,7 +100,7 @@ export default function ReviewSeller() {
         <div className="space-y-3 mb-8">
           <label className="text-[14px] font-bold text-gray-900">Leave a Comment (Optional)</label>
           <Textarea 
-            placeholder={placeholderText} 
+            placeholder="Share your experience with this seller..." 
             className="min-h-[140px] bg-white border-gray-200 text-[14px] rounded-xl resize-none"
             value={comment}
             onChange={(e) => setComment(e.target.value)}

@@ -54,7 +54,7 @@ export default function Dashboard() {
     {
       id: 'TRUST-0845',
       name: 'Shadowless Mewtwo PSA 10',
-      status: 'delivered' as DealStatus,
+      status: 'open' as DealStatus,
       imageUrl: 'https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=200&h=200&fit=crop'
     },
     {
@@ -149,7 +149,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="flex flex-col gap-6 px-5 py-4 pb-[140px] bg-gray-50/50 min-h-screen">
+    <div className={`flex flex-col gap-6 px-5 py-4 ${userMode === 'seller' ? 'pb-[140px]' : 'pb-8'} bg-gray-50/50 min-h-screen`}>
       <AccountHub isOpen={isAccountHubOpen} onClose={() => setIsAccountHubOpen(false)} />
 
       {hasOnboardingSuccess && (
@@ -258,34 +258,22 @@ export default function Dashboard() {
       <div className="mt-6">
         <h2 className="text-[16px] font-bold text-foreground px-1 mb-5">Quick Insights</h2>
         <div className="grid grid-cols-2 gap-3">
-          <div 
-            onClick={() => navigate('/transactions?filter=active')}
-            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
-          >
+          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '3' : '1'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Active Deals</p>
           </div>
           
-          <div 
-            onClick={() => navigate('/transactions?filter=awaiting-delivery')}
-            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
-          >
+          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>1</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Awaiting Delivery</p>
           </div>
 
-          <div 
-            onClick={() => navigate('/transactions?filter=in-transit')}
-            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
-          >
+          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '1' : '2'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">In Transit</p>
           </div>
 
-          <div 
-            onClick={() => navigate('/transactions?filter=completed')}
-            className={`bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 active:scale-[0.98] ${userMode === 'buyer' ? 'hover:border-[#10B981]/40 hover:bg-[#10B981]/5' : 'hover:border-[#2F6BFF]/40 hover:bg-[#2F6BFF]/5'}`}
-          >
+          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '16' : '4'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Completed</p>
           </div>
@@ -358,11 +346,13 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <BottomActionBar>
-        <Button onClick={() => navigate("/create-deal")} className="w-full h-14 text-[16px] shadow-sm">
-          <Plus className="mr-2 h-5 w-5" /> Create New Deal
-        </Button>
-      </BottomActionBar>
+      {userMode === 'seller' && (
+        <BottomActionBar>
+          <Button onClick={() => navigate("/create-deal")} className="w-full h-14 text-[16px] shadow-sm">
+            <Plus className="mr-2 h-5 w-5" /> Create New Deal
+          </Button>
+        </BottomActionBar>
+      )}
     </div>
   )
 }
