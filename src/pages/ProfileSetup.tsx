@@ -22,8 +22,11 @@ export default function ProfileSetup() {
 
   const handleSetup = (e: React.FormEvent) => {
     e.preventDefault();
-    // Route to shipping address selection first, passing onboarding=true
-    navigate(dealId ? `/select-shipping?dealId=${dealId}&onboarding=true` : "/select-shipping?onboarding=true");
+    if (dealId) {
+      navigate(`/add-shipping?dealId=${dealId}`);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (

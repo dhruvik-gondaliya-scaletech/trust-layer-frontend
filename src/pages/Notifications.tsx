@@ -14,152 +14,211 @@ export default function Notifications() {
 
   const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
 
-  const baseData = [
+  type NotificationItem = {
+    id: number;
+    role: 'selling' | 'buying';
+    title: string;
+    productName: string;
+    dealId: string;
+    person?: { roleLabel: string; name: string };
+    highlight?: { label: string; text: string };
+    customMessage?: string;
+    message: string;
+    ctaText?: string;
+    time: string;
+    isRead: boolean;
+  };
+
+  const baseData: NotificationItem[] = [
     {
-      id: 11,
-      role: 'selling',
-      userName: 'TrustLayer',
-      title: 'Deal created successfully',
+      id: 15,
+      role: 'buying',
+      title: 'Seller responded to your dispute',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      description: 'Your deal is ready. Share the deal link with the buyer to continue.',
-      time: 'Just now',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
-      isRead: false
+      message: 'The seller has responded to your reported issue.\nReview the response and continue the resolution process.',
+      ctaText: 'View Dispute',
+      time: '2 days ago',
+      isRead: true
+    },
+    {
+      id: 14,
+      role: 'buying',
+      title: 'Transaction completed',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Your purchase has been completed successfully.\nLeave a review to help build trust within the community.',
+      ctaText: 'Leave Review',
+      time: '2 days ago',
+      isRead: true
+    },
+    {
+      id: 13,
+      role: 'buying',
+      title: 'Review period ending soon',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Your review period expires soon.\nConfirm delivery or report any issues before the deadline.',
+      ctaText: 'View Deal',
+      time: '3 days ago',
+      isRead: true
+    },
+    {
+      id: 12,
+      role: 'buying',
+      title: 'Please review your delivery',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Inspect your item carefully.\nConfirm delivery or report an issue before the review period ends.',
+      ctaText: 'Review Delivery',
+      time: '3 days ago',
+      isRead: true
+    },
+    {
+      id: 11,
+      role: 'buying',
+      title: 'Tracking information available',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      highlight: { label: 'Carrier', text: 'USPS' },
+      message: 'Your package has been shipped.\nTrack its progress using the carrier link.',
+      ctaText: 'Track Package',
+      time: '4 days ago',
+      isRead: true
     },
     {
       id: 10,
-      role: 'selling',
-      userName: 'Michael Smith',
-      title: 'Michael Smith completed payment',
+      role: 'buying',
+      title: 'Seller is preparing your shipment',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      description: 'Michael Smith completed the payment.\n\nFunds are now on hold until the deal is completed.\n\nYou can now prepare the shipment.',
-      time: '15 mins ago',
-      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=150&auto=format&fit=crop',
-      isRead: false
+      person: { roleLabel: 'Seller', name: '@vintage_vault' },
+      message: 'The seller is preparing your order.\nTracking details will appear after shipment.',
+      ctaText: 'View Deal',
+      time: '4 days ago',
+      isRead: true
     },
     {
       id: 9,
-      role: 'selling',
-      userName: 'TrustLayer',
-      title: 'Tracking information needed',
+      role: 'buying',
+      title: 'Payment completed',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      description: 'Please upload your tracking details after shipping the item.',
-      time: '20 mins ago',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
-      isRead: false
+      message: 'Your payment has been secured by TrustLayer.\nFunds will only be released after delivery confirmation.',
+      ctaText: 'View Deal',
+      time: '4 days ago',
+      isRead: true
     },
     {
       id: 8,
-      role: 'selling',
-      userName: 'TrustLayer',
-      title: 'Tracking shared with buyer',
-      productName: 'Vintage Leica M6',
-      dealId: 'TRUST-1050',
-      description: 'Your tracking information has been shared with the buyer.',
-      time: '4 hours ago',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      role: 'buying',
+      title: 'Deal approved',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      person: { roleLabel: 'Seller', name: '@vintage_vault' },
+      message: 'The deal is ready for payment.\nComplete payment to reserve this item.',
+      ctaText: 'Pay Now',
+      time: '5 days ago',
       isRead: true
     },
     {
       id: 7,
       role: 'selling',
-      userName: 'David Wilson',
-      title: 'David Wilson confirmed delivery',
-      productName: 'MacBook Pro M3',
-      dealId: 'TRUST-1068',
-      description: 'The buyer confirmed receiving the item.\n\nFunds will now be released to your wallet.',
-      time: 'Yesterday',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop',
+      title: 'Buyer reported an issue',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
+      highlight: { label: 'Issue', text: 'Item condition does not match description' },
+      message: 'The transaction is temporarily on hold until the issue is resolved.',
+      ctaText: 'View Dispute',
+      time: '5 days ago',
       isRead: true
     },
     {
       id: 6,
       role: 'selling',
-      userName: 'TrustLayer',
       title: 'Funds released',
-      productName: 'MacBook Pro M3',
-      dealId: 'TRUST-1068',
-      description: 'Your payout is now available in your wallet.',
-      time: 'Yesterday',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Your transaction has been completed successfully.\nFunds are now available in your wallet.',
+      ctaText: 'View Wallet',
+      time: '5 days ago',
       isRead: true
     },
     {
       id: 5,
-      role: 'buying',
-      userName: 'Emily Davis',
-      title: 'Emily Davis accepted your deal',
-      productName: 'Pokemon Booster Box',
-      dealId: 'TRUST-1075',
-      description: 'Your deal has been accepted.\n\nComplete payment to continue.',
-      time: 'Yesterday',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop',
+      role: 'selling',
+      title: 'Buyer confirmed delivery',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
+      message: 'The buyer confirmed the item was received.\nFunds will now be released according to TrustLayer policy.',
+      ctaText: 'View Deal',
+      time: '6 days ago',
       isRead: true
     },
     {
       id: 4,
-      role: 'buying',
-      userName: 'TrustLayer',
-      title: 'Payment completed',
-      productName: 'Pokemon Booster Box',
-      dealId: 'TRUST-1075',
-      description: 'Your payment was received successfully.\n\nFunds are now on hold until delivery is confirmed.',
-      time: '2 days ago',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      role: 'selling',
+      title: 'Tracking shared with buyer',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Tracking details have been shared successfully.\nThe buyer can now follow the shipment.',
+      ctaText: 'View Shipment',
+      time: '6 days ago',
       isRead: true
     },
     {
       id: 3,
-      role: 'buying',
-      userName: 'Alex Johnson',
-      title: 'Alex Johnson shipped your item',
-      productName: 'Vintage Leica M6',
-      dealId: 'TRUST-1050',
-      description: 'Tracking information has been shared.\n\nYour package is on the way.',
-      time: '2 days ago',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop',
+      role: 'selling',
+      title: 'Payment received',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
+      message: 'Payment has been secured in TrustLayer Escrow.\nPrepare the item and upload tracking details.',
+      ctaText: 'Add Tracking',
+      time: '7 days ago',
       isRead: true
     },
     {
       id: 2,
-      role: 'buying',
-      userName: 'USPS',
-      title: 'Package delivered',
-      productName: 'Vintage Leica M6',
-      dealId: 'TRUST-1050',
-      description: 'Your package has been marked as delivered.\n\nPlease inspect the item.',
-      time: '3 days ago',
-      avatar: 'https://ui-avatars.com/api/?name=USPS&background=004B87&color=fff',
+      role: 'selling',
+      title: 'Buyer requested listing updates',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
+      highlight: { label: 'Reason', text: 'Need additional photos' },
+      message: 'The buyer paused the purchase until the requested updates are completed.',
+      ctaText: 'Review Feedback',
+      time: '8 days ago',
       isRead: true
     },
     {
       id: 1,
-      role: 'buying',
-      userName: 'TrustLayer',
-      title: 'Confirm delivery',
-      productName: 'Vintage Leica M6',
-      dealId: 'TRUST-1050',
-      description: 'If everything looks good, confirm delivery to complete the transaction.',
-      time: '3 days ago',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
+      role: 'selling',
+      title: 'Deal published successfully',
+      productName: 'Charizard Holo 1999',
+      dealId: 'TRUST-1024',
+      message: 'Your deal is now live and ready to share.\nSend the secure TrustLayer link to your buyer.',
+      ctaText: 'Share Deal Link',
+      time: '8 days ago',
       isRead: true
     }
   ]
 
-  const initialData = isDealDeclined ? [
+  const initialData: NotificationItem[] = isDealDeclined ? [
     {
       id: 99,
       role: 'selling',
-      userName: 'TrustLayer',
-      title: 'Buyer declined your deal',
+      title: 'Buyer requested listing updates',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      description: 'The buyer requested updates before proceeding. Review the feedback and update your listing.',
+      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
+      highlight: { label: 'Reason', text: localStorage.getItem('declineReason') || 'Need additional photos' },
+      customMessage: localStorage.getItem('declineMessage') || '',
+      message: 'The buyer paused the purchase until the requested updates are completed.',
+      ctaText: 'Review Feedback',
       time: 'Just now',
-      avatar: 'https://ui-avatars.com/api/?name=Trust+Layer&background=0D8ABC&color=fff',
       isRead: false
     },
     ...baseData
@@ -334,12 +393,7 @@ export default function Notifications() {
                           <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary" />
                         )}
                         
-                        {/* User Avatar */}
-                        <div className="shrink-0 w-12 h-12 rounded-full border border-gray-200 shadow-sm mt-1 overflow-hidden bg-white">
-                          <img src={item.avatar} alt={item.userName} className="w-full h-full object-cover" />
-                        </div>
-                        
-                        <div className="flex-1 min-w-0 pt-0.5">
+                        <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start mb-1.5">
                             <div className="flex items-center gap-1.5">
                               <div className={`w-2 h-2 rounded-sm ${item.role === 'selling' ? 'bg-[#2563EB]' : 'bg-[#16A34A]'}`}></div>
@@ -356,17 +410,57 @@ export default function Notifications() {
                             </p>
                           </div>
                           
-                          <div className={`flex items-center gap-2 mb-2 ${item.isRead ? 'opacity-70' : ''}`}>
+                          <div className={`flex items-center gap-2 mb-3 ${item.isRead ? 'opacity-70' : ''}`}>
                             <p className="text-[13px] font-bold text-gray-700 truncate max-w-[140px]">{item.productName}</p>
                             <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                             <p className="text-[12px] font-bold text-gray-400">{item.dealId}</p>
                           </div>
                           
-                          <div className={item.isRead ? 'opacity-70' : ''}>
-                            <p className={`text-[14px] leading-relaxed whitespace-pre-line ${!item.isRead ? 'text-gray-700 font-medium' : 'text-gray-500 font-medium'}`}>
-                              {item.description}
+                          {(item.person || item.highlight) && (
+                            <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-100 mr-3">
+                              {item.person && (
+                                <div className={`flex justify-between ${item.highlight ? 'mb-2' : ''}`}>
+                                  <span className="text-[12px] text-gray-500 font-medium">{item.person.roleLabel}:</span>
+                                  <span className="text-[12px] text-gray-900 font-bold">{item.person.name}</span>
+                                </div>
+                              )}
+                              {item.highlight && (
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[12px] text-gray-500 font-medium shrink-0 mr-2">{item.highlight.label}:</span>
+                                  <span className="text-[12px] text-red-600 font-bold text-right">{item.highlight.text}</span>
+                                </div>
+                              )}
+                              {item.customMessage && (
+                                <div className="mt-3 pt-3 border-t border-gray-200">
+                                  <div className="text-[13px] text-gray-600 italic border-l-2 border-gray-300 pl-3 py-0.5">
+                                    "{item.customMessage}"
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className={item.person || item.highlight ? 'mb-3 pr-3' : (item.isRead ? 'opacity-70 mb-3' : 'mb-3')}>
+                            <p className={`text-[14px] leading-relaxed line-clamp-2 ${!item.isRead ? 'text-gray-700 font-medium' : 'text-gray-500 font-medium'}`}>
+                              {item.message}
                             </p>
                           </div>
+                          
+                          {item.ctaText && (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (item.title === 'Buyer requested listing updates') {
+                                  navigate(`/review-feedback/${item.dealId}`);
+                                } else {
+                                  navigate(`/deal-details/${item.dealId}?role=${item.role === 'selling' ? 'seller' : 'buyer'}`);
+                                }
+                              }}
+                              className="w-[calc(100%-12px)] bg-primary text-white text-[13px] font-bold py-2.5 rounded-lg shadow-sm mt-1"
+                            >
+                              {item.ctaText}
+                            </button>
+                          )}
                         </div>
                       </motion.div>
                     ))}

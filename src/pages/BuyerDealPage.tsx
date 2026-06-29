@@ -361,7 +361,7 @@ export default function BuyerDealPage() {
             className="w-full h-[56px] text-[16px] font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white"
             onClick={() => {
               if (isLoggedIn) {
-                navigate("/fund-escrow/TRUST-1024")
+                navigate("/select-shipping?dealId=TRUST-1024")
               } else {
                 navigate("/register?redirect=buyer&dealId=TRUST-1024")
               }

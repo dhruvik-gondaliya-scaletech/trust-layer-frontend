@@ -5,6 +5,7 @@ import { ArrowUpRight, CheckCircle2, ChevronLeft, CreditCard, MessageCircle, Pac
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { ExternalLink, CheckCircle2 as CheckCircle2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { TransactionProgress, type TransactionState } from "@/components/ui/transaction-progress"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
@@ -18,6 +19,7 @@ export default function DealDetails() {
   
   // Local state for expandable sections
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const [showDeliveryConfirmModal, setShowDeliveryConfirmModal] = useState(false)
   
   // Mock data for the specific deal
   const dealId = id || "TRUST-1024"
@@ -484,7 +486,7 @@ export default function DealDetails() {
 
       {/* 8. Primary Action */}
       <BottomActionBar>
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
           {status === "Completed" && (
             <Button className={cn("w-full h-14 text-[16px] font-bold shadow-md text-white rounded-xl", theme.bg, theme.bgHover)} onClick={() => navigate(`/review-seller/${id}`)}>
               <Star className="mr-2 h-5 w-5 fill-current" /> Leave Review
@@ -503,19 +505,87 @@ export default function DealDetails() {
             </Button>
           )}
 
-          {status === "In Transit" && orderType !== "In-Person Transaction" && (
+          {status === "In Transit" && orderType !== "In-Person Transaction" && !isSeller && (
+            <>
+              <Button className={cn("w-full h-14 text-[16px] font-bold shadow-md text-white rounded-xl", theme.bg, theme.bgHover)} onClick={() => window.open('https://tools.usps.com/go/TrackConfirmAction_input', '_blank')}>
+                <ExternalLink className="mr-2 h-5 w-5" /> Track Package
+              </Button>
+              <Button variant="outline" className="w-full h-14 text-[16px] font-bold rounded-xl border-gray-200 text-gray-700 bg-white" onClick={() => setShowDeliveryConfirmModal(true)}>
+                <CheckCircle2Icon className="mr-2 h-5 w-5" /> I've Received My Item
+              </Button>
+            </>
+          )}
+          
+          {status === "In Transit" && orderType !== "In-Person Transaction" && isSeller && (
             <Button className={cn("w-full h-14 text-[16px] font-bold shadow-md text-white rounded-xl", theme.bg, theme.bgHover)}>
               <Truck className="mr-2 h-5 w-5" /> Track Package
             </Button>
           )}
 
           {(status === "Awaiting Buyer Confirmation" || status === "Item Exchanged") && !isSeller && (
-            <Button className={cn("w-full h-14 text-[16px] font-bold shadow-md text-white rounded-xl", theme.bg, theme.bgHover)}>
-              <CheckCircle2 className="mr-2 h-5 w-5" /> Confirm Delivery
-            </Button>
+            <>
+              <Button className={cn("w-full h-14 text-[16px] font-bold shadow-md text-white rounded-xl", theme.bg, theme.bgHover)} onClick={() => navigate(`/review-seller/${id}`)}>
+                <Star className="mr-2 h-5 w-5 fill-current" /> Leave Review
+              </Button>
+              <Button variant="outline" className="w-full h-14 text-[16px] font-bold rounded-xl border-gray-200 text-gray-700 bg-white" onClick={() => navigate(`/transaction-complete`)}>
+                <FileText className="mr-2 h-5 w-5" /> View Transaction Summary
+              </Button>
+            </>
           )}
         </div>
       </BottomActionBar>
+
+      {/* Delivery Confirmation Modal */}
+      <AnimatePresence>
+        {showDeliveryConfirmModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 w-full max-w-[340px] shadow-2xl relative overflow-hidden"
+            >
+              <div className="text-center mb-6 pt-2">
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100 shadow-sm">
+                  <Package className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Have you received and inspected your item?</h3>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                  Confirming delivery will start the fund release process. If there is an issue, please report it before confirming.
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-3 relative z-10">
+                <Button 
+                  variant="outline"
+                  className="w-full h-12 text-[15px] font-bold rounded-xl text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" 
+                  onClick={() => setShowDeliveryConfirmModal(false)}
+                >
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Report an Issue
+                </Button>
+                <Button 
+                  className={cn("w-full h-12 text-[15px] font-bold rounded-xl shadow-sm text-white", theme.bg, theme.bgHover)} 
+                  onClick={() => {
+                    setShowDeliveryConfirmModal(false);
+                    // In a real app, this would trigger an API call and status update
+                    navigate(`/deal-details/${id}?role=buyer`);
+                  }}
+                >
+                  Confirm Delivery
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full h-10 text-[14px] font-bold rounded-xl text-gray-500" 
+                  onClick={() => setShowDeliveryConfirmModal(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

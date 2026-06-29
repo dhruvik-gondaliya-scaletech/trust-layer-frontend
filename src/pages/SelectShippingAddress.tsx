@@ -1,12 +1,21 @@
 import * as React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ChevronLeft, Home, Building2, MapPin, Check, Edit2, Trash2, Plus, Lock } from "lucide-react"
+import { ChevronLeft, Home, Building2, MapPin, Check, Edit2, Trash2, Plus, Lock, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { BottomSheet } from "@/components/ui/bottom-sheet"
 import { BottomActionBar } from "@/components/ui/bottom-action-bar"
+import { CustomSelect } from "@/components/ui/custom-select"
+import { validateAddressForm, type ValidationErrors, formatPhoneInput, cleanZip, cleanCity, cleanState, cleanName } from "@/lib/validation"
+
+const COUNTRIES = [
+  { value: "United States", label: "United States" },
+  { value: "Canada", label: "Canada" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Australia", label: "Australia" },
+];
 
 type Address = {
   id: string
@@ -54,8 +63,25 @@ export default function SelectShippingAddress() {
   const [customLabel, setCustomLabel] = React.useState("")
   const [addressToDelete, setAddressToDelete] = React.useState<string | null>(null)
   const [addressForm, setAddressForm] = React.useState<Partial<Address>>({
-    name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567", type: "Home", isDefault: false
+    name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567", type: "Home", isDefault: false,
+    street: "", city: "", state: "", zip: "", alternatePhone: ""
   })
+  const [errors, setErrors] = React.useState<ValidationErrors>({})
+  const [touched, setTouched] = React.useState<Record<string, boolean>>({})
+
+  React.useEffect(() => {
+    if (isAddressSheetOpen) {
+      setErrors(validateAddressForm(addressForm, customLabel))
+    }
+  }, [addressForm, customLabel, isAddressSheetOpen])
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }))
+  }
+
+  const handlePhoneChange = (val: string) => {
+    setAddressForm(prev => ({ ...prev, alternatePhone: formatPhoneInput(val) }))
+  }
 
   // If no addresses, force add mode
   React.useEffect(() => {
@@ -66,6 +92,17 @@ export default function SelectShippingAddress() {
 
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    const validationErrors = validateAddressForm(addressForm, customLabel)
+    if (Object.keys(validationErrors).length > 0) {
+      const allTouched: Record<string, boolean> = {
+        name: true, street: true, apt: true, zip: true, city: true, state: true, country: true, alternatePhone: true, customLabel: true
+      }
+      setTouched(allTouched)
+      setErrors(validationErrors)
+      return
+    }
+
     const isNewDefault = addressForm.isDefault || addresses.length === 0;
     
     const addrToSave: Address = {
@@ -135,7 +172,8 @@ export default function SelectShippingAddress() {
   }
 
   const handleZipChange = (zip: string) => {
-    setAddressForm({ ...addressForm, zip });
+    const cleaned = cleanZip(zip);
+    setAddressForm({ ...addressForm, zip: cleaned });
     
     const mockZipDb: Record<string, { city: string, state: string }> = {
       "78701": { city: "Austin", state: "TX" },
@@ -146,12 +184,12 @@ export default function SelectShippingAddress() {
       "33101": { city: "Miami", state: "FL" }
     };
     
-    if (zip.length === 5 && mockZipDb[zip]) {
+    if (cleaned.length === 5 && mockZipDb[cleaned]) {
       setAddressForm(prev => ({
         ...prev,
-        zip,
-        city: mockZipDb[zip].city,
-        state: mockZipDb[zip].state
+        zip: cleaned,
+        city: mockZipDb[cleaned].city,
+        state: mockZipDb[cleaned].state
       }));
     }
   }
@@ -207,45 +245,60 @@ export default function SelectShippingAddress() {
               </div>
               {addressForm.type === "Other" && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-2">
-                  <Input value={customLabel} onChange={e => setCustomLabel(e.target.value)} placeholder="e.g. Vacation Home" required className="h-12 bg-gray-50/50" />
+                  <Input value={customLabel} onChange={e => setCustomLabel(e.target.value)} onBlur={() => handleBlur('customLabel')} placeholder="e.g. Vacation Home" className={`h-12 bg-gray-50/50 ${touched.customLabel && errors.customLabel ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+                  {touched.customLabel && errors.customLabel && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.customLabel}</p>}
                 </motion.div>
               )}
             </div>
             
             <div className="space-y-2">
               <label className="text-[13px] font-bold ml-1">Contact Name</label>
-              <Input value={addressForm.name || ""} onChange={e => setAddressForm({...addressForm, name: e.target.value})} placeholder="Alex Johnson" required className="h-12 bg-gray-50/50" />
+              <Input value={addressForm.name || ""} onChange={e => setAddressForm({...addressForm, name: cleanName(e.target.value)})} onBlur={() => handleBlur('name')} placeholder="Alex Johnson" className={`h-12 bg-gray-50/50 ${touched.name && errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+              {touched.name && errors.name && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="text-[13px] font-bold ml-1">Street Address</label>
-              <Input value={addressForm.street || ""} onChange={e => setAddressForm({...addressForm, street: e.target.value})} placeholder="123 Main Street" required className="h-12 bg-gray-50/50" />
+              <Input value={addressForm.street || ""} onChange={e => setAddressForm({...addressForm, street: e.target.value})} onBlur={() => handleBlur('street')} placeholder="123 Main Street" className={`h-12 bg-gray-50/50 ${touched.street && errors.street ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+              {touched.street && errors.street && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.street}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="text-[13px] font-bold ml-1">Apt, Suite, etc. (Optional)</label>
-              <Input value={addressForm.apt || ""} onChange={e => setAddressForm({...addressForm, apt: e.target.value})} placeholder="Apt 4B" className="h-12 bg-gray-50/50" />
+              <Input value={addressForm.apt || ""} onChange={e => setAddressForm({...addressForm, apt: e.target.value})} onBlur={() => handleBlur('apt')} placeholder="Apt 4B" className={`h-12 bg-gray-50/50 ${touched.apt && errors.apt ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+              {touched.apt && errors.apt && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.apt}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[13px] font-bold ml-1">ZIP Code</label>
-                <Input value={addressForm.zip || ""} onChange={e => handleZipChange(e.target.value)} placeholder="78701" required className="h-12 bg-gray-50/50" />
+                <Input value={addressForm.zip || ""} onChange={e => handleZipChange(e.target.value)} onBlur={() => handleBlur('zip')} placeholder="78701" className={`h-12 bg-gray-50/50 ${touched.zip && errors.zip ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+                {touched.zip && errors.zip && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.zip}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-bold ml-1">City</label>
-                <Input value={addressForm.city || ""} onChange={e => setAddressForm({...addressForm, city: e.target.value})} placeholder="Austin" required className="h-12 bg-gray-50/50" />
+                <Input value={addressForm.city || ""} onChange={e => setAddressForm({...addressForm, city: cleanCity(e.target.value)})} onBlur={() => handleBlur('city')} placeholder="Austin" className={`h-12 bg-gray-50/50 ${touched.city && errors.city ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+                {touched.city && errors.city && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.city}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[13px] font-bold ml-1">State</label>
-                <Input value={addressForm.state || ""} onChange={e => setAddressForm({...addressForm, state: e.target.value})} placeholder="TX" required className="h-12 bg-gray-50/50" />
+                <Input value={addressForm.state || ""} onChange={e => setAddressForm({...addressForm, state: cleanState(e.target.value)})} onBlur={() => handleBlur('state')} placeholder="TX" className={`h-12 bg-gray-50/50 ${touched.state && errors.state ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+                {touched.state && errors.state && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.state}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-bold ml-1">Country</label>
-                <Input value={addressForm.country || ""} onChange={e => setAddressForm({...addressForm, country: e.target.value})} placeholder="United States" required className="h-12 bg-gray-50/50" />
+                <div onBlur={() => handleBlur('country')}>
+                  <CustomSelect 
+                    value={addressForm.country} 
+                    onChange={(val) => setAddressForm({...addressForm, country: val})} 
+                    options={COUNTRIES} 
+                    className={touched.country && errors.country ? 'border-red-500' : ''} 
+                  />
+                </div>
+                {touched.country && errors.country && <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.country}</p>}
               </div>
             </div>
 
@@ -261,8 +314,12 @@ export default function SelectShippingAddress() {
 
               <div className="space-y-2">
                 <label className="text-[13px] font-bold ml-1">Alternate Phone Number (Optional)</label>
-                <Input value={addressForm.alternatePhone || ""} onChange={e => setAddressForm({...addressForm, alternatePhone: e.target.value})} type="tel" placeholder="Enter an alternate contact number" className="h-12 bg-gray-50/50" />
-                <p className="text-[12px] text-muted-foreground ml-1 leading-relaxed">Use this if someone else will receive the package or if the courier should contact a different number.</p>
+                <Input value={addressForm.alternatePhone || ""} onChange={e => handlePhoneChange(e.target.value)} onBlur={() => handleBlur('alternatePhone')} type="tel" placeholder="Enter an alternate contact number" className={`h-12 bg-gray-50/50 ${touched.alternatePhone && errors.alternatePhone ? 'border-red-500 focus-visible:ring-red-500' : ''}`} />
+                {touched.alternatePhone && errors.alternatePhone ? (
+                  <p className="text-red-500 text-[12px] font-medium mt-1 ml-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.alternatePhone}</p>
+                ) : (
+                  <p className="text-[12px] text-muted-foreground ml-1 leading-relaxed">Use this if someone else will receive the package or if the courier should contact a different number.</p>
+                )}
               </div>
             </div>
 
@@ -276,7 +333,7 @@ export default function SelectShippingAddress() {
         </div>
         
         <BottomActionBar>
-          <Button type="submit" form="address-form" className="w-full h-14 text-[16px]">
+          <Button disabled={Object.keys(errors).length > 0} type="submit" form="address-form" className="w-full h-14 text-[16px]">
             Save Address
           </Button>
         </BottomActionBar>

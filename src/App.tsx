@@ -4,6 +4,7 @@ import Register from "@/pages/Register"
 import VerifyEmail from "@/pages/VerifyEmail"
 import VerifyPhone from "@/pages/VerifyPhone"
 import ProfileSetup from "@/pages/ProfileSetup"
+import AddShippingAddress from "@/pages/AddShippingAddress"
 import OnboardingComplete from "@/pages/OnboardingComplete"
 import Login from "@/pages/Login"
 import ForgotPassword from "@/pages/ForgotPassword"
@@ -89,6 +90,7 @@ function App() {
           <Route path="/verify-email" element={<MobileLayout><VerifyEmail /></MobileLayout>} />
           <Route path="/verify-phone" element={<MobileLayout><VerifyPhone /></MobileLayout>} />
           <Route path="/profile-setup" element={<MobileLayout><ProfileSetup /></MobileLayout>} />
+          <Route path="/add-shipping" element={<MobileLayout><AddShippingAddress /></MobileLayout>} />
           <Route path="/select-shipping" element={<MobileLayout><SelectShippingAddress /></MobileLayout>} />
           <Route path="/onboarding-complete" element={<MobileLayout><OnboardingComplete /></MobileLayout>} />
           <Route path="/login" element={<MobileLayout><Login /></MobileLayout>} />
