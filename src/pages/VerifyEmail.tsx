@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const dealId = searchParams.get("dealId");
   const [animationStep, setAnimationStep] = useState<"idle" | "loading" | "complete">("idle");
   const [resendCountdown, setResendCountdown] = useState(0);
   const userEmail = "alex@email.com";
@@ -142,10 +144,10 @@ export default function VerifyEmail() {
 
         <BottomActionBar>
           <div className="space-y-3 w-full">
-            <Button onClick={() => navigate("/verify-phone")} className="w-full h-14 text-[16px] font-bold shadow-lg shadow-primary/20">
+            <Button onClick={() => navigate(dealId ? `/verify-phone?dealId=${dealId}` : "/verify-phone")} className="w-full h-14 text-[16px] font-bold shadow-lg shadow-primary/20">
               Continue to Phone Verification
             </Button>
-            <Button onClick={() => navigate("/login")} variant="ghost" className="w-full h-14 text-[15px] font-medium text-muted-foreground hover:bg-gray-100">
+            <Button onClick={() => navigate(dealId ? `/login?dealId=${dealId}` : "/login")} variant="ghost" className="w-full h-14 text-[15px] font-medium text-muted-foreground hover:bg-gray-100">
               Back to Sign In
             </Button>
           </div>

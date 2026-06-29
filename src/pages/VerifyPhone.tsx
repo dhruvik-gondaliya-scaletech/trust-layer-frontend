@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function VerifyPhone() {
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const dealId = searchParams.get("dealId");
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [animationStep, setAnimationStep] = useState<"idle" | "loading" | "complete">("idle");
   const [resendCountdown, setResendCountdown] = useState(0);
@@ -127,7 +129,7 @@ export default function VerifyPhone() {
               </div>
             </div>
 
-            <Button onClick={() => navigate("/profile-setup")} className="w-full h-14 text-[16px] font-bold">
+            <Button onClick={() => navigate(dealId ? `/profile-setup?dealId=${dealId}` : "/profile-setup")} className="w-full h-14 text-[16px] font-bold">
               Complete Profile Setup
             </Button>
           </motion.div>

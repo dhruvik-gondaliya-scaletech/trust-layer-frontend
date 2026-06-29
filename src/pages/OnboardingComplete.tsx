@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 
 export default function OnboardingComplete() {
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const dealId = searchParams.get("dealId");
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-8 relative overflow-hidden">
@@ -76,9 +78,9 @@ export default function OnboardingComplete() {
         >
           <Button 
             className="w-full h-14 text-[16px]"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate(dealId ? `/dashboard?mode=buyer&dealId=${dealId}&onboardingSuccess=true` : "/dashboard")}
           >
-            Go To Dashboard
+            {dealId ? "Continue to Deal" : "Go To Dashboard"}
           </Button>
           <Button 
             variant="outline"

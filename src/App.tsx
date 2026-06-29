@@ -23,6 +23,7 @@ import ReviewSeller from "@/pages/ReviewSeller"
 import TransactionComplete from "@/pages/TransactionComplete"
 import AllTransactions from "@/pages/AllTransactions"
 import DealDetails from "@/pages/DealDetails"
+import SelectShippingAddress from "@/pages/SelectShippingAddress"
 
 import MyProfile from "@/pages/account/MyProfile"
 import VerificationCenter from "@/pages/account/VerificationCenter"
@@ -87,6 +88,7 @@ function App() {
           <Route path="/verify-email" element={<MobileLayout><VerifyEmail /></MobileLayout>} />
           <Route path="/verify-phone" element={<MobileLayout><VerifyPhone /></MobileLayout>} />
           <Route path="/profile-setup" element={<MobileLayout><ProfileSetup /></MobileLayout>} />
+          <Route path="/select-shipping" element={<MobileLayout><SelectShippingAddress /></MobileLayout>} />
           <Route path="/onboarding-complete" element={<MobileLayout><OnboardingComplete /></MobileLayout>} />
           <Route path="/login" element={<MobileLayout><Login /></MobileLayout>} />
           <Route path="/forgot-password" element={<MobileLayout><ForgotPassword /></MobileLayout>} />
