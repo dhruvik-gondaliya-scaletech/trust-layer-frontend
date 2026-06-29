@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, Shield, CheckCircle2, Clock, Truck, ShieldCheck, MapPin, Package, AlertCircle, RefreshCcw, Handshake, ExternalLink, Star } from "lucide-react"
+import { ChevronLeft, Shield, CheckCircle2, Clock, Truck, ShieldCheck, MapPin, Package, AlertCircle, RefreshCcw, Handshake, ExternalLink, Star, Copy, Check } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TransactionProgress, type TransactionState } from "@/components/ui/transaction-progress"
@@ -13,10 +13,16 @@ export default function TransactionTimeline() {
   const navigate = useNavigate()
   const { id } = useParams()
   const [showConfirmModal, setShowConfirmModal] = React.useState(false)
-  
+  const [isCopied, setIsCopied] = React.useState(false)
+
+  const handleCopyTracking = () => {
+    navigator.clipboard.writeText("940010920556801844")
+    setIsCopied(true)
+    setTimeout(() => setIsCopied(false), 2000)
+  }
   const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
   const isDealRepublished = localStorage.getItem("dealRepublished") === "true"
-  
+
   // Dynamic status handling for the demo
   let status: DealStatus = 'Funded'
   if (id === 'TRUST-0992') status = 'Shipped'
@@ -65,7 +71,7 @@ export default function TransactionTimeline() {
       </div>
 
       <div className="flex-1 px-5 pt-4 animate-in fade-in duration-500 space-y-6">
-        
+
         {/* State A - Waiting for Shipment */}
         {(status === 'Funded' || status === 'Declined' || status === 'Republished') && (
           <>
@@ -74,11 +80,11 @@ export default function TransactionTimeline() {
                 {status === 'Declined' ? 'Changes Requested' : status === 'Republished' ? 'Ready for Review' : 'Waiting for Shipment'}
               </div>
               <p className="text-[#64748B] text-[14px] px-2 leading-relaxed">
-                {status === 'Declined' 
-                  ? "The buyer requested updates before proceeding. The seller is currently updating the listing." 
+                {status === 'Declined'
+                  ? "The buyer requested updates before proceeding. The seller is currently updating the listing."
                   : status === 'Republished'
-                  ? "The seller has updated the listing. The buyer will review it again."
-                  : "The seller is preparing your package.\nTracking information will appear here once the item has\nbeen shipped.\nWe'll notify you as soon as shipping details are available."
+                    ? "The seller has updated the listing. The buyer will review it again."
+                    : "The seller is preparing your package.\nTracking information will appear here once the item has\nbeen shipped.\nWe'll notify you as soon as shipping details are available."
                 }
               </p>
             </div>
@@ -103,7 +109,7 @@ export default function TransactionTimeline() {
                     <span className="text-[14px] text-[#64748B]">You'll be able to track your package here.</span>
                   </li>
                 </ul>
-                
+
                 <div className="bg-[#F8FAFC] border-none p-5 rounded-[16px] mt-6">
                   <p className="text-[14px] font-medium text-[#0F172A] text-center">No tracking information available yet.</p>
                   <p className="text-[13px] text-[#64748B] text-center mt-1 leading-relaxed">
@@ -131,44 +137,32 @@ export default function TransactionTimeline() {
               <CardContent className="p-5 space-y-4">
                 <h2 className="font-semibold text-[18px]">Tracking Information</h2>
                 <div className="space-y-3">
-                  {/* Conditional Insurance Block */}
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-                    <span className="text-muted-foreground text-[14px] flex items-center gap-1.5">
-                      Shipping Insurance {true && <ShieldCheck className="w-4 h-4 text-gray-400" />}
-                    </span>
-                    {true ? (
-                      <span className="font-bold text-[12px] bg-green-50 text-green-700 px-2 py-1 rounded flex items-center gap-1">
-                        <span className="text-[14px]">🛡</span> Insured Shipment
-                      </span>
-                    ) : (
-                      <span className="font-bold text-[13px] bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        Not Insured
-                      </span>
-                    )}
-                  </div>
-                  {true && (
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-                      <span className="text-muted-foreground text-[14px]">Coverage Amount</span>
-                      <span className="font-bold text-[14px]">$4,300</span>
-                    </div>
-                  )}
 
                   <div className="flex justify-between items-center pb-2 border-b border-gray-50">
                     <span className="text-muted-foreground text-[14px]">Estimated Delivery</span>
                     <span className="font-bold text-[14px]">Jul 02, 2026</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center pb-2 border-b border-gray-50">
                     <span className="text-muted-foreground text-[14px]">Carrier</span>
                     <span className="font-bold text-[14px]">USPS</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground text-[14px]">Tracking Number</span>
-                    <span className="font-bold text-[14px]">940010920556801844</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[14px]">940010920556801844</span>
+                      <button 
+                        onClick={handleCopyTracking}
+                        className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 hover:text-gray-900"
+                        title="Copy tracking number"
+                      >
+                        {isCopied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-blue-50 text-blue-800 p-3.5 rounded-xl text-[13px] font-medium leading-relaxed">
                   Shipment updates are provided by the carrier. Track your package directly using the carrier link below.
                 </div>
@@ -242,45 +236,32 @@ export default function TransactionTimeline() {
       </div>
 
       <BottomActionBar>
-        <div className="flex gap-3 w-full">
-          {status === 'Funded' && (
+        <div className="grid grid-cols-2 gap-3 w-full px-1">
+          {(status === 'Funded' || status === 'Shipped') && (
             <>
-              <Button disabled variant="outline" className="flex-1 h-14 flex-col justify-center gap-0 border-gray-200 bg-white">
-                <span className="text-[14px] font-bold text-gray-400">Track Package</span>
-                <span className="text-[10px] font-normal text-gray-400 mt-0.5">Available after shipment.</span>
+              <Button variant="outline" className="w-full h-14 text-[14px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 px-2 leading-tight whitespace-normal" onClick={() => navigate(`/dispute-flow/${id || 'TRUST-1024'}`)}>
+                Report an Issue
               </Button>
-              <Button disabled variant="outline" className="flex-1 h-14 flex-col justify-center gap-0 border-gray-200 bg-gray-50">
+              <Button disabled variant="outline" className="w-full h-14 flex-col justify-center gap-0 border-gray-200 bg-gray-50 px-2 overflow-hidden">
                 <span className="text-[14px] font-bold text-gray-400">Confirm Delivery</span>
-                <span className="text-[10px] font-normal text-gray-400 mt-0.5">Available after delivery.</span>
-              </Button>
-            </>
-          )}
-
-          {status === 'Shipped' && (
-            <>
-              <Button className="flex-1 h-14 text-[14px] font-bold shadow-sm" variant="outline" onClick={() => window.open('https://usps.com', '_blank')}>
-                Track Package <ExternalLink className="ml-2 h-4 w-4" />
-              </Button>
-              <Button disabled variant="outline" className="flex-1 h-14 flex-col justify-center gap-0 border-gray-200 bg-gray-50">
-                <span className="text-[14px] font-bold text-gray-400">Confirm Delivery</span>
-                <span className="text-[10px] font-normal text-gray-400 mt-0.5">Available after delivery.</span>
+                <span className="text-[9.5px] font-normal text-gray-400 mt-0.5 whitespace-normal text-center leading-tight max-w-[140px]">Available after the estimated delivery date.</span>
               </Button>
             </>
           )}
 
           {status === 'Delivered' && (
             <>
-              <Button variant="outline" className="flex-1 h-14 text-[14px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700" onClick={() => navigate("/dispute-flow/TRUST-1024")}>
+              <Button variant="outline" className="w-full h-14 text-[14px] font-bold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 px-2 leading-tight whitespace-normal" onClick={() => navigate(`/dispute-flow/${id || 'TRUST-1024'}`)}>
                 Report an Issue
               </Button>
-              <Button className="flex-1 h-14 text-[14px] font-bold bg-success hover:bg-success/90 text-white" onClick={() => setShowConfirmModal(true)}>
+              <Button className="w-full h-14 text-[14px] font-bold bg-success hover:bg-success/90 text-white px-2 leading-tight whitespace-normal" onClick={() => setShowConfirmModal(true)}>
                 Confirm Delivery
               </Button>
             </>
           )}
 
           {status === 'Closed' && (
-            <Button className="w-full h-14 text-[16px] font-bold shadow-sm bg-primary hover:bg-primary/90 text-white" onClick={() => navigate("/review-seller/TRUST-1024")}>
+            <Button className="col-span-2 w-full h-14 text-[16px] font-bold shadow-sm bg-primary hover:bg-primary/90 text-white" onClick={() => navigate("/review-seller/TRUST-1024")}>
               <Star className="w-5 h-5 mr-2" /> Leave Review
             </Button>
           )}
@@ -291,36 +272,36 @@ export default function TransactionTimeline() {
       <AnimatePresence>
         {showConfirmModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center px-5 pointer-events-auto">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => setShowConfirmModal(false)}
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-white w-full max-w-[340px] rounded-3xl p-6 relative z-10 shadow-2xl"
             >
-              <h3 className="text-[20px] font-extrabold text-center text-gray-900 mb-2">Confirm Delivery</h3>
-              <p className="text-[14px] text-gray-500 text-center font-medium mb-6">
-                By confirming delivery, funds will be released to the seller and the transaction will be completed.
+              <h3 className="text-[20px] font-extrabold text-center text-gray-900 mb-2">Confirm Delivery?</h3>
+              <p className="text-[14px] text-gray-500 text-center font-medium mb-6 leading-relaxed">
+                By confirming delivery, you acknowledge that you have received the item and it matches the agreed condition. This action will begin the payment release process and cannot be undone.
               </p>
-              
+
               <div className="flex flex-col gap-2.5">
-                <Button 
+                <Button
                   className="w-full bg-success hover:bg-success/90 text-white font-bold h-12 rounded-xl text-[15px] shadow-sm"
                   onClick={() => {
                     setShowConfirmModal(false)
-                    navigate("/transaction-complete/TRUST-1024")
+                    navigate(`/review-seller/${id || 'TRUST-1024'}`)
                   }}
                 >
-                  Confirm Delivery
+                  Yes, Confirm Delivery
                 </Button>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="w-full text-gray-600 font-bold h-12 rounded-xl text-[15px] hover:bg-gray-100"
                   onClick={() => setShowConfirmModal(false)}
                 >

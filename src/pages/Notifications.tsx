@@ -10,10 +10,8 @@ import { motion, AnimatePresence } from "framer-motion"
 
 export default function Notifications() {
   const navigate = useNavigate()
-  const [filter, setFilter] = React.useState<'all' | 'selling' | 'buying'>('all')
+  const [filter, setFilter] = React.useState<'all' | 'selling' | 'buying'>('selling')
   const [toasts, setToasts] = React.useState<{ id: number, message: string }[]>([])
-
-  const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
 
   type NotificationItem = {
     id: number;
@@ -30,142 +28,15 @@ export default function Notifications() {
     isRead: boolean;
   };
 
-  const baseData: NotificationItem[] = [
+  const initialData: NotificationItem[] = [
     {
-      id: 15,
-      role: 'buying',
-      title: 'Seller responded to your dispute',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'The seller has responded to your reported issue.\nReview the response and continue the resolution process.',
-      ctaText: 'View Dispute',
-      time: '2 days ago',
-      isRead: true
-    },
-    {
-      id: 14,
-      role: 'buying',
-      title: 'Transaction completed',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Your purchase has been completed successfully.\nLeave a review to help build trust within the community.',
-      ctaText: 'Leave Review',
-      time: '2 days ago',
-      isRead: true
-    },
-    {
-      id: 13,
-      role: 'buying',
-      title: 'Review period ending soon',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Your review period expires soon.\nConfirm delivery or report any issues before the deadline.',
-      ctaText: 'View Deal',
-      time: '3 days ago',
-      isRead: true
-    },
-    {
-      id: 12,
-      role: 'buying',
-      title: 'Please review your delivery',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Inspect your item carefully.\nConfirm delivery or report an issue before the review period ends.',
-      ctaText: 'Review Delivery',
-      time: '3 days ago',
-      isRead: true
-    },
-    {
-      id: 11,
-      role: 'buying',
-      title: 'Tracking information available',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      highlight: { label: 'Carrier', text: 'USPS' },
-      message: 'Your package has been shipped.\nTrack its progress using the carrier link.',
-      ctaText: 'Track Package',
-      time: '4 days ago',
-      isRead: true
-    },
-    {
-      id: 10,
-      role: 'buying',
-      title: 'Seller is preparing your shipment',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      person: { roleLabel: 'Seller', name: '@vintage_vault' },
-      message: 'The seller is preparing your order.\nTracking details will appear after shipment.',
-      ctaText: 'View Deal',
-      time: '4 days ago',
-      isRead: true
-    },
-    {
-      id: 9,
-      role: 'buying',
-      title: 'Payment completed',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Your payment has been secured by TrustLayer.\nFunds will only be released after delivery confirmation.',
-      ctaText: 'View Deal',
-      time: '4 days ago',
-      isRead: true
-    },
-    {
-      id: 8,
-      role: 'buying',
-      title: 'Deal approved',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      person: { roleLabel: 'Seller', name: '@vintage_vault' },
-      message: 'The deal is ready for payment.\nComplete payment to reserve this item.',
-      ctaText: 'Pay Now',
-      time: '5 days ago',
-      isRead: true
-    },
-    {
-      id: 7,
-      role: 'selling',
-      title: 'Buyer reported an issue',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
-      highlight: { label: 'Issue', text: 'Item condition does not match description' },
-      message: 'The transaction is temporarily on hold until the issue is resolved.',
-      ctaText: 'View Dispute',
-      time: '5 days ago',
-      isRead: true
-    },
-    {
-      id: 6,
-      role: 'selling',
-      title: 'Funds released',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Your transaction has been completed successfully.\nFunds are now available in your wallet.',
-      ctaText: 'View Wallet',
-      time: '5 days ago',
-      isRead: true
-    },
-    {
-      id: 5,
+      id: 4,
       role: 'selling',
       title: 'Buyer confirmed delivery',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
       person: { roleLabel: 'Buyer', name: 'Michael Smith' },
-      message: 'The buyer confirmed the item was received.\nFunds will now be released according to TrustLayer policy.',
-      ctaText: 'View Deal',
-      time: '6 days ago',
-      isRead: true
-    },
-    {
-      id: 4,
-      role: 'selling',
-      title: 'Tracking shared with buyer',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      message: 'Tracking details have been shared successfully.\nThe buyer can now follow the shipment.',
-      ctaText: 'View Shipment',
+      message: 'The buyer confirmed the item was received successfully. Funds have now been released to your TrustLayer Wallet.',
       time: '6 days ago',
       isRead: true
     },
@@ -176,8 +47,7 @@ export default function Notifications() {
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
       person: { roleLabel: 'Buyer', name: 'Michael Smith' },
-      message: 'Payment has been secured in TrustLayer Escrow.\nPrepare the item and upload tracking details.',
-      ctaText: 'Add Tracking',
+      message: 'Payment has been securely received. Prepare your item and upload tracking details.',
       time: '7 days ago',
       isRead: true
     },
@@ -190,7 +60,6 @@ export default function Notifications() {
       person: { roleLabel: 'Buyer', name: 'Michael Smith' },
       highlight: { label: 'Reason', text: 'Need additional photos' },
       message: 'The buyer paused the purchase until the requested updates are completed.',
-      ctaText: 'Review Feedback',
       time: '8 days ago',
       isRead: true
     },
@@ -200,31 +69,11 @@ export default function Notifications() {
       title: 'Deal published successfully',
       productName: 'Charizard Holo 1999',
       dealId: 'TRUST-1024',
-      message: 'Your deal is now live and ready to share.\nSend the secure TrustLayer link to your buyer.',
-      ctaText: 'Share Deal Link',
+      message: 'Your deal is now live and ready to share. Send the secure TrustLayer link to your buyer.',
       time: '8 days ago',
       isRead: true
     }
   ]
-
-  const initialData: NotificationItem[] = isDealDeclined ? [
-    {
-      id: 99,
-      role: 'selling',
-      title: 'Buyer requested listing updates',
-      productName: 'Charizard Holo 1999',
-      dealId: 'TRUST-1024',
-      person: { roleLabel: 'Buyer', name: 'Michael Smith' },
-      highlight: { label: 'Reason', text: localStorage.getItem('declineReason') || 'Need additional photos' },
-      customMessage: localStorage.getItem('declineMessage') || '',
-      message: 'The buyer paused the purchase until the requested updates are completed.',
-      ctaText: 'Review Feedback',
-      time: 'Just now',
-      isRead: false
-    },
-    ...baseData
-  ] : baseData
-
 
   const [notifications, setNotifications] = React.useState(initialData)
 
@@ -250,6 +99,8 @@ export default function Notifications() {
     switch (notification.title) {
       case 'Deal published successfully':
       case 'Buyer confirmed delivery':
+      case 'Review received':
+      case 'Buyer approved deal':
         navigate(`/deal-details/${notification.dealId}`);
         break;
       case 'Buyer requested listing updates':
@@ -258,26 +109,8 @@ export default function Notifications() {
       case 'Payment received':
         navigate(`/add-tracking/${notification.dealId}`);
         break;
-      case 'Tracking shared with buyer':
-      case 'Payment completed':
-      case 'Seller is preparing your shipment':
-      case 'Tracking information available':
-      case 'Please review your delivery':
-      case 'Review period ending soon':
+      case 'Shipment uploaded':
         navigate(`/timeline/${notification.dealId}`);
-        break;
-      case 'Funds released':
-        navigate('/wallet');
-        break;
-      case 'Buyer reported an issue':
-      case 'Seller responded to your dispute':
-        navigate(`/dispute-flow/${notification.dealId}`);
-        break;
-      case 'Deal approved':
-        navigate(`/fund-escrow/${notification.dealId}`);
-        break;
-      case 'Transaction completed':
-        navigate(`/review-seller/${notification.dealId}`);
         break;
       default:
         navigate(`/deal-details/${notification.dealId}`);
@@ -352,22 +185,21 @@ export default function Notifications() {
             />
             
             <button
-              onClick={() => setFilter('all')}
-              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 ${filter === 'all' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              disabled
+              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 text-gray-400 opacity-40 cursor-not-allowed`}
             >
-              All ({allCount})
+              All (0)
             </button>
             <button
-              onClick={() => setFilter('selling')}
-              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 ${filter === 'selling' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 text-blue-600`}
             >
               Selling ({sellingCount})
             </button>
             <button
-              onClick={() => setFilter('buying')}
-              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 ${filter === 'buying' ? 'text-green-600' : 'text-gray-500 hover:text-gray-700'}`}
+              disabled
+              className={`flex-1 py-2 text-[13px] font-bold rounded-lg transition-colors relative z-10 text-gray-400 opacity-40 cursor-not-allowed`}
             >
-              Buying ({buyingCount})
+              Buying (0)
             </button>
           </div>
         </div>
@@ -416,9 +248,10 @@ export default function Notifications() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         key={item.id} 
-                        onClick={() => handleNotificationClick(item)}
-                        className={`p-[18px] pr-4 rounded-[18px] border relative overflow-hidden flex gap-3 items-center cursor-pointer active:scale-[0.98] transition-all shadow-[0_2px_10px_rgba(15,23,42,0.05)]
+                        onClick={() => item.title !== 'Deal published successfully' && handleNotificationClick(item)}
+                        className={`p-[18px] pr-4 rounded-[18px] border relative overflow-hidden flex gap-3 items-center transition-all shadow-[0_2px_10px_rgba(15,23,42,0.05)]
                           ${item.isRead ? 'bg-[#FCFCFD] border-[#EEF2F7]' : 'bg-white border-[#E9EDF5]'}
+                          ${item.title !== 'Deal published successfully' ? 'cursor-pointer active:scale-[0.98]' : ''}
                         `}
                       >
 
@@ -427,7 +260,7 @@ export default function Notifications() {
                           <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary" />
                         )}
                         
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pr-3 pb-1">
                           <div className="flex justify-between items-start mb-1.5">
                             <div className="flex items-center gap-1.5">
                               <div className={`w-2 h-2 rounded-sm ${item.role === 'selling' ? 'bg-[#2563EB]' : 'bg-[#16A34A]'}`}></div>
@@ -451,9 +284,9 @@ export default function Notifications() {
                           </div>
                           
                           {(item.person || item.highlight) && (
-                            <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-100 mr-3">
+                            <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-100 relative pr-8">
                               {item.person && (
-                                <div className={`flex justify-between ${item.highlight ? 'mb-2' : ''}`}>
+                                <div className={`flex justify-between items-center ${item.highlight ? 'mb-2' : ''}`}>
                                   <span className="text-[12px] text-gray-500 font-medium">{item.person.roleLabel}:</span>
                                   <span className="text-[12px] text-gray-900 font-bold">{item.person.name}</span>
                                 </div>
@@ -471,17 +304,18 @@ export default function Notifications() {
                                   </div>
                                 </div>
                               )}
+                              <ChevronRight className="absolute right-3 top-[13px] w-4 h-4 text-gray-300 stroke-[3]" />
                             </div>
                           )}
                           
-                          <div className={item.person || item.highlight ? 'mb-1 pr-3' : (item.isRead ? 'opacity-70 mb-1' : 'mb-1')}>
+                          <div className={item.person || item.highlight ? 'mb-1' : (item.isRead ? 'opacity-70 mb-1 relative pr-6' : 'mb-1 relative pr-6')}>
                             <p className={`text-[14px] leading-relaxed line-clamp-2 ${!item.isRead ? 'text-gray-700 font-medium' : 'text-gray-500 font-medium'}`}>
                               {item.message}
                             </p>
+                            {(!item.person && !item.highlight && item.title !== 'Deal published successfully') && (
+                              <ChevronRight className="absolute right-0 top-[2px] w-4 h-4 text-gray-300 stroke-[3]" />
+                            )}
                           </div>
-                        </div>
-                        <div className="shrink-0 text-gray-300">
-                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </motion.div>
                     ))}

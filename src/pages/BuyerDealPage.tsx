@@ -4,7 +4,6 @@ import { Shield, Check, X, Star, ChevronLeft, ShieldCheck, Trophy, Lock, Message
 import { Button } from "@/components/ui/button"
 import { TrustProfileCard } from "@/components/trust-profile-card"
 import { motion, AnimatePresence } from "framer-motion"
-import { TransactionProgress } from "@/components/ui/transaction-progress"
 
 export default function BuyerDealPage() {
   const navigate = useNavigate()
@@ -194,9 +193,6 @@ export default function BuyerDealPage() {
           </div>
         </div>
 
-        {/* SECTION 1.5: PROGRESS TRACKER */}
-        <TransactionProgress state="Buyer Reviewing Deal" userRole="buyer" />
-
         {/* SECTION 2: PRODUCT DETAILS */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
           <div className="flex justify-between items-start mb-1">
@@ -279,33 +275,6 @@ export default function BuyerDealPage() {
               isTrustedMember: true
             }} 
           />
-        </div>
-
-        {/* SECTION 5: TRUSTLAYER PROTECTION TIMELINE */}
-        <div className="bg-blue-50/50 rounded-3xl p-5 shadow-sm border border-blue-100">
-          <div className="relative">
-            {/* Horizontal Timeline Line */}
-            <div className="absolute top-3 left-[10%] right-[10%] h-[1.5px] bg-blue-200" />
-            
-            <div className="flex justify-between relative z-10">
-              {[
-                { title: "Funds Protected" },
-                { title: "Seller Ships" },
-                { title: "Buyer Inspects" },
-                { title: "Buyer Approves" },
-                { title: "Funds Released" },
-              ].map((step, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-2 w-[20%]">
-                  <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 bg-white transition-all ${idx === 0 ? 'border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' : 'border-blue-200'}`}>
-                    {idx === 0 ? <div className="w-1.5 h-1.5 bg-primary rounded-full" /> : null}
-                  </div>
-                  <div className={`text-[9px] font-bold text-center leading-tight ${idx === 0 ? 'text-blue-950' : 'text-blue-900/50'}`}>
-                    {step.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* SECTION 6: FEE RESPONSIBILITY & PAYMENT SUMMARY */}

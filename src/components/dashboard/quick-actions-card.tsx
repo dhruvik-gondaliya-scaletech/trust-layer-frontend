@@ -30,7 +30,7 @@ function getQuickActionContent(status: DealStatus, userMode: 'buyer' | 'seller',
     switch (status) {
       case 'declined': return { statusLabel: 'ACTION REQUIRED', title: 'Buyer requested changes', ctaText: 'Review Feedback', ctaRoute: `/review-feedback/${id}` };
       case 'draft': return { statusLabel: 'DRAFT', title: 'Complete Setup', ctaText: 'Continue Setup', ctaRoute: '/create-deal' };
-      case 'open': return { statusLabel: 'WAITING FOR BUYER', title: 'Deal Ready', ctaText: 'Share Deal', ctaRoute: `/deal-details/${id}` };
+      case 'open': return { statusLabel: 'LINK CREATED', title: 'Link is ready to be shared with the buyer.', ctaText: 'View Deal', ctaRoute: `/deal-published` };
       case 'funded': return { statusLabel: 'PAYMENT RECEIVED', title: 'Upload Tracking Details', ctaText: 'Add Tracking', ctaRoute: `/add-tracking/${id}` };
       case 'shipped': return { statusLabel: 'SHIPPED', title: 'Package In Transit', ctaText: 'View Shipment', ctaRoute: `/deal-details/${id}` };
       case 'delivered': return { statusLabel: 'DELIVERED', title: 'Waiting for Buyer Inspection', ctaText: 'View Deal', ctaRoute: `/deal-details/${id}` };
@@ -111,7 +111,11 @@ export function QuickActionsCard({ userMode, deals }: QuickActionsCardProps) {
           if (!content.statusLabel) return null;
 
           return (
-            <Card key={deal.id} className="border border-border bg-white shadow-sm overflow-hidden">
+            <Card 
+              key={deal.id} 
+              className="border border-border bg-white shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(content.ctaRoute)}
+            >
               <div className="py-3.5 px-4 flex flex-col gap-3.5">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className={`w-[48px] h-[48px] rounded-xl flex items-center justify-center shrink-0 border overflow-hidden bg-gray-100 ${themeBorderColor}`}>
@@ -138,7 +142,10 @@ export function QuickActionsCard({ userMode, deals }: QuickActionsCardProps) {
                   )}
                   <Button 
                     className={`w-[120px] shrink-0 text-white font-medium text-[14px] h-[36px] rounded-[10px] ${themeBgColor} ${themeHoverBgColor}`} 
-                    onClick={() => navigate(content.ctaRoute)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(content.ctaRoute);
+                    }}
                   >
                     {content.ctaText}
                   </Button>

@@ -36,6 +36,11 @@ export function TrustProfileCard({ user, variant = 'medium', className }: TrustP
     medium: "text-[22px]",
     large: "text-[28px]"
   }
+  const statSizes = {
+    small: "text-[20px]",
+    medium: "text-[28px]",
+    large: "text-[32px]"
+  }
 
   return (
     <div className={cn("bg-white rounded-[28px] p-6 shadow-sm border border-gray-100 relative overflow-hidden text-left w-full", className)}>
@@ -76,13 +81,13 @@ export function TrustProfileCard({ user, variant = 'medium', className }: TrustP
       </div>
       
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-[#F7F8FA] p-5 rounded-[20px] flex flex-col items-start justify-center">
-          <div className="text-[12px] text-muted-foreground uppercase font-medium tracking-[0.08em] mb-2">Successful Deals</div>
-          <div className="text-[28px] font-bold text-foreground leading-none">{user.successfulDeals}</div>
+        <div className="bg-[#F7F8FA] p-5 rounded-[20px] flex flex-col items-start justify-center overflow-hidden">
+          <div className="text-[11px] sm:text-[12px] text-muted-foreground uppercase font-medium tracking-[0.08em] mb-2 whitespace-nowrap">Successful Deals</div>
+          <div className={cn("font-bold text-foreground leading-none", statSizes[variant])}>{user.successfulDeals}</div>
         </div>
-        <div className="bg-[#F7F8FA] p-5 rounded-[20px] flex flex-col items-start justify-center">
-          <div className="text-[12px] text-muted-foreground uppercase font-medium tracking-[0.08em] mb-2">Member Since</div>
-          <div className="text-[28px] font-bold text-foreground leading-none">{user.memberSince}</div>
+        <div className="bg-[#F7F8FA] p-5 rounded-[20px] flex flex-col items-start justify-center overflow-hidden">
+          <div className="text-[11px] sm:text-[12px] text-muted-foreground uppercase font-medium tracking-[0.08em] mb-2 whitespace-nowrap">Member Since</div>
+          <div className={cn("font-bold text-foreground leading-none", statSizes[variant])}>{user.memberSince}</div>
         </div>
       </div>
     </div>

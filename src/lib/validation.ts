@@ -1,13 +1,22 @@
 export const noHtmlRegex = /<[^>]*>/;
-// A basic check to prevent emojis (this catches most surrogate pairs and emoji ranges)
-export const noEmojiRegex = /[\u1F600-\u1F64F\u1F300-\u1F5FF\u1F680-\u1F6FF\u1F700-\u1F77F\u1F780-\u1F7FF\u1F800-\u1F8FF\u1F900-\u1F9FF\u1FA00-\u1FA6F\u1FA70-\u1FAFF\u2600-\u26FF\u2700-\u27BF]/;
+export const noEmojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u;
 
 export const isValidName = (name: string) => {
-  return /^[a-zA-Z\s\-']+$/.test(name);
+  return /^[a-zA-Z\s\-'\.]+$/.test(name);
 };
 
 export const isValidCityState = (text: string) => {
-  return /^[a-zA-Z\s]+$/.test(text);
+  return /^[a-zA-Z\s\-\.]+$/.test(text);
+};
+
+const US_STATES = new Set([
+  "al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky", "la", "me", "md", "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy",
+  "alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware", "florida", "georgia", "hawaii", "idaho", "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana", "maine", "maryland", "massachusetts", "michigan", "minnesota", "mississippi", "missouri", "montana", "nebraska", "nevada", "new hampshire", "new jersey", "new mexico", "new york", "north carolina", "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina", "south dakota", "tennessee", "texas", "utah", "vermont", "virginia", "washington", "west virginia", "wisconsin", "wyoming",
+  "dc", "district of columbia", "pr", "puerto rico"
+]);
+
+export const isValidUSState = (state: string) => {
+  return US_STATES.has(state.toLowerCase().trim());
 };
 
 export const isValidZip = (zip: string) => {
@@ -55,15 +64,19 @@ export const cleanZip = (val: string) => {
 };
 
 export const cleanCity = (val: string) => {
-  return val.replace(/[^a-zA-Z\s\-']/g, '').replace(/\s{2,}/g, ' ').trimStart();
+  return val.replace(/[^a-zA-Z\s\-\.]/g, '').replace(/\s{2,}/g, ' ').trimStart();
 };
 
 export const cleanState = (val: string) => {
-  return val.replace(/[^a-zA-Z\s\-]/g, '').replace(/\s{2,}/g, ' ').trimStart();
+  let cleaned = val.replace(/[^a-zA-Z\s]/g, '').replace(/\s{2,}/g, ' ').trimStart();
+  if (cleaned.length === 2) {
+    cleaned = cleaned.toUpperCase();
+  }
+  return cleaned;
 };
 
 export const cleanName = (val: string) => {
-  return val.replace(/[^a-zA-Z\s\-']/g, '').replace(/\s{2,}/g, ' ').trimStart();
+  return val.replace(/[^a-zA-Z\s\-'\.]/g, '').replace(/\s{2,}/g, ' ').trimStart();
 };
 
 export type ValidationErrors = {
@@ -101,7 +114,7 @@ export const validateAddressForm = (form: any, customLabelStr: string) => {
   const name = form.name?.trim() || "";
   if (!name) errors.name = "This field is required.";
   else if (name.length < 2 || name.length > 60) errors.name = "Name must be 2-60 characters.";
-  else if (!isValidName(name)) errors.name = "Please enter a valid name (letters, spaces, hyphens, apostrophes only).";
+  else if (!isValidName(name)) errors.name = "Only letters, spaces, apostrophes, hyphens, and periods are allowed.";
   else {
     const genErr = checkGeneral(name);
     if (genErr) errors.name = genErr;
@@ -144,7 +157,7 @@ export const validateAddressForm = (form: any, customLabelStr: string) => {
   // City
   const city = form.city?.trim() || "";
   if (!city) errors.city = "This field is required.";
-  else if (!isValidCityState(city)) errors.city = "City cannot contain numbers or special characters.";
+  else if (!isValidCityState(city)) errors.city = "City can only contain letters and spaces.";
   else {
     const genErr = checkGeneral(city);
     if (genErr) errors.city = genErr;
@@ -153,7 +166,7 @@ export const validateAddressForm = (form: any, customLabelStr: string) => {
   // State
   const state = form.state?.trim() || "";
   if (!state) errors.state = "This field is required.";
-  else if (!isValidCityState(state)) errors.state = "State cannot contain numbers or special characters.";
+  else if (!isValidUSState(state)) errors.state = "Enter a valid US state.";
   else {
     const genErr = checkGeneral(state);
     if (genErr) errors.state = genErr;
