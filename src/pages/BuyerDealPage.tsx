@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Shield, Check, X, Star, ChevronLeft, ShieldCheck, Trophy, Lock, MessageCircle, FileText, Image as ImageIcon, Video, CheckCircle2, ChevronRight, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TrustProfileCard } from "@/components/trust-profile-card"
@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion"
 
 export default function BuyerDealPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isLoggedIn = new URLSearchParams(location.search).get("isLoggedIn") === "true"
   
   // Animation state for WOW moment
   const [displayScore, setDisplayScore] = useState(0)
@@ -88,9 +90,6 @@ export default function BuyerDealPage() {
             <Shield className="w-5 h-5 text-primary" />
             <span className="font-bold text-[15px]">TrustLayer</span>
           </div>
-        </div>
-        <div className="text-[12px] font-semibold text-primary bg-blue-50 px-2 py-1 rounded-full flex items-center gap-1">
-          <Lock className="w-3.5 h-3.5" /> Secure Payment
         </div>
       </div>
 
@@ -351,9 +350,15 @@ export default function BuyerDealPage() {
         <div className="flex flex-col gap-3">
           <Button
             className="w-full h-[56px] text-[16px] font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white"
-            onClick={() => navigate("/fund-escrow/TRUST-1024")}
+            onClick={() => {
+              if (isLoggedIn) {
+                navigate("/fund-escrow/TRUST-1024")
+              } else {
+                navigate("/register?redirect=buyer&dealId=TRUST-1024")
+              }
+            }}
           >
-            <Check className="w-5 h-5" /> Approve Deal • ${totalDue.toLocaleString('en-US', {maximumFractionDigits: 0})}
+            <Check className="w-5 h-5" /> {isLoggedIn ? "Continue to Payment" : "Approve Deal"} • ${totalDue.toLocaleString('en-US', {maximumFractionDigits: 0})}
           </Button>
           <Button
             variant="outline"

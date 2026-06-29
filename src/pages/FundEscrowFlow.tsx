@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card"
 
 export default function FundEscrowFlow() {
   const navigate = useNavigate()
-  const [step, setStep] = React.useState<number>(1)
+  const [step, setStep] = React.useState<number>(4)
   
   // Step 1: Account
   const [isLoginView, setIsLoginView] = React.useState(false)
@@ -33,71 +33,16 @@ export default function FundEscrowFlow() {
   const [isPhoneVerified, setIsPhoneVerified] = React.useState(false)
   const [isVerifyingPhone, setIsVerifyingPhone] = React.useState(false)
   
-  // Step 3: Address Selection
-  type Address = {
-    id: string;
-    type: string;
-    name: string;
-    street: string;
-    apt?: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    phone: string;
-    isDefault?: boolean;
-  }
-
-  const [addresses, setAddresses] = React.useState<Address[]>([
-    {
-      id: "1",
-      type: "Home",
-      name: "Alex Johnson",
-      street: "123 Main Street",
-      city: "Austin",
-      state: "TX",
-      zip: "78701",
-      country: "United States",
-      phone: "+1 (555) 123-4567",
-      isDefault: true
-    },
-    {
-      id: "2",
-      type: "Office",
-      name: "Alex Johnson",
-      street: "500 Congress Ave",
-      city: "Austin",
-      state: "TX",
-      zip: "78704",
-      country: "United States",
-      phone: "+1 (555) 987-6543"
-    }
-  ])
-  const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>("1")
-  
-  const [isAddressSheetOpen, setIsAddressSheetOpen] = React.useState(false)
-  const [editingAddressId, setEditingAddressId] = React.useState<string | null>(null)
-  const [customLabel, setCustomLabel] = React.useState("")
-  const [addressForm, setAddressForm] = React.useState<Partial<Address>>({
-    name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567", type: "Home", isDefault: false
-  })
-  const [addressToDelete, setAddressToDelete] = React.useState<string | null>(null)
-
-  const sortedAddresses = React.useMemo(() => {
-    return [...addresses].sort((a, b) => {
-      if (a.isDefault && !b.isDefault) return -1;
-      if (!a.isDefault && b.isDefault) return 1;
-      return 0;
-    });
-  }, [addresses])
-
-  const selectedAddress = addresses.find(a => a.id === selectedAddressId)
-
-  React.useEffect(() => {
-    if (step === 3 && addresses.length > 0 && !selectedAddressId) {
-      setSelectedAddressId(sortedAddresses[0].id)
-    }
-  }, [step, addresses.length, sortedAddresses])
+  const selectedAddress = {
+    name: "Alex Johnson",
+    street: "123 Main Street",
+    apt: "",
+    city: "Austin",
+    state: "TX",
+    zip: "78701",
+    country: "United States",
+    phone: "+1 (555) 123-4567"
+  };
 
   // Step 4: Terms
   const [termsChecked, setTermsChecked] = React.useState({
@@ -133,119 +78,19 @@ export default function FundEscrowFlow() {
   
   // Handlers
   const nextStep = () => setStep(s => {
-    if (s === 1 && isLoginView) return 3
+    if (s === 1 && isLoginView) return 4
     if (s === 2) return 2.5
-    if (s === 2.5) return 3
+    if (s === 2.5) return 4
     return s + 1
   })
   const prevStep = () => {
-    if (step === 1) navigate("/buyer-view/TRUST-1024")
+    if (step === 4) navigate("/dashboard")
     else setStep(s => {
-      if (s === 3 && isLoginView) return 1
-      if (s === 3) return 2.5
-      if (s === 2.5) return 2
       return s - 1
     })
   }
 
-  const handleSaveAddress = (e: React.FormEvent) => {
-    e.preventDefault()
-    const isNewDefault = addressForm.isDefault || addresses.length === 0;
-    
-    const addrToSave: Address = {
-      ...(addressForm as Address),
-      type: addressForm.type === "Other" ? customLabel : (addressForm.type || "Home"),
-      isDefault: isNewDefault,
-      id: editingAddressId || Date.now().toString()
-    }
-    
-    let newAddresses = [...addresses]
-    
-    if (isNewDefault) {
-      newAddresses = newAddresses.map(a => ({ ...a, isDefault: false }))
-    }
-    
-    if (editingAddressId) {
-      newAddresses = newAddresses.map(a => a.id === editingAddressId ? addrToSave : a)
-    } else {
-      newAddresses.push(addrToSave)
-    }
-    
-    setAddresses(newAddresses)
-    setSelectedAddressId(addrToSave.id)
-    setIsAddressSheetOpen(false)
-    setEditingAddressId(null)
-  }
 
-  const handleEditAddress = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const addr = addresses.find(a => a.id === id)
-    if (!addr) return
-    
-    let type = addr.type
-    let cLabel = ""
-    if (type !== "Home" && type !== "Office") {
-      type = "Other"
-      cLabel = addr.type
-    }
-    
-    setAddressForm(addr)
-    setCustomLabel(cLabel)
-    setEditingAddressId(id)
-    setIsAddressSheetOpen(true)
-  }
-
-  const handleSetDefault = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setAddresses(addresses.map(a => ({ ...a, isDefault: a.id === id })))
-    setSelectedAddressId(id)
-  }
-
-  const handleDeleteAddress = (id: string) => {
-    if (addresses.length <= 1) return;
-    
-    const newAddresses = addresses.filter(a => a.id !== id);
-    if (addresses.find(a => a.id === id)?.isDefault && newAddresses.length > 0) {
-      newAddresses[0].isDefault = true;
-    }
-    setAddresses(newAddresses);
-    setAddressToDelete(null);
-    if (selectedAddressId === id) {
-      setSelectedAddressId(newAddresses[0].id);
-    }
-  }
-
-  const handleZipChange = (zip: string) => {
-    setAddressForm({ ...addressForm, zip });
-    
-    // Mock auto-fill logic
-    const mockZipDb: Record<string, { city: string, state: string }> = {
-      "78701": { city: "Austin", state: "TX" },
-      "78704": { city: "Austin", state: "TX" },
-      "10001": { city: "New York", state: "NY" },
-      "90210": { city: "Beverly Hills", state: "CA" },
-      "60601": { city: "Chicago", state: "IL" },
-      "33101": { city: "Miami", state: "FL" }
-    };
-    
-    if (zip.length === 5 && mockZipDb[zip]) {
-      setAddressForm(prev => ({
-        ...prev,
-        zip,
-        city: mockZipDb[zip].city,
-        state: mockZipDb[zip].state
-      }));
-    }
-  }
-
-  const openAddAddress = () => {
-    setAddressForm({
-      name: "Alex Johnson", country: "United States", phone: "+1 (555) 123-4567", type: "Home", isDefault: addresses.length === 0
-    })
-    setCustomLabel("")
-    setEditingAddressId(null)
-    setIsAddressSheetOpen(true)
-  }
 
   const handleOtpChange = (index: number, value: string) => {
     // Handle pasting a full code
@@ -664,72 +509,7 @@ export default function FundEscrowFlow() {
             </motion.div>
           )}
 
-          {/* STEP 3: SHIPPING ADDRESS */}
-          {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 pt-2">
-               <div>
-                  <h1 className="text-2xl font-bold tracking-tight mb-2">Select Shipping Address</h1>
-                  <p className="text-[14px] text-muted-foreground">
-                     Choose where you would like this item delivered.
-                  </p>
-               </div>
-               <div className="space-y-4">
-                  {sortedAddresses.map(addr => (
-                     <Card 
-                        key={addr.id}
-                        onClick={() => setSelectedAddressId(addr.id)}
-                        className={`p-5 cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAddressId === addr.id ? 'border-primary bg-blue-50/50 shadow-sm' : 'border-gray-100 hover:border-gray-200'}`}
-                     >
-                        <div className="flex gap-4">
-                           <div className={`mt-1 w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${selectedAddressId === addr.id ? 'bg-primary border-primary' : 'border-gray-300'}`}>
-                              {selectedAddressId === addr.id && <Check className="w-3.5 h-3.5 text-white" />}
-                           </div>
-                           <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                 <div className="flex items-center gap-2">
-                                    {addr.type === "Home" ? <Home className="w-4 h-4 text-muted-foreground" /> : addr.type === "Office" ? <Building2 className="w-4 h-4 text-muted-foreground" /> : <MapPin className="w-4 h-4 text-muted-foreground" />}
-                                    <span className="font-bold text-[15px]">{addr.type}</span>
-                                 </div>
-                                 {addr.isDefault && (
-                                    <span className="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">DEFAULT ADDRESS</span>
-                                 )}
-                              </div>
-                              <p className="text-[14px] font-semibold mb-1">{addr.name}</p>
-                              <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                 {addr.street} {addr.apt && `, ${addr.apt}`} <br/>
-                                 {addr.city}, {addr.state} {addr.zip}<br/>
-                                 {addr.country}
-                              </p>
-                              <p className="text-[13px] text-muted-foreground mt-2">{addr.phone}</p>
-                           </div>
-                        </div>
 
-                        {/* Inline Actions */}
-                        <div className={`mt-4 pt-4 border-t flex items-center ${selectedAddressId === addr.id ? 'border-blue-100/50' : 'border-gray-100'}`}>
-                          <div className="flex gap-4 w-full">
-                            <button onClick={(e) => handleEditAddress(addr.id, e)} className="text-[13px] font-bold text-gray-500 hover:text-primary transition-colors flex items-center gap-1.5 p-1 -ml-1">
-                              <Edit2 className="w-3.5 h-3.5" /> Edit
-                            </button>
-                            <button onClick={(e) => { e.stopPropagation(); setAddressToDelete(addr.id); }} className="text-[13px] font-bold text-gray-500 hover:text-red-600 transition-colors flex items-center gap-1.5 p-1">
-                              <Trash2 className="w-3.5 h-3.5" /> Delete
-                            </button>
-                            <div className="flex-1" />
-                            {!addr.isDefault && (
-                              <button onClick={(e) => handleSetDefault(addr.id, e)} className="text-[13px] font-bold text-primary hover:underline transition-colors flex items-center gap-1.5 p-1 -mr-1">
-                                Set as Default
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                     </Card>
-                  ))}
-                  <Button variant="outline" className="w-full h-[56px] rounded-2xl border-2 border-dashed border-gray-200 text-gray-500 font-bold hover:bg-gray-50 hover:text-gray-900 transition-colors" onClick={openAddAddress}>
-                     <Plus className="w-5 h-5 mr-2" /> Add New Address
-                  </Button>
-               </div>
-            </motion.div>
-          )}
 
           {/* STEP 4: CONFIRM TERMS */}
           {step === 4 && (
@@ -747,7 +527,7 @@ export default function FundEscrowFlow() {
                   <Card className="p-4 border border-gray-100">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-bold text-[14px] text-gray-500 uppercase tracking-wider">Shipping Address</h3>
-                      <button onClick={() => setStep(3)} className="text-[13px] text-primary font-bold hover:underline">
+                      <button onClick={() => navigate("/select-shipping?dealId=TRUST-1024")} className="text-[13px] text-primary font-bold hover:underline">
                         [ Change ]
                       </button>
                     </div>
@@ -939,7 +719,7 @@ export default function FundEscrowFlow() {
                       {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zip}
                     </p>
                   </div>
-                  <button onClick={() => setStep(3)} className="text-[13px] text-primary font-bold hover:underline">
+                  <button onClick={() => navigate("/select-shipping?dealId=TRUST-1024")} className="text-[13px] text-primary font-bold hover:underline">
                     [ Change ]
                   </button>
                 </div>
@@ -1320,156 +1100,7 @@ export default function FundEscrowFlow() {
         )}
       </AnimatePresence>
 
-      {/* DELETE ADDRESS CONFIRMATION */}
-      <AnimatePresence>
-        {addressToDelete && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setAddressToDelete(null)}
-            />
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl p-6 relative z-10"
-            >
-              <div className="w-16 h-16 rounded-full bg-red-50 border-[6px] border-red-50 flex items-center justify-center mb-6">
-                <AlertCircle className="w-8 h-8 text-red-500" />
-              </div>
-              <h2 className="text-[22px] font-extrabold text-gray-900 mb-2 tracking-tight">Delete Address?</h2>
-              <p className="text-[15px] text-gray-500 mb-6 leading-relaxed">
-                Are you sure you want to delete this address? This action cannot be undone.
-              </p>
-              
-              {addresses.length === 1 && (
-                <div className="p-4 bg-red-50 text-red-600 text-[14px] font-bold rounded-2xl mb-6 flex items-center gap-2">
-                  <Info className="w-5 h-5 shrink-0" />
-                  You cannot delete your only shipping address.
-                </div>
-              )}
 
-              <div className="flex gap-3">
-                <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-bold text-gray-500 hover:text-gray-900 bg-gray-50 hover:bg-gray-100" onClick={() => setAddressToDelete(null)}>Cancel</Button>
-                <Button 
-                  className="flex-1 h-14 rounded-2xl font-bold bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20" 
-                  onClick={() => handleDeleteAddress(addressToDelete)}
-                  disabled={addresses.length === 1}
-                >
-                  Delete
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ADDRESS BOTTOM SHEET */}
-      <AnimatePresence>
-        {isAddressSheetOpen && (
-          <div className="fixed inset-0 z-[70] flex justify-center items-end sm:items-center">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsAddressSheetOpen(false)}
-            />
-            <motion.div 
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-[430px] bg-white rounded-t-[2rem] sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
-            >
-              <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-6 pt-6 pb-4 border-b border-gray-100 flex justify-between items-center">
-                <h2 className="text-[20px] font-extrabold tracking-tight">{editingAddressId ? "Edit Address" : "Add Address"}</h2>
-                <button onClick={() => setIsAddressSheetOpen(false)} className="p-2 -mr-2 bg-gray-50 text-gray-500 rounded-full hover:bg-gray-100 transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="p-6 overflow-y-auto">
-                <form onSubmit={handleSaveAddress} className="space-y-6">
-                  
-                  {/* Contact Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest pl-1">Contact</h3>
-                    <div className="space-y-3">
-                      <Input required value={addressForm.name || ""} onChange={e => setAddressForm({...addressForm, name: e.target.value})} placeholder="Full Name" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                      <Input required type="tel" value={addressForm.phone || ""} onChange={e => setAddressForm({...addressForm, phone: e.target.value})} placeholder="Phone Number" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                    </div>
-                  </div>
-
-                  {/* Address Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest pl-1">Address</h3>
-                    <div className="space-y-3">
-                      <Input required value={addressForm.street || ""} onChange={e => setAddressForm({...addressForm, street: e.target.value})} placeholder="Address Line 1" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                      <Input value={addressForm.apt || ""} onChange={e => setAddressForm({...addressForm, apt: e.target.value})} placeholder="Apartment, Suite, etc. (Optional)" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                    </div>
-                  </div>
-
-                  {/* Location Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest pl-1">Location</h3>
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input required value={addressForm.zip || ""} onChange={e => handleZipChange(e.target.value)} placeholder="ZIP Code" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                        <Input disabled value={addressForm.country || "United States"} className="h-14 rounded-xl bg-gray-50 text-gray-400 font-medium cursor-not-allowed border-gray-200" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input required value={addressForm.city || ""} onChange={e => setAddressForm({...addressForm, city: e.target.value})} placeholder="City" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20" />
-                        <select 
-                          required
-                          value={addressForm.state || ""} 
-                          onChange={e => setAddressForm({...addressForm, state: e.target.value})} 
-                          className="flex h-14 w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2 text-[15px] font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30"
-                        >
-                          <option value="" disabled>State</option>
-                          <option value="CA">California (CA)</option>
-                          <option value="FL">Florida (FL)</option>
-                          <option value="IL">Illinois (IL)</option>
-                          <option value="NY">New York (NY)</option>
-                          <option value="TX">Texas (TX)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Address Label */}
-                  <div className="space-y-4">
-                    <h3 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest pl-1">Address Label</h3>
-                    <div className="flex gap-3">
-                      {["Home", "Office", "Other"].map(label => {
-                        const isSelected = addressForm.type === label || (label === "Other" && addressForm.type !== "Home" && addressForm.type !== "Office");
-                        return (
-                          <label key={label} className={`flex-1 flex justify-center items-center h-12 border-2 rounded-xl text-[14px] font-bold cursor-pointer transition-colors ${isSelected ? 'bg-primary/5 text-primary border-primary' : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200'}`}>
-                            <input type="radio" name="addressLabel" className="hidden" checked={isSelected} onChange={() => setAddressForm({...addressForm, type: label})} />
-                            {label}
-                          </label>
-                        )
-                      })}
-                    </div>
-                    {(addressForm.type === "Other" || (addressForm.type !== "Home" && addressForm.type !== "Office")) && (
-                      <Input value={customLabel} onChange={e => setCustomLabel(e.target.value)} placeholder="e.g. My Beach House" className="h-14 rounded-xl bg-gray-50/50 border-gray-200 text-[15px] font-medium focus-visible:ring-primary/20 mt-3" />
-                    )}
-                  </div>
-
-                  <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer border border-gray-100 mt-6">
-                    <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors border-2 ${addressForm.isDefault ? 'bg-primary border-primary' : 'bg-white border-gray-300'}`}>
-                      {addressForm.isDefault && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-                    </div>
-                    <span className="text-[15px] font-bold text-gray-800">Make this my default shipping address</span>
-                    <input type="checkbox" className="hidden" checked={addressForm.isDefault} onChange={(e) => setAddressForm({...addressForm, isDefault: e.target.checked})} />
-                  </label>
-
-                  <div className="pt-4 pb-2">
-                    <Button type="submit" className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-gray-900/20">
-                      Save Address
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
     </div>
   )

@@ -35,6 +35,18 @@ export default function Dashboard() {
   const initialMode = new URLSearchParams(location.search).get('mode') as "seller" | "buyer" || "seller"
   const [userMode, setUserMode] = useState<"seller" | "buyer">(initialMode)
   const [activeDealStatus, setActiveDealStatus] = useState<DealStatus>('funded')
+  
+  const dealIdToOpen = new URLSearchParams(location.search).get('dealId');
+  const hasOnboardingSuccess = new URLSearchParams(location.search).get('onboardingSuccess') === 'true';
+
+  React.useEffect(() => {
+    if (dealIdToOpen && hasOnboardingSuccess) {
+      const timer = setTimeout(() => {
+        navigate(`/buyer-view/${dealIdToOpen}?isLoggedIn=true`);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [dealIdToOpen, hasOnboardingSuccess, navigate]);
 
   const sellerDeals = [
     {
@@ -52,15 +64,22 @@ export default function Dashboard() {
 
   const buyerDeals = [
     {
+      id: 'TRUST-1024',
+      name: 'Charizard Holo 1999',
+      status: 'funded' as DealStatus,
+      imageUrl: '/pokemon-main.jpg'
+    },
+    {
       id: 'TRUST-0992',
       name: 'First Edition Base Set Booster',
       status: 'shipped' as DealStatus,
       imageUrl: 'https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=200&h=200&fit=crop'
     },
     {
-      id: 'TRUST-1024',
-      name: 'Charizard Holo 1999',
-      status: 'funded' as DealStatus,
+      id: 'TRUST-0845',
+      name: 'Shadowless Mewtwo PSA 10',
+      status: 'delivered' as DealStatus,
+      imageUrl: 'https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=200&h=200&fit=crop'
     }
   ]
 
@@ -115,6 +134,20 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col gap-6 px-5 py-4 pb-[140px] bg-gray-50/50 min-h-screen">
       <AccountHub isOpen={isAccountHubOpen} onClose={() => setIsAccountHubOpen(false)} />
+
+      {hasOnboardingSuccess && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-green-50 border border-green-200 p-4 rounded-2xl mb-2 flex items-start gap-3 shadow-sm z-50 relative"
+        >
+          <CheckCircle2 className="w-6 h-6 text-green-600 shrink-0 mt-0.5" />
+          <div className="flex flex-col gap-1">
+            <p className="text-[14px] text-green-900 font-bold leading-tight">Your account is ready.</p>
+            <p className="text-[13px] text-green-800/80 font-medium">Review and complete your pending transaction. Opening deal...</p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Header section */}
       <div className="flex flex-col pt-2 mb-4 relative z-50">

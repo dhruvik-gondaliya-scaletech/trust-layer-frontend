@@ -7,6 +7,8 @@ import { BottomActionBar } from "@/components/ui/bottom-action-bar";
 
 export default function ProfileSetup() {
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const dealId = searchParams.get("dealId");
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -20,7 +22,8 @@ export default function ProfileSetup() {
 
   const handleSetup = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/onboarding-complete");
+    // Route to shipping address selection first, passing onboarding=true
+    navigate(dealId ? `/select-shipping?dealId=${dealId}&onboarding=true` : "/select-shipping?onboarding=true");
   };
 
   return (

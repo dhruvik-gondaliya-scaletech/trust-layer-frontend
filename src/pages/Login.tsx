@@ -7,10 +7,16 @@ import { BottomActionBar } from "@/components/ui/bottom-action-bar";
 
 export default function Login() {
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const dealId = searchParams.get("dealId");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    if (dealId) {
+      navigate(`/select-shipping?dealId=${dealId}`)
+    } else {
+      navigate("/dashboard")
+    }
   };
 
   return (
@@ -51,7 +57,7 @@ export default function Login() {
 
         <p className="text-center text-[14px] text-muted-foreground mt-8">
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-bold hover:underline">
+          <Link to={dealId ? `/register?dealId=${dealId}` : "/register"} className="text-primary font-bold hover:underline">
             Create Account
           </Link>
         </p>

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
-import { ChevronLeft, Upload, CheckCircle2, Info, Camera, Plus, Video, FileBadge, Trash2, Edit2, ChevronDown, Check, ChevronUp, Zap, Image as ImageIcon, Rocket, Trophy, ShieldCheck, AlertCircle } from "lucide-react"
+import { ChevronLeft, Upload, CheckCircle2, Info, Camera, Plus, Video, FileBadge, Trash2, Edit2, ChevronDown, Check, ChevronUp, Zap, Image as ImageIcon, Rocket, Trophy, ShieldCheck, AlertCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -70,6 +70,8 @@ export default function CreateDeal() {
   const navigate = useNavigate()
   const [step, setStep] = React.useState(1)
   const totalSteps = 5
+  
+  const [showOrderTypeInfo, setShowOrderTypeInfo] = React.useState(false)
 
   // Step 1 State
   const [title, setTitle] = React.useState("Charizard Holo 1999 Base Set")
@@ -475,8 +477,17 @@ export default function CreateDeal() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[13px] font-medium text-foreground">Order Type</label>
+              <div className="space-y-2 relative">
+                <div className="flex items-center justify-between">
+                  <label className="text-[13px] font-medium text-foreground">Order Type</label>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowOrderTypeInfo(true)}
+                    className="text-blue-500 hover:text-blue-600 transition-colors"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                </div>
                 <CustomSelect
                   placeholder="Select order type"
                   value={orderType}
@@ -486,6 +497,53 @@ export default function CreateDeal() {
                     { value: "In-Person Transaction", label: "In-Person Transaction" }
                   ]}
                 />
+
+                <AnimatePresence>
+                  {showOrderTypeInfo && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowOrderTypeInfo(false)} />
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute right-0 top-6 z-50 w-full max-w-[280px] bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-gray-100 p-4"
+                      >
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-bold text-[14px] text-foreground">Order Types</h4>
+                          <button onClick={() => setShowOrderTypeInfo(false)} className="text-gray-400 hover:text-gray-600">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-base">📦</span>
+                              <h5 className="font-bold text-[13px] text-foreground">Online Transaction</h5>
+                            </div>
+                            <ul className="text-[12px] text-muted-foreground space-y-1">
+                              <li>• For items that will be shipped to the buyer.</li>
+                              <li>• The seller will upload tracking details after shipping.</li>
+                              <li>• The buyer can track the shipment and confirm delivery.</li>
+                            </ul>
+                          </div>
+                          
+                          <div>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-base">🤝</span>
+                              <h5 className="font-bold text-[13px] text-foreground">In-Person Transaction</h5>
+                            </div>
+                            <ul className="text-[12px] text-muted-foreground space-y-1">
+                              <li>• For local, face-to-face exchanges.</li>
+                              <li>• No shipping or tracking information is required.</li>
+                              <li>• After the item is handed over, the buyer confirms delivery to complete the transaction.</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="flex items-center gap-2 mt-4 p-4 border rounded-2xl cursor-pointer hover:bg-gray-50" onClick={() => setIsGraded(!isGraded)}>

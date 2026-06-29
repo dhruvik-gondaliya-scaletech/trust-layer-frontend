@@ -7,6 +7,9 @@ import { BottomActionBar } from "@/components/ui/bottom-action-bar";
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = window.location;
+  const searchParams = new URLSearchParams(location.search);
+  const dealId = searchParams.get("dealId");
   const [hasConsent, setHasConsent] = useState(false);
   const [showError, setShowError] = useState(false);
 
@@ -16,7 +19,7 @@ export default function Register() {
       setShowError(true);
       return;
     }
-    navigate("/verify-email");
+    navigate(dealId ? `/verify-email?dealId=${dealId}` : "/verify-email");
   };
 
   return (
@@ -67,7 +70,7 @@ export default function Register() {
 
         <p className="text-center text-[14px] text-muted-foreground mt-8">
           Already have an account?{" "}
-          <Link to="/login" className="text-primary font-bold hover:underline">
+          <Link to={dealId ? `/login?dealId=${dealId}` : "/login"} className="text-primary font-bold hover:underline">
             Sign In
           </Link>
         </p>
