@@ -290,7 +290,7 @@ export default function BuyerDealPage() {
           </div>
           
           <div className="space-y-3 relative z-10">
-            {verificationSteps.map((step) => (
+            {verificationSteps.map((step: any) => (
                <div key={step.id} className="flex flex-col gap-0.5">
                  <div className="flex items-center gap-2.5">
                    {step.isComplete ? (
