@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronLeft, ShieldCheck, Check, CheckCircle2, 
@@ -65,6 +65,22 @@ export default function FundEscrowFlow() {
 
   // Step 5: Fund
   const [paymentMethod, setPaymentMethod] = React.useState<"card" | "wallet">("card")
+  const [checkoutSubView, setCheckoutSubView] = React.useState<"main" | "add-billing" | "add-card">("main")
+  const [savedBillingAddress, setSavedBillingAddress] = React.useState<any>({
+    name: "Alex Johnson",
+    street: "123 Main Street",
+    apt: "",
+    city: "Austin",
+    state: "TX",
+    zip: "78701",
+    country: "United States"
+  });
+  const [savedCard, setSavedCard] = React.useState<any>({
+    brand: "Visa",
+    last4: "4242",
+    expiry: "08/28"
+  });
+
   const [cardNumber, setCardNumber] = React.useState("")
   const [expiry, setExpiry] = React.useState("")
   const [cvc, setCvc] = React.useState("")
@@ -84,7 +100,11 @@ export default function FundEscrowFlow() {
     return s + 1
   })
   const prevStep = () => {
-    if (step === 4) navigate("/dashboard")
+    if (step === 5 && checkoutSubView !== "main") {
+      setCheckoutSubView("main")
+      return
+    }
+    if (step === 4) navigate(-1)
     else setStep(s => {
       return s - 1
     })
@@ -633,7 +653,7 @@ export default function FundEscrowFlow() {
                           <span className="font-medium text-foreground">${itemPriceNum.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center px-2 text-muted-foreground">
-                          <span>Shipping</span>
+                          <span>Shipping (Reimbursed to Seller)</span>
                           <span className="font-medium text-foreground">${shippingCostNum}</span>
                         </div>
                         
@@ -674,10 +694,10 @@ export default function FundEscrowFlow() {
                 </div>
                 <div>
                   <p className="text-[13px] font-medium leading-tight mb-1">
-                    I understand that the Platform Fee is non-refundable.
+                    I have read and agree to the TrustLayer Terms & Conditions.
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    The Platform Fee helps cover transaction processing and dispute support services.
+                    By proceeding with this transaction, you agree to TrustLayer's <Link to="/terms" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy-policy" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">Privacy Policy</Link>.
                   </p>
                 </div>
               </div>
@@ -687,43 +707,60 @@ export default function FundEscrowFlow() {
           {/* STEP 5: SECURE FUNDS */}
           {step === 5 && (
             <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 pt-2">
-              <h1 className="text-2xl font-bold tracking-tight">Fund Deal</h1>
+              <h1 className="text-2xl font-bold tracking-tight">
+                {checkoutSubView === "main" && "Fund Deal"}
+                {checkoutSubView === "add-billing" && "Add Billing Address"}
+                {checkoutSubView === "add-card" && "Add Payment Method"}
+              </h1>
               
-              <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-2xl p-6 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
-                <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full mb-4">
-                     <ShieldCheck className="w-4 h-4" />
-                     <span className="text-[12px] font-bold tracking-wide">Secure Transaction</span>
+              {checkoutSubView === "main" && (
+                <>
+                  <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-2xl p-6 shadow-lg relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                      <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full mb-4">
+                         <ShieldCheck className="w-4 h-4" />
+                         <span className="text-[12px] font-bold tracking-wide">Secure Transaction</span>
+                      </div>
+                      <div className="text-[13px] text-blue-100 font-medium uppercase tracking-widest mb-1">Total Due Today</div>
+                      <div className="text-[42px] font-black tracking-tight leading-none">${totalDueNum.toLocaleString()}</div>
+                    </div>
                   </div>
-                  <div className="text-[13px] text-blue-100 font-medium uppercase tracking-widest mb-1">Total Due Today</div>
-                  <div className="text-[42px] font-black tracking-tight leading-none">${totalDueNum.toLocaleString()}</div>
-                </div>
-              </div>
 
-              <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl flex items-center gap-3">
-                 <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
-                 <p className="text-[13px] font-medium text-blue-900">Payment is released only when you confirm delivery or when the delivery confirmation window expires.</p>
-              </div>
-
-              {/* Shipping To Summary */}
-              {selectedAddress && (
-                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex justify-between items-start">
-                  <div>
-                    <h3 className="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-1">Shipping To</h3>
-                    <p className="text-[14px] font-bold text-gray-900">{selectedAddress.name}</p>
-                    <p className="text-[13px] text-gray-600 mt-0.5">
-                      {selectedAddress.street} {selectedAddress.apt && `, ${selectedAddress.apt}`}
-                    </p>
-                    <p className="text-[13px] text-gray-600">
-                      {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zip}
-                    </p>
+                  <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl flex items-center gap-3">
+                     <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0" />
+                     <p className="text-[13px] font-medium text-blue-900">Payment is released only when you confirm delivery or when the delivery confirmation window expires.</p>
                   </div>
-                  <button onClick={() => navigate("/select-shipping?dealId=TRUST-1024")} className="text-[13px] text-primary font-bold hover:underline">
-                    [ Change ]
-                  </button>
-                </div>
-              )}
+
+                  <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col">
+                    <h3 className="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2">Bill To</h3>
+                    <p className="text-[12px] text-muted-foreground mb-4 leading-relaxed">
+                      This section represents the buyer's billing address associated with the selected payment method.
+                    </p>
+                    {savedBillingAddress ? (
+                      <div className="flex justify-between items-start w-full bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+                        <div>
+                          <p className="text-[14px] font-bold text-gray-900">{savedBillingAddress.name}</p>
+                          <p className="text-[13px] text-gray-600 mt-0.5">
+                            {savedBillingAddress.street} {savedBillingAddress.apt && `, ${savedBillingAddress.apt}`}
+                          </p>
+                          <p className="text-[13px] text-gray-600">
+                            {savedBillingAddress.city}, {savedBillingAddress.state} {savedBillingAddress.zip}
+                          </p>
+                        </div>
+                        <button onClick={() => setCheckoutSubView("add-billing")} className="text-[13px] text-primary font-bold hover:underline">
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-full flex flex-col items-center justify-center p-4 bg-white border border-dashed border-gray-300 rounded-xl">
+                        <p className="text-[13px] font-medium text-gray-900 mb-1">No billing address found.</p>
+                        <Button variant="outline" size="sm" onClick={() => setCheckoutSubView("add-billing")} className="w-full text-primary border-primary hover:bg-primary/5 mt-2">
+                          + Add Billing Address
+                        </Button>
+                      </div>
+                    )}
+                  </div>
 
               <div className="space-y-4 pt-2">
                 <div className="flex bg-gray-100 p-1 rounded-xl">
@@ -743,27 +780,36 @@ export default function FundEscrowFlow() {
 
                 {paymentMethod === "card" ? (
                   <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                    <div className="space-y-2">
-                      <label className="text-[13px] font-medium">Card Number</label>
-                      <div className="relative">
-                        <Input placeholder="0000 0000 0000 0000" className="h-12 pl-10 bg-gray-50/50" />
-                        <CreditCard className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    {savedCard ? (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-4 bg-white border-2 border-primary/20 rounded-xl shadow-sm relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full -mr-8 -mt-8" />
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-7 bg-gray-50 rounded border border-gray-200 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-blue-800 italic uppercase">Visa</span>
+                            </div>
+                            <div>
+                              <p className="text-[14px] font-bold text-gray-900">{savedCard.brand} •••• {savedCard.last4}</p>
+                              <p className="text-[12px] text-gray-500">Expires {savedCard.expiry}</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 relative z-10">
+                            <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wider">Selected</span>
+                          </div>
+                        </div>
+                        <Button variant="outline" onClick={() => setCheckoutSubView("add-card")} className="w-full h-[44px] border border-gray-200 text-gray-600 hover:text-foreground font-bold text-[13px] rounded-xl bg-gray-50 hover:bg-gray-100 border-dashed">
+                          + New Card
+                        </Button>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[13px] font-medium">Expiry</label>
-                        <Input placeholder="MM/YY" className="h-12 bg-gray-50/50" />
+                    ) : (
+                      <div className="bg-gray-50 border border-dashed border-gray-300 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+                        <CreditCard className="w-8 h-8 text-gray-400 mb-3" />
+                        <p className="text-[14px] font-medium text-gray-900 mb-1">No payment method added.</p>
+                        <Button onClick={() => setCheckoutSubView("add-card")} className="bg-primary text-white h-[40px] px-6 rounded-full font-bold text-[13px] mt-2">
+                          + Add Card
+                        </Button>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[13px] font-medium">CVC</label>
-                        <Input placeholder="123" className="h-12 bg-gray-50/50" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[13px] font-medium">ZIP Code</label>
-                      <Input placeholder="10001" className="h-12 bg-gray-50/50" />
-                    </div>
+                    )}
                   </div>
                 ) : (
                   <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 animate-in fade-in slide-in-from-bottom-2">
@@ -799,6 +845,74 @@ export default function FundEscrowFlow() {
                    <span>Payments are processed securely through our payment provider.</span>
                 </div>
               </div>
+              </>
+            )}
+
+              {checkoutSubView === "add-billing" && (
+                <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5"><label className="text-[13px] font-medium">First Name</label><Input placeholder="Alex" className="bg-gray-50/50" /></div>
+                      <div className="space-y-1.5"><label className="text-[13px] font-medium">Last Name</label><Input placeholder="Johnson" className="bg-gray-50/50" /></div>
+                    </div>
+                    <div className="space-y-1.5"><label className="text-[13px] font-medium">Street Address</label><Input placeholder="123 Main Street" className="bg-gray-50/50" /></div>
+                    <div className="space-y-1.5"><label className="text-[13px] font-medium">Apt, Suite, etc. (Optional)</label><Input placeholder="" className="bg-gray-50/50" /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5"><label className="text-[13px] font-medium">City</label><Input placeholder="Austin" className="bg-gray-50/50" /></div>
+                      <div className="space-y-1.5"><label className="text-[13px] font-medium">State</label><Input placeholder="TX" className="bg-gray-50/50" /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5"><label className="text-[13px] font-medium">ZIP Code</label><Input placeholder="78701" className="bg-gray-50/50" /></div>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white mt-6"
+                    onClick={() => {
+                      setSavedBillingAddress({ name: "Alex Johnson", street: "123 Main Street", apt: "", city: "Austin", state: "TX", zip: "78701", country: "United States" });
+                      setCheckoutSubView("main");
+                    }}
+                  >
+                    Save Billing Address
+                  </Button>
+                </div>
+              )}
+
+              {checkoutSubView === "add-card" && (
+                <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[13px] font-medium">Card Number</label>
+                      <div className="relative">
+                        <Input placeholder="0000 0000 0000 0000" className="h-12 pl-10 bg-gray-50/50" />
+                        <CreditCard className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[13px] font-medium">Expiry</label>
+                        <Input placeholder="MM/YY" className="h-12 bg-gray-50/50" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[13px] font-medium">CVC</label>
+                        <Input placeholder="123" className="h-12 bg-gray-50/50" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[13px] font-medium">Name on Card</label>
+                      <Input placeholder="Alex Johnson" className="h-12 bg-gray-50/50" />
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full h-[56px] text-[16px] font-bold rounded-2xl bg-primary text-white mt-6"
+                    onClick={() => {
+                      setSavedCard({ brand: "Visa", last4: "4242", expiry: "08/28" });
+                      setCheckoutSubView("main");
+                    }}
+                  >
+                    Save Card
+                  </Button>
+                </div>
+              )}
             </motion.div>
           )}
 

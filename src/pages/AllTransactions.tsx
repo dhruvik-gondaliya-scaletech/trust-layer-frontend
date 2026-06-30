@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { ChevronLeft, Search, Filter, ChevronDown, ChevronRight, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,24 +8,41 @@ import { Card } from "@/components/ui/card"
 
 export default function AllTransactions() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const statusFilter = searchParams.get('status') || 'Completed'
+
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState("All")
 
-  const transactions = [
+  const allTransactions = [
     { id: 'TRUST-1024', name: 'Charizard Holo 1999', amount: 4300, date: 'Jun 20, 2026', type: 'buying', status: 'Completed', image: '/pokemon-main.jpg' },
     { id: 'TRUST-1025', name: 'Vintage Leica M6', amount: 2400, date: 'Jun 18, 2026', type: 'buying', status: 'Completed', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop' },
     { id: 'TRUST-1026', name: 'MacBook Pro M3', amount: 1850, date: 'Jun 15, 2026', type: 'selling', status: 'Completed', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=200&auto=format&fit=crop' },
     { id: 'TRUST-1021', name: 'Rolex Submariner', amount: 9500, date: 'May 30, 2026', type: 'selling', status: 'Completed', image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=200&auto=format&fit=crop' },
     { id: 'TRUST-1018', name: 'Sony A7IV Camera', amount: 2100, date: 'May 12, 2026', type: 'buying', status: 'Completed', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop' },
+    
+    // Active
+    { id: 'TRUST-1030', name: 'PS5 Pro Console', amount: 650, date: 'Jun 28, 2026', type: 'selling', status: 'Active', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=200&auto=format&fit=crop' },
+    { id: 'TRUST-1031', name: 'Nike Air Max 97', amount: 180, date: 'Jun 29, 2026', type: 'buying', status: 'Active', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop' },
+    { id: 'TRUST-1032', name: 'Apple Watch Ultra', amount: 750, date: 'Jun 29, 2026', type: 'selling', status: 'Active', image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=200&auto=format&fit=crop' },
+    
+    // Awaiting Delivery
+    { id: 'TRUST-1033', name: 'Herman Miller Chair', amount: 950, date: 'Jun 26, 2026', type: 'buying', status: 'Awaiting Delivery', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop' },
+    
+    // In Transit
+    { id: 'TRUST-1034', name: 'Nintendo Switch OLED', amount: 320, date: 'Jun 25, 2026', type: 'selling', status: 'In Transit', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=200&auto=format&fit=crop' },
+    { id: 'TRUST-1035', name: 'DJI Mini 3 Pro', amount: 800, date: 'Jun 24, 2026', type: 'buying', status: 'In Transit', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=200&auto=format&fit=crop' },
   ]
 
-  const filters = ["All", "Buying", "Selling", "Completed"]
+  const transactions = allTransactions.filter(tx => tx.status === statusFilter)
+
+  const filters = ["All", "Buying", "Selling"]
 
   const filteredTransactions = transactions.filter(tx => {
     // Filter logic
     if (activeFilter === "Buying" && tx.type !== "buying") return false
     if (activeFilter === "Selling" && tx.type !== "selling") return false
-    if (activeFilter === "Completed" && tx.status !== "Completed") return false
 
     // Search logic
     if (searchQuery) {
@@ -51,8 +68,8 @@ export default function AllTransactions() {
 
       <div className="p-5 space-y-5">
         <div>
-          <h2 className="text-[22px] font-extrabold tracking-tight text-foreground">Completed Deals</h2>
-          <p className="text-[14px] text-muted-foreground font-medium mt-0.5">{transactions.length} total completed transactions</p>
+          <h2 className="text-[22px] font-extrabold tracking-tight text-foreground">{statusFilter === 'Completed' ? 'Completed Deals' : `${statusFilter} Deals`}</h2>
+          <p className="text-[14px] text-muted-foreground font-medium mt-0.5">{filteredTransactions.length} total {statusFilter.toLowerCase()} transactions</p>
         </div>
 
         {/* Search */}
