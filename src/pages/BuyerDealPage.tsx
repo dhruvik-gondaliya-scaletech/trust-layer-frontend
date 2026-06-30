@@ -10,22 +10,44 @@ export default function BuyerDealPage() {
   const location = useLocation()
   const isLoggedIn = new URLSearchParams(location.search).get("isLoggedIn") === "true"
   
-  // Animation state for WOW moment
-  const [displayScore, setDisplayScore] = useState(0)
-  const [isMaxed, setIsMaxed] = useState(false)
-  const [showBurst, setShowBurst] = useState(false)
+  // Deal State
+  const publishedDeal = JSON.parse(localStorage.getItem('publishedDeal') || 'null') || {};
+  const trustVerification = publishedDeal.trustVerification || {};
+  
+  const verificationSteps = trustVerification.checklist || [];
+
+  const calculatedTrustScore = trustVerification.totalScore || 0;
+  const confidenceTitle = trustVerification.confidenceTitle || 'No deal data found';
+  const confidenceMessage = trustVerification.confidenceMessage || 'Please publish a deal first.';
+
+  const itemPrice = publishedDeal.price || 0;
+  const shippingCost = publishedDeal.shippingCost || 0;
+  const productType = publishedDeal.productType || 'Unknown Category';
+  const condition = publishedDeal.condition || 'Not specified';
+  const isGraded = publishedDeal.isGraded || false;
+  const title = publishedDeal.title || 'Untitled Item';
+  const serialNumber = publishedDeal.serialNumber || '';
+  const feeOption = publishedDeal.feeOption !== undefined ? publishedDeal.feeOption : 1;
 
   // Carousel State
   const [activeSlide, setActiveSlide] = useState(0)
-  const slides = [
-    { type: 'image', url: '/pokemon-main.jpg' }, // Main
-    { type: 'image', url: '/pokemon-front.jpg' }, // Front
-    { type: 'image', url: '/pokemon-back.jpg' }, // Back
-    { type: 'image', url: '/pokemon-side.jpg' }, // Side
-    { type: 'image', url: '/pokemon-detail.jpg' }, // Detail
-    { type: 'video', url: '/pokemon-main.jpg' }, // Video thumbnail
-    { type: 'certification', url: '/pokemon-cert.jpg' }
-  ]
+  const slides = []
+  if (publishedDeal.media?.mainPhoto) slides.push({ type: 'image', url: publishedDeal.media.mainPhoto })
+  if (publishedDeal.media?.frontPhoto) slides.push({ type: 'image', url: publishedDeal.media.frontPhoto })
+  if (publishedDeal.media?.backPhoto) slides.push({ type: 'image', url: publishedDeal.media.backPhoto })
+  if (publishedDeal.media?.sidePhoto) slides.push({ type: 'image', url: publishedDeal.media.sidePhoto })
+  if (publishedDeal.media?.detailPhoto) slides.push({ type: 'image', url: publishedDeal.media.detailPhoto })
+  if (publishedDeal.media?.hasVideo) slides.push({ type: 'video', url: publishedDeal.media.mainPhoto || '/pokemon-main.jpg' })
+  if (publishedDeal.media?.hasCert) slides.push({ type: 'certification', url: '/pokemon-cert.jpg' })
+
+  if (slides.length === 0) {
+    slides.push({ type: 'image', url: '/pokemon-main.jpg' });
+  }
+
+  // Animation state for WOW moment
+  const [displayScore, setDisplayScore] = useState(0)
+  const [isScoreLoaded, setIsScoreLoaded] = useState(false)
+  const [showBurst, setShowBurst] = useState(false)
 
   // Decline Modal State
   const [showDeclineModal, setShowDeclineModal] = useState(false)
@@ -43,9 +65,6 @@ export default function BuyerDealPage() {
     setShowFeedbackSuccess(true)
   }
 
-  const feeOption = Number(localStorage.getItem('feeOption')) || 1
-  const itemPrice = 8450
-  const shippingCost = 35
   const totalPlatformFee = 245
   
   let buyerFeeShare = 0
@@ -56,10 +75,16 @@ export default function BuyerDealPage() {
   const totalDue = itemPrice + shippingCost + buyerFeeShare
 
   useEffect(() => {
-    // Animate score 0 -> 100 over 1.5 seconds
     const duration = 1500
-    const endScore = 100
+    const endScore = calculatedTrustScore
     const incrementTime = 30
+    
+    if (endScore === 0) {
+      setDisplayScore(0)
+      setIsScoreLoaded(true)
+      return
+    }
+
     const steps = duration / incrementTime
     const increment = endScore / steps
     
@@ -68,17 +93,19 @@ export default function BuyerDealPage() {
       current += increment
       if (current >= endScore) {
         setDisplayScore(endScore)
-        setIsMaxed(true)
-        setShowBurst(true)
+        setIsScoreLoaded(true)
+        if (endScore === 100) {
+          setShowBurst(true)
+          setTimeout(() => setShowBurst(false), 2000)
+        }
         clearInterval(timer)
-        setTimeout(() => setShowBurst(false), 2000) // Hide burst text after 2 seconds
       } else {
         setDisplayScore(Math.floor(current))
       }
     }, incrementTime)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [calculatedTrustScore])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] pb-[220px] font-sans">
@@ -132,10 +159,33 @@ export default function BuyerDealPage() {
             </AnimatePresence>
 
             {/* Top overlays */}
-            <div className="absolute top-4 left-4 right-4 flex justify-end items-start z-10 pointer-events-none">
-              <div className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl bg-gray-900/90 backdrop-blur-md shadow-lg border border-[#F5C542]/30 transition-all duration-1000 ${isMaxed ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
-                 <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider mb-[-2px]">PSA 10</span>
-                 <div className="bg-[#F5C542] text-gray-900 text-[10px] font-bold px-1.5 rounded-sm mt-1">TRUST {displayScore}</div>
+            <div className="absolute top-4 right-4 flex justify-end items-start z-10 pointer-events-none">
+              <div className={`relative transition-all duration-1000 ${isScoreLoaded ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+                {/* Glow behind badge */}
+                <div className="absolute inset-0 bg-blue-500/30 blur-2xl rounded-full" />
+                
+                {/* Premium Badge Container */}
+                <div className="relative flex items-center gap-3 pl-3 pr-5 py-2.5 rounded-[24px] bg-gradient-to-b from-[#1e3a8a]/95 to-[#0f172a]/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-[#F5C542]/30 ring-1 ring-[#F5C542]/10">
+                  
+                  {/* Subtle inner highlight */}
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#F5C542]/60 to-transparent opacity-60" />
+                  
+                  {/* Left Icon Area */}
+                  <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#F5C542] to-[#d97706] shadow-[0_0_15px_rgba(245,197,66,0.3)] border border-[#F5C542]/50">
+                    <ShieldCheck className="w-5 h-5 text-blue-950" strokeWidth={2.5} />
+                  </div>
+                  
+                  {/* Right Text Area */}
+                  <div className="flex flex-col pt-0.5">
+                    <span className="text-[#F5C542] text-[10.5px] font-bold tracking-[0.15em] uppercase leading-none mb-1">
+                      Trust Score
+                    </span>
+                    <span className="text-white text-[24px] font-black leading-none drop-shadow-md">
+                      {displayScore}
+                    </span>
+                  </div>
+                  
+                </div>
               </div>
             </div>
             
@@ -197,12 +247,12 @@ export default function BuyerDealPage() {
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
           <div className="flex justify-between items-start mb-1">
             <p className="text-[12px] font-bold text-primary uppercase tracking-wider">
-              Trading Cards • Mint (PSA 10)
+              {productType} • {condition}
             </p>
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-gray-100 px-1.5 py-0.5 rounded">TRUST-1024</span>
           </div>
           <h1 className="text-[18px] font-extrabold leading-tight mb-2 text-foreground">
-            Charizard Holo 1999 — PSA 10 Gem Mint
+            {title}
           </h1>
           <div className="text-[28px] font-black text-foreground mb-4">
             ${itemPrice.toLocaleString('en-US', {minimumFractionDigits: 0})}
@@ -212,16 +262,14 @@ export default function BuyerDealPage() {
             <div className="pt-2 flex flex-col gap-2">
                <div className="flex justify-between items-center py-2 border-b border-gray-50">
                  <div className="text-[12px] text-muted-foreground font-medium">Condition</div>
-                 <div className="text-[13px] font-bold text-foreground">Mint (PSA 10)</div>
+                 <div className="text-[13px] font-bold text-foreground">{condition}</div>
                </div>
-               <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                 <div className="text-[12px] text-muted-foreground font-medium">Certification Authority</div>
-                 <div className="text-[13px] font-bold text-foreground">PSA</div>
-               </div>
-               <div className="flex justify-between items-center py-2">
-                 <div className="text-[12px] text-muted-foreground font-medium">Certification Number</div>
-                 <div className="text-[13px] font-bold text-primary">#48920199</div>
-               </div>
+               {isGraded && (
+                 <div className="flex justify-between items-center py-2">
+                   <div className="text-[12px] text-muted-foreground font-medium">Certification Number</div>
+                   <div className="text-[13px] font-bold text-primary">{serialNumber || 'Provided'}</div>
+                 </div>
+               )}
             </div>
           </div>
         </div>
@@ -236,34 +284,48 @@ export default function BuyerDealPage() {
               </h3>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] text-blue-900/60 uppercase font-bold tracking-widest mb-0.5">Trust Score</span>
-              <span className="text-[22px] font-black text-blue-600 leading-none">{isMaxed ? '100 / 100' : '0 / 100'}</span>
+              <span className="text-[9px] text-blue-900/60 uppercase font-bold tracking-widest mb-0.5">Current Trust Score</span>
+              <span className="text-[22px] font-black text-blue-600 leading-none">{displayScore} / 100</span>
             </div>
           </div>
           
-          <div className="space-y-2 relative z-10">
-            {[
-              "Seller Verified",
-              "Product Verified",
-              "Video Verified",
-              "Certification Verified",
-              "TrustLayer Protected"
-            ].map((req, idx) => (
-               <div key={idx} className="flex items-center gap-2.5">
-                  <Check className="w-3.5 h-3.5 text-blue-600 stroke-[3]" />
-                  <span className="text-[13px] font-medium text-blue-900">{req}</span>
+          <div className="space-y-3 relative z-10">
+            {verificationSteps.map((step: any) => (
+               <div key={step.id} className="flex flex-col gap-0.5">
+                 <div className="flex items-center gap-2.5">
+                   {step.isComplete ? (
+                     <Check className="w-4 h-4 text-blue-600 stroke-[3]" />
+                   ) : (
+                     <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+                       <X className="w-2.5 h-2.5 text-gray-600 stroke-[4]" />
+                     </div>
+                   )}
+                   <span className={`text-[13px] font-medium ${step.isComplete ? 'text-blue-900' : 'text-gray-500'}`}>
+                     {step.label}
+                   </span>
+                 </div>
+                 {!step.isComplete && (
+                   <div className="pl-[26px]">
+                     <span className="text-[11px] text-gray-500 leading-tight">{step.errorMsg}</span>
+                   </div>
+                 )}
                </div>
             ))}
           </div>
-          <div className="mt-4 pt-3 border-t border-blue-200/50 flex justify-between items-center">
-            <span className="text-[12px] font-bold text-blue-900">Maximum Buyer Confidence</span>
+          <div className="mt-5 pt-3 border-t border-blue-200/50 flex flex-col gap-0.5">
+            <span className="text-[12px] font-bold text-blue-900">
+              {confidenceTitle}
+            </span>
+            <span className="text-[11px] text-blue-900/80">
+              {confidenceMessage}
+            </span>
           </div>
         </div>
 
-        {/* SECTION 4: SELLER TRUST PROFILE */}
         <div className="mb-6">
           <TrustProfileCard 
             variant="medium" 
+            onClick={() => navigate('/profile/preview')}
             user={{
               username: "@vintage_vault",
               avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",

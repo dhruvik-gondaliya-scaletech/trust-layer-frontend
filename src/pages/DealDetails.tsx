@@ -25,26 +25,29 @@ export default function DealDetails() {
   // Mock data for the specific deal
   const dealId = id || "TRUST-1024"
   
+  // Deal State
+  const publishedDeal = JSON.parse(localStorage.getItem('publishedDeal') || 'null') || {};
+  
   // Dynamic status handling (can be "Completed", "Awaiting Shipment", "In Transit", "Awaiting Buyer Confirmation")
   const status: string = "Completed" // Try changing this to test different states
   
   // Basic Info
-  const productName = "Charizard Holo 1999"
-  const productCondition = "Mint Condition - PSA 9"
-  const itemPrice = 4250
-  const shipping = 30
-  const platformFee = 20
+  const productName = publishedDeal.title || "Untitled Item"
+  const productCondition = publishedDeal.condition ? `${publishedDeal.condition}${publishedDeal.isGraded ? ` - PSA ${publishedDeal.serialNumber}` : ''}` : "Not specified"
+  const itemPrice = publishedDeal.price || 0
+  const shipping = publishedDeal.shippingCost || 0
+  const platformFee = 245
   const feePaidBy: string = "buyer" // or "seller"
   const amount = itemPrice + shipping + (feePaidBy === "buyer" ? platformFee : 0)
-  const sellerReceived = itemPrice - (feePaidBy === "seller" ? platformFee : 0)
+  const sellerReceived = itemPrice + shipping - (feePaidBy === "seller" ? platformFee : 0)
   
   // Dynamic role and status handling
   const userRole: string = "seller" // Fixed to "seller" as per new routing architecture
   const isSeller = userRole === "seller"
-  const orderType: string = "Online Transaction" // Defaulting to Online for tracking flow
+  const orderType: string = publishedDeal.orderType || "Online Transaction"
   
   const trackingNumber: string | null = "9400123456789012345678"
-  const carrier = "USPS Priority"
+  const carrier = publishedDeal.carrier || "USPS"
 
   
   const theme = {
@@ -303,7 +306,7 @@ export default function DealDetails() {
               </div>
               {orderType !== "In-Person Transaction" && (
                 <div className="flex justify-between items-center text-gray-600 font-medium">
-                  <span>Shipping</span>
+                  <span>Shipping (Reimbursed to Seller)</span>
                   <span className="text-gray-900 font-bold">${shipping.toLocaleString()}</span>
                 </div>
               )}

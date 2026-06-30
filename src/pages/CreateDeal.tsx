@@ -103,16 +103,18 @@ export default function CreateDeal() {
   const [scorePulsing, setScorePulsing] = React.useState(false)
 
   // Trust Score Logic
-  const verifiedProfileScore = isGraded ? 0 : 20
-  const itemDetailsScore = 20
-  const mainPhotoScore = mainPhoto ? 15 : 0
-  const fScore = frontPhoto ? 3.75 : 0
-  const bScore = backPhoto ? 3.75 : 0
-  const sScore = sidePhoto ? 3.75 : 0
-  const dScore = detailPhoto ? 3.75 : 0
-  const videoScore = hasVideo ? 30 : 0
-  const certScore = hasCert && isGraded ? 20 : 0
-  const currentScore = Math.min(100, verifiedProfileScore + itemDetailsScore + mainPhotoScore + fScore + bScore + sScore + dScore + videoScore + certScore)
+  const isDetailsComplete = !!(title && productType && price && condition)
+  const isMainPhotoComplete = !!mainPhoto
+  const isAdditionalPhotosComplete = !!(frontPhoto && backPhoto && sidePhoto && detailPhoto)
+  const isVideoComplete = !!hasVideo
+  const isCertComplete = !!hasCert
+
+  const itemDetailsScore = isDetailsComplete ? 20 : 0
+  const mainPhotoScore = isMainPhotoComplete ? 15 : 0
+  const additionalPhotosScore = isAdditionalPhotosComplete ? 15 : 0
+  const videoScore = isVideoComplete ? 30 : 0
+  const certScore = isCertComplete ? 20 : 0
+  const currentScore = itemDetailsScore + mainPhotoScore + additionalPhotosScore + videoScore + certScore
 
   const [displayScore, setDisplayScore] = React.useState(currentScore)
   const [celebrationPhase, setCelebrationPhase] = React.useState<'idle' | 'bursting' | 'finished'>('idle')
@@ -143,6 +145,8 @@ export default function CreateDeal() {
     localStorage.setItem('feeOption', feeOption.toString())
   }, [feeOption])
   const [showFeeBreakdown, setShowFeeBreakdown] = React.useState(false)
+
+
 
   // Toast state
   const [toasts, setToasts] = React.useState<{ id: number, message: string, subtext?: string, duration?: number }[]>([])
@@ -235,6 +239,76 @@ export default function CreateDeal() {
     } else if (step < totalSteps) {
       setStep(step + 1)
     } else {
+      const isDetailsComplete = !!(title && productType && price && condition);
+      const isMainPhotoComplete = !!mainPhoto;
+      const isAdditionalPhotosComplete = !!(frontPhoto && backPhoto && sidePhoto && detailPhoto);
+      const isVideoComplete = !!hasVideo;
+      const isCertComplete = !!hasCert;
+
+      const totalScore = 
+        (isDetailsComplete ? 20 : 0) + 
+        (isMainPhotoComplete ? 15 : 0) + 
+        (isAdditionalPhotosComplete ? 15 : 0) + 
+        (isVideoComplete ? 30 : 0) + 
+        (isCertComplete ? 20 : 0);
+
+      let confidenceTitle = 'Buyer Confidence Building';
+      let confidenceMessage = 'Additional verification is available for this listing.';
+      if (totalScore === 100) {
+        confidenceTitle = 'Maximum Buyer Confidence';
+        confidenceMessage = 'All available verification steps have been completed.';
+      } else if (totalScore >= 80) {
+        confidenceTitle = 'High Buyer Confidence';
+        confidenceMessage = 'Most verification steps have been completed.';
+      } else if (totalScore >= 60) {
+        confidenceTitle = 'Good Buyer Confidence';
+        confidenceMessage = 'Some optional verification steps were not completed.';
+      }
+
+      const publishedDeal = {
+        title,
+        price: Number(price) || 0,
+        description,
+        condition,
+        productType,
+        isGraded,
+        serialNumber,
+        orderType,
+        handlingTime,
+        carrier,
+        customCarrier,
+        shippingType,
+        isInsured,
+        shippingCost: Number(shippingCost) || 0,
+        meetingLocation,
+        meetingDate,
+        meetingTime,
+        feeOption,
+        media: {
+          mainPhoto,
+          frontPhoto,
+          backPhoto,
+          sidePhoto,
+          detailPhoto,
+          hasVideo,
+          hasCert
+        },
+        trustVerification: {
+          totalScore,
+          confidenceTitle,
+          confidenceMessage,
+          checklist: [
+            { id: 'details', label: 'Item Details', points: 20, isComplete: isDetailsComplete, errorMsg: 'No item details provided.' },
+            { id: 'mainPhoto', label: 'Main Photo', points: 15, isComplete: isMainPhotoComplete, errorMsg: 'No main product photo uploaded.' },
+            { id: 'additionalPhotos', label: 'Additional Photos', points: 15, isComplete: isAdditionalPhotosComplete, errorMsg: 'No additional product photos uploaded.' },
+            { id: 'video', label: 'Product Video', points: 30, isComplete: isVideoComplete, errorMsg: 'No verification video uploaded.' },
+            { id: 'cert', label: 'Certification Verification', points: 20, isComplete: isCertComplete, errorMsg: 'No certification or proof uploaded.' }
+          ]
+        }
+      };
+
+      localStorage.setItem('publishedDeal', JSON.stringify(publishedDeal));
+
       const mode = new URLSearchParams(window.location.search).get("mode")
       if (mode === "edit") {
         localStorage.removeItem("dealDeclined")
@@ -301,7 +375,9 @@ export default function CreateDeal() {
     if (type === "video") { setHasVideo(true); newVideo = true; addToast("🎥 Excellent! Video verification added"); setExpandedSection("cert"); }
     if (type === "cert") { setHasCert(true); newCert = true; addToast("🏆 Verification boosted!"); setExpandedSection(null); }
     
-    const newScore = Math.min(100, verifiedProfileScore + itemDetailsScore + (newMain ? 20 : 0) + (newFront ? 5 : 0) + (newBack ? 5 : 0) + (newSide ? 5 : 0) + (newDetail ? 5 : 0) + (newVideo ? 20 : 0) + ((newCert && isGraded) ? 20 : 0))
+    const isDetailsComplete = !!(title && productType && price && condition);
+    const newAdditionalPhotosScore = (newFront || newBack || newSide || newDetail) ? 15 : 0;
+    const newScore = (isDetailsComplete ? 20 : 0) + (newMain ? 15 : 0) + newAdditionalPhotosScore + (newVideo ? 30 : 0) + ((newCert || (isGraded && serialNumber)) ? 20 : 0);
     
     if (currentScore < 80 && newScore >= 80) {
       setTimeout(() => addToast(`⭐ Almost there! Just a few more steps`, `Trust Score: ${newScore}/100`), 1500)
@@ -317,7 +393,8 @@ export default function CreateDeal() {
 
   // Fee option mapping: 0 = Split, 1 = Buyer Pays, 2 = Seller Pays
   const sellerFee = feeOption === 2 ? platformFee : feeOption === 0 ? platformFee / 2 : 0
-  const sellerEarnings = itemPriceNum - sellerFee
+  const sellerEarnings = itemPriceNum - sellerFee + shipCostNum
+  const buyerTotal = itemPriceNum + shipCostNum + (feeOption === 1 ? platformFee : feeOption === 0 ? platformFee / 2 : 0)
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-[180px]">
@@ -417,7 +494,7 @@ export default function CreateDeal() {
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-4 pt-4 border-t border-blue-500/30 text-[13px] space-y-2 relative z-10 overflow-hidden">
                     <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '15/15 Complete' : '0/15'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={(fScore+bScore+sScore+dScore) === 15 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/15 {fScore+bScore+sScore+dScore === 15 ? 'Complete' : ''}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={(frontPhoto || backPhoto || sidePhoto || detailPhoto) ? 'text-white font-bold' : 'text-blue-300'}>{(frontPhoto || backPhoto || sidePhoto || detailPhoto) ? '15/15 Complete' : '0/15'}</span></div>
                     <div className="flex justify-between"><span className="text-blue-200">Product Video</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '30/30 Complete' : '0/30'}</span></div>
                     {!isGraded ? (
                       <div className="flex justify-between"><span className="text-blue-200">TrustLayer Verified Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
@@ -760,7 +837,7 @@ export default function CreateDeal() {
               </Card>
             )}
 
-            {isScoreMaxed && (
+            {currentScore === 100 ? (
               <motion.div 
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -804,6 +881,46 @@ export default function CreateDeal() {
                     Your listing now provides the highest level of buyer confidence available on TrustLayer.
                     <br className="hidden sm:block" /> This can help buyers feel more comfortable completing high-value transactions.
                   </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 relative"
+              >
+                <div className="bg-blue-50/50 border border-blue-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                  <div className="flex flex-col items-center text-center relative z-10 mb-4">
+                    <h3 className="text-[18px] font-bold text-blue-900 leading-tight mb-1">Build Buyer Trust</h3>
+                    <p className="text-[14px] text-blue-800/80">Complete the remaining verification steps to maximize buyer confidence.</p>
+                  </div>
+                  
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-inner border border-white/50">
+                    <div className="flex justify-between items-center mb-3 border-b border-blue-100/50 pb-2">
+                      <span className="font-bold text-blue-900 text-[14px]">Current Progress</span>
+                      <span className="font-extrabold text-[16px] text-blue-700">{displayScore} / 100</span>
+                    </div>
+                    <ul className="space-y-3">
+                      <li className="flex items-center gap-3 text-[13px] font-medium text-blue-900">
+                        {isMainPhotoComplete ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-gray-400" />} 
+                        {isMainPhotoComplete ? 'Main Photo Verified' : 'Main Photo Required'}
+                      </li>
+                      <li className="flex items-center gap-3 text-[13px] font-medium text-blue-900">
+                        {isAdditionalPhotosComplete ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-gray-400" />} 
+                        {isAdditionalPhotosComplete ? 'Additional Photos Verified' : 'Upload Additional Photos'}
+                      </li>
+                      <li className="flex items-center gap-3 text-[13px] font-medium text-blue-900">
+                        {isVideoComplete ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-gray-400" />} 
+                        {isVideoComplete ? 'Product Video Complete' : 'Record Product Video'}
+                      </li>
+                      {isGraded && (
+                        <li className="flex items-center gap-3 text-[13px] font-medium text-blue-900">
+                          {isCertComplete ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-gray-400" />} 
+                          {isCertComplete ? 'Certification Verified' : 'Upload Certificate'}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -890,10 +1007,12 @@ export default function CreateDeal() {
               ))}
             </div>
 
-            <div className="mt-3 text-[13px] text-muted-foreground p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p>Shipping charges are paid separately by the buyer and do not affect your estimated payout.</p>
-            </div>
+            {orderType !== "In-Person Transaction" && shipCostNum > 0 && (
+              <div className="mt-3 text-[13px] text-muted-foreground p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                <p>Shipping charges are included in the buyer's total payment. Once the buyer funds the deal, these shipping funds become available for you to purchase the shipping label.</p>
+              </div>
+            )}
 
             <div className="mt-8 border rounded-2xl overflow-hidden">
               <div
@@ -921,20 +1040,24 @@ export default function CreateDeal() {
                       <span className="text-muted-foreground">Item Price</span>
                       <span className="font-medium">${itemPriceNum.toFixed(2)}</span>
                     </div>
-                    {orderType !== "In-Person Transaction" && (
+                    {orderType !== "In-Person Transaction" && shipCostNum > 0 && (
                       <div className="flex justify-between text-[14px]">
-                        <span className="text-muted-foreground">Shipping Charge</span>
-                        <span className="font-medium text-blue-600">Paid by Buyer</span>
+                        <span className="text-muted-foreground">Shipping Reimbursement</span>
+                        <span className="font-medium text-green-600">+${shipCostNum.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-[14px]">
                       <span className="text-muted-foreground">Platform Fee (3.5% + $0.30) <span className="opacity-80 text-[11px]">(non-refundable)</span></span>
-                      <span className="font-medium">${platformFee.toFixed(2)}</span>
-                    </div>
-                    <div className="w-full h-px bg-gray-100 my-2" />
-                    <div className="flex justify-between text-[14px]">
-                      <span className="text-muted-foreground">Your Fee Responsibility</span>
                       <span className="font-medium text-destructive">-${sellerFee.toFixed(2)}</span>
+                    </div>
+                    <div className="w-full h-px bg-gray-100 my-3" />
+                    <div className="flex justify-between text-[14px]">
+                      <span className="text-muted-foreground">Buyer Pays</span>
+                      <span className="font-medium">${buyerTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-[15px] font-bold mt-2">
+                      <span className="text-foreground">Seller Receives</span>
+                      <span className="text-primary">${sellerEarnings.toFixed(2)}</span>
                     </div>
                   </motion.div>
                 )}
@@ -986,15 +1109,11 @@ export default function CreateDeal() {
               <AnimatePresence>
                 {showScoreBreakdown && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 text-[13px] space-y-2 relative z-10 overflow-hidden">
-                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className="text-white font-bold">20/20 Complete</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={mainPhoto ? 'text-white font-bold' : 'text-blue-300'}>{mainPhoto ? '15/15 Complete' : '0/15'}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={(fScore+bScore+sScore+dScore) === 15 ? 'text-white font-bold' : 'text-blue-300'}>{fScore+bScore+sScore+dScore}/15 {fScore+bScore+sScore+dScore === 15 ? 'Complete' : ''}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-200">Product Video</span><span className={hasVideo ? 'text-white font-bold' : 'text-blue-300'}>{hasVideo ? '30/30 Complete' : '0/30'}</span></div>
-                    {!isGraded ? (
-                      <div className="flex justify-between"><span className="text-blue-200">TrustLayer Verified Profile</span><span className="text-white font-bold">20/20 Complete</span></div>
-                    ) : (
-                      <div className="flex justify-between"><span className="text-blue-200">Certification Verification</span><span className={hasCert ? 'text-white font-bold' : 'text-blue-300'}>{hasCert ? '20/20 Complete' : '0/20'}</span></div>
-                    )}
+                    <div className="flex justify-between"><span className="text-blue-200">Item Details</span><span className={isDetailsComplete ? 'text-white font-bold' : 'text-blue-300'}>{isDetailsComplete ? '20/20 Complete' : '0/20'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Main Photo</span><span className={isMainPhotoComplete ? 'text-white font-bold' : 'text-blue-300'}>{isMainPhotoComplete ? '15/15 Complete' : '0/15'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Additional Photos</span><span className={isAdditionalPhotosComplete ? 'text-white font-bold' : 'text-blue-300'}>{isAdditionalPhotosComplete ? '15/15 Complete' : '0/15'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Product Video</span><span className={isVideoComplete ? 'text-white font-bold' : 'text-blue-300'}>{isVideoComplete ? '30/30 Complete' : '0/30'}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-200">Certification Verification</span><span className={isCertComplete ? 'text-white font-bold' : 'text-blue-300'}>{isCertComplete ? '20/20 Complete' : '0/20'}</span></div>
                   </motion.div>
                 )}
               </AnimatePresence>

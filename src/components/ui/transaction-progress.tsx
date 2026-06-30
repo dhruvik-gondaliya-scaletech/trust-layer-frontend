@@ -88,9 +88,9 @@ export function TransactionProgress({ state, userRole = 'buyer', theme = { text:
         <Activity className={cn("w-4 h-4", theme.text)} /> Progress
       </h3>
       
-      <div className="flex justify-between items-center relative">
+      <div className="flex justify-between items-start relative">
         {/* Connecting line */}
-        <div className="absolute left-[10%] right-[10%] top-4 h-[2px] bg-gray-100 z-0">
+        <div className="absolute left-[10%] right-[10%] top-4 -translate-y-1/2 h-[2px] bg-gray-100 z-0">
           <div 
             className={cn("h-full transition-all duration-500", theme.bg)}
             style={{ width: widthMap[filledCount] || '0%' }}
@@ -102,15 +102,15 @@ export function TransactionProgress({ state, userRole = 'buyer', theme = { text:
           return (
             <div key={index} className="relative z-10 flex flex-col items-center gap-2 group" style={{ width: '20%' }}>
               <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-colors shadow-sm",
+                "w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-[12px] font-bold leading-none transition-colors shadow-sm",
                 completed 
                   ? cn("border-2 border-white text-white", theme.bg) 
                   : "bg-gray-100 text-gray-400 border-2 border-white"
               )}>
-                {completed ? <Check className="w-4 h-4" /> : index + 1}
+                {completed ? <Check className="w-4 h-4" strokeWidth={2.5} /> : <span>{index + 1}</span>}
               </div>
-              <div className="text-center">
-                <p className={cn("text-[10px] font-bold leading-tight max-w-[60px] mx-auto", completed ? "text-gray-900" : "text-gray-400")}>
+              <div className="text-center w-full px-0.5">
+                <p className={cn("text-[10px] font-bold leading-tight mx-auto", completed ? "text-gray-900" : "text-gray-400")}>
                   {label}
                 </p>
               </div>

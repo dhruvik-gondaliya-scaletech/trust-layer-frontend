@@ -49,6 +49,10 @@ export default function Dashboard() {
   }, [dealIdToOpen, hasOnboardingSuccess, navigate]);
 
   const isDealDeclined = localStorage.getItem("dealDeclined") === "true"
+  
+  const publishedDeal = JSON.parse(localStorage.getItem('publishedDeal') || 'null') || {};
+  const dealTitle = publishedDeal.title || 'Untitled Deal';
+  const dealImage = publishedDeal.media?.mainPhoto || '/pokemon-main.jpg';
 
   const sellerDeals = [
     {
@@ -59,17 +63,18 @@ export default function Dashboard() {
     },
     {
       id: 'TRUST-1024',
-      name: 'Charizard Holo 1999',
+      name: dealTitle,
       status: (isDealDeclined ? 'declined' : 'funded') as DealStatus,
+      imageUrl: dealImage
     }
   ]
 
   const buyerDeals = [
     {
       id: 'TRUST-1024',
-      name: 'Charizard Holo 1999',
+      name: dealTitle,
       status: 'funded' as DealStatus,
-      imageUrl: '/pokemon-main.jpg'
+      imageUrl: dealImage
     },
     {
       id: 'TRUST-0992',
@@ -258,22 +263,34 @@ export default function Dashboard() {
       <div className="mt-6">
         <h2 className="text-[16px] font-bold text-foreground px-1 mb-5">Quick Insights</h2>
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
+          <div 
+            onClick={() => navigate("/transactions?status=Active")}
+            className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:shadow-sm active:scale-95 transition-all"
+          >
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '3' : '1'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Active Deals</p>
           </div>
           
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
+          <div 
+            onClick={() => navigate("/transactions?status=Awaiting Delivery")}
+            className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:shadow-sm active:scale-95 transition-all"
+          >
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>1</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Awaiting Delivery</p>
           </div>
 
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
+          <div 
+            onClick={() => navigate("/transactions?status=In Transit")}
+            className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:shadow-sm active:scale-95 transition-all"
+          >
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '1' : '2'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">In Transit</p>
           </div>
 
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center">
+          <div 
+            onClick={() => navigate("/transactions?status=Completed")}
+            className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-none h-[96px] flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:shadow-sm active:scale-95 transition-all"
+          >
             <p className={`text-[30px] font-bold leading-none mb-1 ${userMode === 'buyer' ? 'text-[#10B981]' : 'text-[#2F6BFF]'}`}>{userMode === 'seller' ? '16' : '4'}</p>
             <p className="text-[13px] font-medium text-gray-500 text-center">Completed</p>
           </div>

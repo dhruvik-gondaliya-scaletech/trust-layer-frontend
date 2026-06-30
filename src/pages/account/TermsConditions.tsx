@@ -5,11 +5,19 @@ import { ChevronLeft } from "lucide-react"
 export default function TermsConditions() {
   const navigate = useNavigate()
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1)
+    } else {
+      navigate('/dashboard')
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
       <div className="flex items-center justify-center p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
         <button 
-          onClick={() => navigate('/dashboard')} 
+          onClick={handleBack} 
           className="absolute left-4 p-2 -ml-2 rounded-full text-foreground hover:bg-gray-100 transition-colors"
         >
           <ChevronLeft className="h-6 w-6" />
