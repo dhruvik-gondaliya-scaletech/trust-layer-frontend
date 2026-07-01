@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import type { Variants } from "framer-motion"
 import { 
@@ -20,6 +20,7 @@ interface AccountHubProps {
 export function AccountHub({ isOpen, onClose }: AccountHubProps) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Drawer variants
   const drawerVariants: Variants = {
@@ -120,8 +121,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         key={i} 
                         onClick={() => {
                           if (item.route) {
-                            navigate(item.route);
-                            onClose();
+                            navigate(item.route, { state: { backgroundLocation: location } });
                           }
                         }}
                         className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
@@ -154,8 +154,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         key={i} 
                         onClick={() => {
                           if (item.route) {
-                            navigate(item.route);
-                            onClose();
+                            navigate(item.route, { state: { backgroundLocation: location } });
                           }
                         }}
                         className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
@@ -188,8 +187,7 @@ export function AccountHub({ isOpen, onClose }: AccountHubProps) {
                         key={i} 
                         onClick={() => {
                           if (item.route) {
-                            navigate(item.route);
-                            onClose();
+                            navigate(item.route, { state: { backgroundLocation: location } });
                           }
                         }}
                         className="flex items-center gap-3 p-4 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] transition-all duration-150 cursor-pointer border-b border-gray-50 last:border-0 group"
