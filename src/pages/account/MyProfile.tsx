@@ -94,6 +94,59 @@ export default function MyProfile() {
           <p className="text-[14px] font-bold text-gray-500 mb-3">Austin, Texas • United States</p>
         </div>
 
+        {/* PROFILE COMPLETION */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          {progress < 100 ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[15px] font-extrabold text-gray-900">Profile Completion</span>
+                <span className="text-[15px] font-extrabold text-blue-600">{progress}% Complete</span>
+              </div>
+              
+              <div className="h-2.5 bg-gray-100 rounded-full w-full overflow-hidden relative">
+                <motion.div 
+                  className="absolute top-0 left-0 bottom-0 bg-blue-600 rounded-full" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                />
+              </div>
+
+              <p className="text-[13px] text-gray-500 font-medium">
+                Complete your profile to build trust and unlock all TrustLayer features.
+              </p>
+
+              <Button 
+                className="w-full font-bold h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                onClick={() => {
+                  if (missingItems.length > 0) {
+                    missingItems[0].action();
+                  }
+                }}
+              >
+                Complete Profile
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-emerald-600 font-extrabold text-[15px]">
+                <span>✓ Profile Complete</span>
+              </div>
+              
+              <p className="text-[13px] text-gray-500 font-medium">
+                Your profile is ready to build trust with every transaction.
+              </p>
+
+              <Button 
+                variant="outline"
+                className="w-full font-bold h-11 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl flex items-center justify-center gap-2"
+                onClick={() => navigate('/profile/preview')}
+              >
+                <User className="w-4 h-4" /> View Public Profile
+              </Button>
+            </div>
+          )}
+        </div>
+
         {/* ABOUT ME */}
         <div className="space-y-3">
           <h3 className="text-[14px] font-extrabold text-gray-400 uppercase tracking-wider px-1">About Me</h3>
@@ -157,43 +210,11 @@ export default function MyProfile() {
               </div>
               <span className="text-[14px] font-bold text-gray-900 flex-1">Phone Verified</span>
             </div>
-            <div className="flex items-center gap-3 p-4 border-b border-gray-50">
+            <div className="flex items-center gap-3 p-4">
               <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center shrink-0">
                 <Clock className="w-4 h-4" />
               </div>
               <span className="text-[14px] font-bold text-gray-900 flex-1">Member Since March 2026</span>
-            </div>
-            
-            <div className="p-4 border-b border-gray-50 last:border-0">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[14px] font-bold text-gray-900">Profile Completion</span>
-                <span className="text-[14px] font-bold text-blue-600">{progress}%</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full w-full overflow-hidden mb-3 relative">
-                <motion.div 
-                  className="absolute top-0 left-0 bottom-0 bg-blue-600 rounded-full" 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                />
-              </div>
-              {progress < 100 && (
-                <div className="mt-3">
-                  <span className="text-[12px] font-bold text-gray-500 mb-2 block uppercase tracking-wider">Remaining Steps</span>
-                  <div className="space-y-2">
-                    {missingItems.map(item => (
-                      <div key={item.id} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                        <button 
-                          onClick={item.action}
-                          className="text-[13px] font-bold text-blue-600 hover:text-blue-700 text-left"
-                        >
-                          {item.title}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

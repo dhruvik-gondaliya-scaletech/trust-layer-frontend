@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
-import { ChevronLeft, Mail, MapPin, Clock } from "lucide-react"
+import { ChevronLeft, Clock } from "lucide-react"
 
 export default function ContactUs() {
   const navigate = useNavigate()
@@ -24,35 +24,12 @@ export default function ContactUs() {
             <h3 className="font-bold text-[18px]">Get in Touch</h3>
             
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                <Mail className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-bold text-[15px] text-foreground">Support</p>
-                <p className="text-[14px] text-muted-foreground">support@trustlayer.app</p>
-                
-                <p className="font-bold text-[15px] text-foreground mt-3">Business Inquiries</p>
-                <p className="text-[14px] text-muted-foreground">business@trustlayer.app</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-bold text-[15px] text-foreground">Office Address</p>
-                <p className="text-[14px] text-muted-foreground">123 TrustWay Blvd, Suite 400<br/>San Francisco, CA 94107<br/>United States</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-bold text-[15px] text-foreground">Support Hours</p>
-                <p className="text-[14px] text-muted-foreground">Monday - Friday<br/>9:00 AM - 6:00 PM (PST)</p>
+                <p className="font-bold text-[15px] text-foreground">Support Response Time</p>
+                <p className="text-[14px] text-muted-foreground">We respond to all support requests within 1 business day.</p>
               </div>
             </div>
           </div>

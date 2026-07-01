@@ -38,17 +38,17 @@ export default function RefundPolicy() {
             
             <div>
               <h3 className="font-bold text-[16px] mb-2">2. Funds on Hold</h3>
-              <p>When a buyer makes a payment, the funds are held securely in escrow by TrustLayer. The seller is notified to fulfill the order. Funds are not released to the seller until the buyer confirms they have received the item as described.</p>
+              <p>When a buyer makes a payment, the funds are held securely by TrustLayer. The seller is notified to fulfill the order. Funds are not released to the seller until the buyer confirms they have received the item as described, or the transaction is automatically completed if no action is taken within 14 days of the confirmed delivery date.</p>
             </div>
             
             <div>
               <h3 className="font-bold text-[16px] mb-2">3. Return Process</h3>
-              <p>If a buyer receives an item that does not match the description, they have 48 hours to open a dispute. If the dispute is approved for a return, the buyer must ship the item back to the seller using a trackable shipping method.</p>
+              <p>If a buyer receives an item that does not match the description, they have 14 days to open a dispute. If the dispute is approved for a return, the buyer must ship the item back to the seller using a trackable shipping method through the TrustLayer Return Process.</p>
             </div>
 
             <div>
               <h3 className="font-bold text-[16px] mb-2">4. Refund Process</h3>
-              <p>Refunds are issued to the original payment method. The refund process is initiated immediately upon the seller confirming receipt of the returned item in its original condition. Depending on the payment provider, it may take 3-5 business days for the funds to reflect in the buyer's account.</p>
+              <p>Refunds are issued directly to your TrustLayer Wallet. The refund process is initiated immediately after the seller confirms receipt of the returned item. Once the refund has been issued, you may withdraw your funds or use your wallet balance for future purchases on TrustLayer.</p>
             </div>
           </div>
         </div>

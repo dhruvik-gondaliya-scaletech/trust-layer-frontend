@@ -22,17 +22,17 @@ export default function AboutTrustLayer() {
           <div className="space-y-4 text-[15px] text-foreground leading-relaxed">
             <h3 className="font-bold text-[18px]">Company Overview</h3>
             <p className="text-muted-foreground">
-              TrustLayer is the premier escrow-based marketplace designed for high-value transactions. We believe that buying and selling premium items should be entirely risk-free for both parties.
+              TrustLayer is a premier order protection software designed for 1v1 deals. We believe that buying and selling items should be entirely risk-free for both parties.
             </p>
             
             <h3 className="font-bold text-[18px]">Our Mission</h3>
             <p className="text-muted-foreground">
-              Our mission is to eliminate fraud, scams, and uncertainty in online commerce by providing a completely secure, transparent, and user-friendly transaction layer.
+              Our mission is to eliminate fraud, scams, and uncertainty in online commerce by providing a completely secure, transparent, and user-friendly order protection solution.
             </p>
             
             <h3 className="font-bold text-[18px]">How TrustLayer Works</h3>
             <p className="text-muted-foreground">
-              Instead of paying the seller directly, buyers deposit funds securely into a TrustLayer vault. The seller is then notified to ship the item. The funds are only released to the seller once the buyer receives and approves the item, guaranteeing satisfaction.
+              Instead of paying through an unsecured method. TrustLayer protects your deal through advance imaging, video verification, payment protection, shipment monitoring, and much more. Buying items on the internet will be the safest thing you can do through TrustLayer
             </p>
 
             <h3 className="font-bold text-[18px]">Why Buyers and Sellers Trust Us</h3>

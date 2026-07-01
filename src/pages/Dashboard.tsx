@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom"
 import {
   Plus,
   ChevronRight,
@@ -30,7 +30,25 @@ import type { DealStatus } from "@/components/dashboard/quick-actions-card"
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [isAccountHubOpen, setIsAccountHubOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const isAccountHubOpen = searchParams.get('drawer') === 'open'
+
+  const setIsAccountHubOpen = (open: boolean) => {
+    if (open) {
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('drawer', 'open')
+      navigate(`?${newParams.toString()}`)
+    } else {
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1)
+      } else {
+        const newParams = new URLSearchParams(searchParams)
+        newParams.delete('drawer')
+        setSearchParams(newParams, { replace: true })
+      }
+    }
+  }
+
   const location = useLocation()
   const initialMode = new URLSearchParams(location.search).get('mode') as "seller" | "buyer" || "seller"
   const [userMode, setUserMode] = useState<"seller" | "buyer">(initialMode)
